@@ -1,0 +1,81 @@
+PODS:
+  - Alamofire (5.4.0)
+  - BigInt (3.1.0):
+    - SipHash (~> 1.2)
+  - CryptoSwift (0.15.0)
+  - DmaIRIS_SDK_IOS (0.1.0):
+    - Alamofire (~> 5.2)
+    - HandyJSON (= 5.0.0-beta)
+    - web3swift (~> 1.1.10)
+  - FBSnapshotTestCase (2.1.4):
+    - FBSnapshotTestCase/SwiftSupport (= 2.1.4)
+  - FBSnapshotTestCase/Core (2.1.4)
+  - FBSnapshotTestCase/SwiftSupport (2.1.4):
+    - FBSnapshotTestCase/Core
+  - HandyJSON (5.0.0-beta)
+  - PromiseKit (6.13.1):
+    - PromiseKit/CorePromise (= 6.13.1)
+    - PromiseKit/Foundation (= 6.13.1)
+    - PromiseKit/UIKit (= 6.13.1)
+  - PromiseKit/CorePromise (6.13.1)
+  - PromiseKit/Foundation (6.13.1):
+    - PromiseKit/CorePromise
+  - PromiseKit/UIKit (6.13.1):
+    - PromiseKit/CorePromise
+  - Result (4.1.0)
+  - scrypt (2.0):
+    - CryptoSwift (~> 0.11)
+  - secp256k1_swift (1.0.3)
+  - SipHash (1.2.2)
+  - SwiftRLP (1.0.1):
+    - BigInt (~> 3.1)
+  - web3swift (1.1.10):
+    - BigInt (~> 3.1)
+    - CryptoSwift (~> 0.11)
+    - PromiseKit (~> 6.3)
+    - Result (~> 4.0)
+    - scrypt (~> 2.0)
+    - secp256k1_swift (~> 1.0.3)
+    - SwiftRLP (~> 1.0.1)
+
+DEPENDENCIES:
+  - DmaIRIS_SDK_IOS (from `../`)
+  - FBSnapshotTestCase (~> 2.1.4)
+
+SPEC REPOS:
+  trunk:
+    - Alamofire
+    - BigInt
+    - CryptoSwift
+    - FBSnapshotTestCase
+    - HandyJSON
+    - PromiseKit
+    - Result
+    - scrypt
+    - secp256k1_swift
+    - SipHash
+    - SwiftRLP
+    - web3swift
+
+EXTERNAL SOURCES:
+  DmaIRIS_SDK_IOS:
+    :path: "../"
+
+SPEC CHECKSUMS:
+  Alamofire: 3b6a534a3df22db367e4dedeeca73d1ddfcf0e2f
+  BigInt: 76b5dfdfa3e2e478d4ffdf161aeede5502e2742f
+  CryptoSwift: 769f58a9e89f64e8796c2e59ce5f002dc81a2438
+  DmaIRIS_SDK_IOS: 3367a625ef39edd5b1d1c9099c9db893ee1f27ae
+  FBSnapshotTestCase: 094f9f314decbabe373b87cc339bea235a63e07a
+  HandyJSON: b84ac9904050a0897a0802092b7cb8808e0a4e9a
+  PromiseKit: 28fda91c973cc377875d8c0ea4f973013c05b6db
+  Result: bd966fac789cc6c1563440b348ab2598cc24d5c7
+  scrypt: 3fe5b1a3b0976f97cd87488673a8f7c65708cc84
+  secp256k1_swift: 4fc5c4b2d2c6d21ee8ccb868cdc92da12f38bed9
+  SipHash: fad90a4683e420c52ef28063063dbbce248ea6d4
+  SwiftRLP: 9de2c9512a9a6bf0909cd84cc143a7ff1aff7820
+  web3swift: 843dd5295d2ae755e6f80e9e0bdabe2868a5c7d8
+
+PODFILE CHECKSUM: 9585aaf966c5c963972b020397a0b7c54ce6a7b6
+
+COCOAPODS: 1.10.0

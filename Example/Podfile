@@ -1,0 +1,11 @@
+use_frameworks!
+
+target 'DmaIRIS_SDK_IOS_Example' do
+  pod 'DmaIRIS_SDK_IOS', :path => '../'
+
+  target 'DmaIRIS_SDK_IOS_Tests' do
+    inherit! :search_paths
+
+    pod 'FBSnapshotTestCase' , '~> 2.1.4'
+  end
+end

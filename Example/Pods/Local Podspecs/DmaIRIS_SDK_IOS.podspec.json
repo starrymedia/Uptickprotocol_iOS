@@ -1,0 +1,33 @@
+{
+  "name": "DmaIRIS_SDK_IOS",
+  "version": "0.1.0",
+  "summary": "A short description of DmaIRIS_SDK_IOS.",
+  "description": "TODO: Add long description of the pod here.",
+  "homepage": "https://github.com/447690182@qq.com/DmaIRIS_SDK_IOS",
+  "license": {
+    "type": "MIT",
+    "file": "LICENSE"
+  },
+  "authors": {
+    "447690182@qq.com": "447690182@qq.com"
+  },
+  "source": {
+    "git": "https://github.com/447690182@qq.com/DmaIRIS_SDK_IOS.git",
+    "tag": "0.1.0"
+  },
+  "platforms": {
+    "ios": "10.0"
+  },
+  "source_files": "DmaIRIS_SDK_IOS/Classes/**/*",
+  "dependencies": {
+    "Alamofire": [
+      "~> 5.2"
+    ],
+    "web3swift": [
+      "~>1.1.10"
+    ],
+    "HandyJSON": [
+      "5.0.0-beta"
+    ]
+  }
+}
