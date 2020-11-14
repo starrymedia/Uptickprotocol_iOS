@@ -21,14 +21,14 @@ Pod::Spec.new do |s|
 TODO: Add long description of the pod here.
                        DESC
 
-  s.homepage         = 'https://github.com/447690182@qq.com/DmaIRIS_SDK_IOS'
+  s.homepage         = 'https://github.com/starrymedia/DmaIRIS_SDK_IOS'
   # s.screenshots     = 'www.example.com/screenshots_1', 'www.example.com/screenshots_2'
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
-  s.author           = { '447690182@qq.com' => '447690182@qq.com' }
-  s.source           = { :git => 'https://github.com/447690182@qq.com/DmaIRIS_SDK_IOS.git', :tag => s.version.to_s }
+  s.author           = { 'fan' => '447690182@qq.com' }
+  s.source           = { :git => 'https://github.com/starrymedia/DmaIRIS_SDK_IOS.git', :tag => s.version.to_s }
   # s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
 
-  s.ios.deployment_target = '8.0'
+  s.ios.deployment_target = '10.0'
 
   s.source_files = 'DmaIRIS_SDK_IOS/Classes/**/*'
   
@@ -39,4 +39,8 @@ TODO: Add long description of the pod here.
   # s.public_header_files = 'Pod/Classes/**/*.h'
   # s.frameworks = 'UIKit', 'MapKit'
   # s.dependency 'AFNetworking', '~> 2.3'
+  s.dependency 'Alamofire', '~> 5.2'
+  s.dependency 'web3swift', '~>1.1.10'
+  s.dependency 'HandyJSON', '5.0.0-beta'
+
 end
