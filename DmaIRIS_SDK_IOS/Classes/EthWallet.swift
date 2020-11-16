@@ -9,6 +9,7 @@
 import UIKit
 import web3swift
 import BigInt
+import secp256k1_swift
 
 open class EthWallet: NSObject {
 //    let url:String = "http://192.168.1.104:8545"
@@ -50,6 +51,39 @@ open class EthWallet: NSObject {
         return str
     }
     
+    
+    
+    public class func signatureString(signDoc: String,mnemonics:String) -> String? {
+        
+        guard let hash = Data(base64Encoded: signDoc)?.sha256() else {
+            print("signDoc error")
+            return "signDoc error"
+        }
+        
+        guard let privateKey = EthWallet.exportAddressAndPrivateKeyFromMnemonics(mnemonics: mnemonics).privateKey else {
+            print("privateKey error")
+            return "privateKey error"
+        }
+
+        guard let privateKeyData = Data.fromHex(privateKey) else {
+            print("privateKeyData error")
+            return "privateKeyData error"
+        }
+        let sign = SECP256K1.signForRecovery(hash: hash, privateKey: privateKeyData, useExtraEntropy: false)
+        
+        guard let serializedSignature = sign.serializedSignature else {
+            print("sign serializedSignature error")
+            return "sign serializedSignature error"
+        }
+        guard let signature = SECP256K1.unmarshalSignature(signatureData: serializedSignature) else {
+            print("signature error")
+            return "signature error"
+        }
+        print("r:\(signature.r.base64EncodedString() )")
+        print("s:\(signature.s.base64EncodedString() )")
+        let data = signature.r + signature.s
+        return data.base64EncodedString()
+    }
   
     /// 获取助记词
     ///
@@ -64,8 +98,10 @@ open class EthWallet: NSObject {
     ///
     /// - Returns: 0代表助记词 1代表私钥 2代表地址
     func create() -> (mnemonics:String?,privateKey:String?,address:String?) {
+        let prefixPath = "m/44'/118'/0'/0"
         guard let mnemonics = try?BIP39.generateMnemonics(bitsOfEntropy: 256) else {return (nil,nil,nil)}
-        let keystore = try!BIP32Keystore.init(mnemonics:mnemonics!)
+        let keystore = try! BIP32Keystore(mnemonics: mnemonics!, prefixPath: prefixPath)
+
         let account = keystore?.addresses![0]
         let privateKey = try!keystore?.UNSAFE_getPrivateKeyData(password: "web3swift", account: account!).toHexString()
         let address = account?.address
@@ -74,10 +110,14 @@ open class EthWallet: NSObject {
     
     /// 通过助记词生成钱包地址和私钥 0私钥1钱包地址
     ///
-    /// - Parameter mnemonics: 私钥
-    /// - Returns: 钱包地址
+    /// - Parameter mnemonics: 助记词
+    /// - Returns: 私钥，钱包地址
    public class func exportAddressAndPrivateKeyFromMnemonics(mnemonics:String) -> (privateKey:String?,address:String?) {
-        let keystore = try!BIP32Keystore.init(mnemonics:mnemonics)
+    
+        let prefixPath = "m/44'/118'/0'/0"
+        let keystore = try! BIP32Keystore(mnemonics: mnemonics, prefixPath: prefixPath)
+
+//        let keystore = try!BIP32Keystore.init(mnemonics:mnemonics)
         let account = keystore?.addresses![0]
         let privateKey = try!keystore?.UNSAFE_getPrivateKeyData(password: "web3swift", account: account!).toHexString()
         let address = account?.address
@@ -112,7 +152,7 @@ open class EthWallet: NSObject {
     ///   - privateKey: 私钥
     ///   - passWord: 密码
     /// - Returns: keyStore
-    func exportKeystoreFromPrivateKeyAndPassword(privateKey :String, passWord: String) -> String? {
+    public class func exportKeystoreFromPrivateKeyAndPassword(privateKey :String, passWord: String) -> String? {
 
         guard let keystoreV3 = try! EthereumKeystoreV3.init(privateKey: Data.fromHex(privateKey)!, password: passWord, aesMode:"aes-128-ctr") else {return nil}
         guard let jsonData = try? JSONEncoder().encode(keystoreV3.keystoreParams) else {return nil}
@@ -151,7 +191,7 @@ open class EthWallet: NSObject {
     ///   - gasLimit: gas限制 例如Demo
     /// - Returns: 哈希值
     func transfer(privatekey:String,to:String,value:String,gasPrice:String,gasLimit:String) -> ContractResult {
-        let keyJsonString = self.exportKeystoreFromPrivateKeyAndPassword(privateKey: privatekey, passWord: "")
+        let keyJsonString = EthWallet.exportKeystoreFromPrivateKeyAndPassword(privateKey: privatekey, passWord: "")
         let keystore = EthereumKeystoreV3.init(keyJsonString!)
         let keystoreManager = KeystoreManager.init([keystore!])
         let account = keystoreManager.addresses![0]
