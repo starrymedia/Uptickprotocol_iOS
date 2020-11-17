@@ -28,6 +28,9 @@
     ],
     "HandyJSON": [
       "5.0.0-beta"
+    ],
+    "gRPC-Swift": [
+      "1.0.0-alpha.20"
     ]
   }
 }

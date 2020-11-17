@@ -42,5 +42,6 @@ TODO: Add long description of the pod here.
   s.dependency 'Alamofire', '~> 5.2'
   s.dependency 'web3swift', '~>1.1.10'
   s.dependency 'HandyJSON', '5.0.0-beta'
+  s.dependency 'gRPC-Swift', '1.0.0-alpha.20'
 
 end

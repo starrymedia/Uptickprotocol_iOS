@@ -10,6 +10,7 @@ import UIKit
 import web3swift
 import BigInt
 import secp256k1_swift
+import SwiftProtobuf
 
 open class EthWallet: NSObject {
 //    let url:String = "http://192.168.1.104:8545"
@@ -42,7 +43,7 @@ open class EthWallet: NSObject {
     
     
     
-   public class func exportBech32Address(_ mnemonics: String) -> String {
+   public class func exportBech32Address(mnemonics: String) -> String {
         guard let publicKey = try? exportPublicKey(mnemonics) else { return "" }
         guard let pubkeyHexData = Data(base64Encoded: publicKey!.base64EncodedString()) else { return "" }
         let hash = RIPEMD160.hash(message: (pubkeyHexData.sha256()))
@@ -50,8 +51,6 @@ open class EthWallet: NSObject {
         let str = Bech32().encode("iaa", values: data!)
         return str
     }
-    
-    
     
     public class func signatureString(signDoc: String,mnemonics:String) -> String? {
         
@@ -128,7 +127,7 @@ open class EthWallet: NSObject {
     ///
     /// - Parameter privateKey: 私钥
     /// - Returns: 钱包地址
-    func exportAddressFromPrivateKey(privateKey:String) -> String? {
+   public class func exportAddressFromPrivateKey(privateKey:String) -> String? {
         guard let keystoreV3 = try!EthereumKeystoreV3.init(privateKey: Data.fromHex(privateKey)!) else{ return ""}
         let keystoreManager = KeystoreManager.init([keystoreV3])
         guard let address = keystoreManager.addresses?.first?.address else {return ""}

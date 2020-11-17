@@ -15,10 +15,6 @@
 		607FACE01AFB9204008FA782 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDE1AFB9204008FA782 /* LaunchScreen.xib */; };
 		607FACEC1AFB9204008FA782 /* Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACEB1AFB9204008FA782 /* Tests.swift */; };
 		B85B347B879D611D662763A4 /* Pods_DmaIRIS_SDK_IOS_Tests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8C093D867D2893CFD1039C32 /* Pods_DmaIRIS_SDK_IOS_Tests.framework */; };
-		F8B899222560257500072AB3 /* auth.pb.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B8991E2560257500072AB3 /* auth.pb.swift */; };
-		F8B899232560257500072AB3 /* query.grpc.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B8991F2560257500072AB3 /* query.grpc.swift */; };
-		F8B899242560257500072AB3 /* genesis.pb.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B899202560257500072AB3 /* genesis.pb.swift */; };
-		F8B899252560257500072AB3 /* query.pb.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B899212560257500072AB3 /* query.pb.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -50,10 +46,6 @@
 		981C96CECD081BFAF90AFA6B /* Pods-DmaIRIS_SDK_IOS_Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DmaIRIS_SDK_IOS_Example.release.xcconfig"; path = "Target Support Files/Pods-DmaIRIS_SDK_IOS_Example/Pods-DmaIRIS_SDK_IOS_Example.release.xcconfig"; sourceTree = "<group>"; };
 		BA259A7AE285C13E7E27FCB3 /* Pods-DmaIRIS_SDK_IOS_Example.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DmaIRIS_SDK_IOS_Example.debug.xcconfig"; path = "Target Support Files/Pods-DmaIRIS_SDK_IOS_Example/Pods-DmaIRIS_SDK_IOS_Example.debug.xcconfig"; sourceTree = "<group>"; };
 		D2E744664C8CBBADAAF83FAA /* Pods-DmaIRIS_SDK_IOS_Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DmaIRIS_SDK_IOS_Tests.debug.xcconfig"; path = "Target Support Files/Pods-DmaIRIS_SDK_IOS_Tests/Pods-DmaIRIS_SDK_IOS_Tests.debug.xcconfig"; sourceTree = "<group>"; };
-		F8B8991E2560257500072AB3 /* auth.pb.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = auth.pb.swift; sourceTree = "<group>"; };
-		F8B8991F2560257500072AB3 /* query.grpc.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = query.grpc.swift; sourceTree = "<group>"; };
-		F8B899202560257500072AB3 /* genesis.pb.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = genesis.pb.swift; sourceTree = "<group>"; };
-		F8B899212560257500072AB3 /* query.pb.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = query.pb.swift; sourceTree = "<group>"; };
 		FFCF7B90644FE6861635B8CF /* Pods-DmaIRIS_SDK_IOS_Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DmaIRIS_SDK_IOS_Tests.release.xcconfig"; path = "Target Support Files/Pods-DmaIRIS_SDK_IOS_Tests/Pods-DmaIRIS_SDK_IOS_Tests.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -101,10 +93,6 @@
 		607FACD21AFB9204008FA782 /* Example for DmaIRIS_SDK_IOS */ = {
 			isa = PBXGroup;
 			children = (
-				F8B8991E2560257500072AB3 /* auth.pb.swift */,
-				F8B899202560257500072AB3 /* genesis.pb.swift */,
-				F8B8991F2560257500072AB3 /* query.grpc.swift */,
-				F8B899212560257500072AB3 /* query.pb.swift */,
 				607FACD51AFB9204008FA782 /* AppDelegate.swift */,
 				607FACD71AFB9204008FA782 /* ViewController.swift */,
 				607FACD91AFB9204008FA782 /* Main.storyboard */,
@@ -428,10 +416,6 @@
 			files = (
 				607FACD81AFB9204008FA782 /* ViewController.swift in Sources */,
 				607FACD61AFB9204008FA782 /* AppDelegate.swift in Sources */,
-				F8B899222560257500072AB3 /* auth.pb.swift in Sources */,
-				F8B899252560257500072AB3 /* query.pb.swift in Sources */,
-				F8B899242560257500072AB3 /* genesis.pb.swift in Sources */,
-				F8B899232560257500072AB3 /* query.grpc.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

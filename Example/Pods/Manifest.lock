@@ -15,6 +15,7 @@ PODS:
   - CryptoSwift (0.15.0)
   - DmaIRIS_SDK_IOS (0.1.0):
     - Alamofire (~> 5.2)
+    - gRPC-Swift (= 1.0.0-alpha.20)
     - HandyJSON (= 5.0.0-beta)
     - web3swift (~> 1.1.10)
   - FBSnapshotTestCase (2.1.4):
@@ -154,7 +155,7 @@ SPEC CHECKSUMS:
   CNIOSHA1: cdd2e93752f5273b528946560337ca092cdbe0aa
   CNIOWindows: a0f8814c907c2621b66bc2789682d5e889602b45
   CryptoSwift: 769f58a9e89f64e8796c2e59ce5f002dc81a2438
-  DmaIRIS_SDK_IOS: ab3a16dfae4e194e6761e41f08574a3987138166
+  DmaIRIS_SDK_IOS: a79835a7dcb7af891b693112dd594bb88877b142
   FBSnapshotTestCase: 094f9f314decbabe373b87cc339bea235a63e07a
   gRPC-Swift: 074c94af029b6bf70bab68cd0e278428a4470997
   HandyJSON: b84ac9904050a0897a0802092b7cb8808e0a4e9a
