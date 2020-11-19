@@ -1,0 +1,6 @@
+framework module DmaIRIS_SDK_IOS {
+  umbrella header "DmaIRIS_SDK_IOS-umbrella.h"
+
+  export *
+  module * { export * }
+}

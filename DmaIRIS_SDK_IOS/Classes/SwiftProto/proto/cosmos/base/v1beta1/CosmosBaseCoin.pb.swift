@@ -26,7 +26,7 @@ fileprivate struct _GeneratedWithProtocGenSwiftVersion: SwiftProtobuf.ProtobufAP
 /// NOTE: The amount field is an Int which implements the custom method
 ///
 /// signatures required by gogoproto.
-struct Cosmos_Base_V1beta1_Coin {
+public struct Cosmos_Base_V1beta1_Coin {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -35,9 +35,9 @@ struct Cosmos_Base_V1beta1_Coin {
 
   var amount: String = String()
 
-  var unknownFields = SwiftProtobuf.UnknownStorage()
+    public var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  init() {}
+    public init() {}
 }
 
 /// DecCoin defines a token with a denomination and a decimal amount.
@@ -92,13 +92,13 @@ struct Cosmos_Base_V1beta1_DecProto {
 fileprivate let _protobuf_package = "cosmos.base.v1beta1"
 
 extension Cosmos_Base_V1beta1_Coin: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".Coin"
-  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    public static let protoMessageName: String = _protobuf_package + ".Coin"
+    public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "denom"),
     2: .same(proto: "amount"),
   ]
 
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    mutating public func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
       switch fieldNumber {
       case 1: try decoder.decodeSingularStringField(value: &self.denom)
@@ -108,7 +108,7 @@ extension Cosmos_Base_V1beta1_Coin: SwiftProtobuf.Message, SwiftProtobuf._Messag
     }
   }
 
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     if !self.denom.isEmpty {
       try visitor.visitSingularStringField(value: self.denom, fieldNumber: 1)
     }
@@ -118,7 +118,7 @@ extension Cosmos_Base_V1beta1_Coin: SwiftProtobuf.Message, SwiftProtobuf._Messag
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: Cosmos_Base_V1beta1_Coin, rhs: Cosmos_Base_V1beta1_Coin) -> Bool {
+    public static func ==(lhs: Cosmos_Base_V1beta1_Coin, rhs: Cosmos_Base_V1beta1_Coin) -> Bool {
     if lhs.denom != rhs.denom {return false}
     if lhs.amount != rhs.amount {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}

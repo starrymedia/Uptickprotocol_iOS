@@ -49,6 +49,7 @@ open class EthWallet: NSObject {
         let hash = RIPEMD160.hash(message: (pubkeyHexData.sha256()))
         let data = try? SegwitAddrCoder().convertBits(instart: 0, from: 8, to: 5, pad: true, idata: hash)
         let str = Bech32().encode("iaa", values: data!)
+        let addressData = try! Bech32().decode(str).checksum
         return str
     }
     
