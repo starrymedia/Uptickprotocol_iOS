@@ -13,9 +13,6 @@ import Alamofire
 
 public let IRIS = DmaIRISSession.default
 
-
-
-
 open class DmaIRISSession {
 
     public static let `default` = DmaIRISSession()

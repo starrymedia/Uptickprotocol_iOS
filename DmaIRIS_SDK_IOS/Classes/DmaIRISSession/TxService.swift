@@ -7,6 +7,7 @@
 
 import Foundation
 import Alamofire
+import HandyJSON
 
 //MARK:- TxService
 class TxService {
@@ -18,8 +19,8 @@ class TxService {
                 _ callback: @escaping (_ tx: Tx) -> Void) {
 
         //获取地址
-        let publicKeyData = try? EthWallet.exportPublicKey(mnemonics)
-        let address = EthWallet.exportBech32Address(mnemonics: mnemonics)
+        let publicKeyData = try? WalletManager.exportPublicKey(mnemonics)
+        let address = WalletManager.exportBech32Address(mnemonics: mnemonics)
         IRIS.queryAccount(address: address) { (address, sequence, accountNumber) in
             print("address:\(address)")
             print("sequence:\(sequence)")
@@ -65,7 +66,7 @@ class TxService {
             
             //签名算法
             let hash = try? signdoc.serializedData().sha256()
-            let signResult = EthWallet.signatureString(signDoc: (hash?.base64EncodedString())!, mnemonics: mnemonics)
+            let signResult = WalletManager.signatureString(signDoc: (hash?.base64EncodedString())!, mnemonics: mnemonics)
                         
             var txSign = Tx()
             txSign.body = txBody
@@ -81,7 +82,7 @@ class TxService {
     
     class func broadcast(url: String,
                    tx: Tx,
-                   _ callback: @escaping (_ res: String) -> Void) {
+                   _ callback: @escaping (_ res: String) -> ()) {
                
         guard let txString = try? tx.serializedData().base64EncodedString() else {
             print("broadcast tx error")
@@ -95,10 +96,46 @@ class TxService {
         AF.request(url,
                    method: .post,
                    parameters: broadcast,
-                   encoder: JSONParameterEncoder.default).response { response in
-                    debugPrint(response)
+                   encoder: JSONParameterEncoder.default).responseString { response in
+                    switch response.result {
+                    case .success(let jsonString):
+                        print(jsonString)
+                        if let model = BroadcastModel.deserialize(from: jsonString) {
+                            print(model)
+                            if let hash = model.result?.hash {
+                                callback(hash)
+                            }
+                        }
+                    case .failure(let error):
+                        print(error)
+                    }
+
                     callback("返回的值")
         }
     }
     
+}
+
+struct BroadcastModel: HandyJSON {
+    var jsonrpc: String?
+    var id: String?
+    var result: BroadcastResult?
+}
+
+struct BroadcastResult: HandyJSON {
+    var hash: String?
+    var height: String?
+    var check_tx: BroadcastTx?
+    var deliver_tx: BroadcastTx?
+}
+
+struct BroadcastTx: HandyJSON {
+    var code: Int?
+    var data: Any?
+    var log: String?
+    var info: String?
+    var gas_wanted: String?
+    var gas_used: String?
+    var codespace: String?
+    var events: [Any]?
 }

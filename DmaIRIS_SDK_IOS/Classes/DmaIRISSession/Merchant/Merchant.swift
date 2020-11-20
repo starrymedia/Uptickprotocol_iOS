@@ -13,6 +13,9 @@ public let MerchantSession = Merchant.default
 
 let nodeUrl = "http://192.168.1.104:8090"
 
+let onsaleUrl = "/api/1/merchant/onsale"//上架
+let offsaleUrl = "/api/1/merchant/offsale"//下架
+let transferUrl = "/api/1/merchant/transfer"//购买
 let allAssetUrl = "/api/1/query/allAsset" //所有上架的
 let getAssetByDenomUrl = "/api/1/query/getAssetByDenom"//根据denom查询已上架的资产
 let getTokenUrl = "/api/1/query/getToken"//获取已上架NFT信息
@@ -104,6 +107,128 @@ public class Merchant {
                 if let responseModel = TokensModel.deserialize(from: jsonString) {
                     if let data = responseModel.data {
                         callback(data)
+                    }
+                }
+
+            case .failure(let error):
+                print(error)
+            }
+        }
+    }
+    
+    public func onsale(denom: String,
+                       tokenids: [String],
+                       price: String,
+                       coin: String,
+                       privateKey: String,
+                       mnemonics: String) {
+        
+        guard let publicKeyData = try? WalletManager.exportPublicKey(mnemonics) else {
+            print("publicKey error")
+            return
+        }
+        let publicKeyString = publicKeyData?.base64EncodedString()
+        let address = WalletManager.exportBech32Address(mnemonics: mnemonics)
+
+        var param: Parameters = ["pubKey": publicKeyString ?? "",
+                                 "nftDenom": denom,
+                                 "owner": address]
+        
+        var labels = [[String: String]]()
+        for tokenId in tokenids {
+            let label = ["coin": coin,
+                         "nftId": tokenId,
+                         "price": price]
+            labels.append(label)
+        }
+        param["labels"] = labels
+        
+        print(param)
+        
+        let url = nodeUrl + onsaleUrl
+        AF.request(url, method: .post, parameters: param).responseString { response in
+            switch response.result {
+            case .success(let jsonString):
+                print(jsonString)
+                if let responseModel = TokensModel.deserialize(from: jsonString) {
+                    if let data = responseModel.data {
+//                        callback(data)
+                        #warning("稍后再写")
+                    }
+                }
+
+            case .failure(let error):
+                print(error)
+            }
+        }
+    }
+    
+    //MARK:- 下架
+    public func offsale(denom: String,
+                        tokenIds: [String],
+                       privateKey: String,
+                       mnemonics: String) {
+        
+        guard let publicKeyData = try? WalletManager.exportPublicKey(mnemonics) else {
+            print("publicKey error")
+            return
+        }
+        let publicKeyString = publicKeyData?.base64EncodedString()
+        let address = WalletManager.exportBech32Address(mnemonics: mnemonics)
+
+        let param: Parameters = ["pubKey": publicKeyString ?? "",
+                                 "nftDenom": denom,
+                                 "owner": address,
+                                 "ids": tokenIds]
+        print(param)
+        
+        let url = nodeUrl + offsaleUrl
+        AF.request(url, method: .post, parameters: param).responseString { response in
+            switch response.result {
+            case .success(let jsonString):
+                print(jsonString)
+                if let responseModel = TokensModel.deserialize(from: jsonString) {
+                    if let data = responseModel.data {
+//                        callback(data)
+                        #warning("稍后再写")
+                    }
+                }
+
+            case .failure(let error):
+                print(error)
+            }
+        }
+    }
+    
+    //MARK:- 购买
+    public func transfer(denom: String,
+                        tokenIds: [String],
+                       privateKey: String,
+                       mnemonics: String) {
+        
+        guard let publicKeyData = try? WalletManager.exportPublicKey(mnemonics) else {
+            print("publicKey error")
+            return
+        }
+        let publicKeyString = publicKeyData?.base64EncodedString()
+        let address = WalletManager.exportBech32Address(mnemonics: mnemonics)
+
+        let param: Parameters = ["pubKey": publicKeyString ?? "",
+                                 "nftDenom": denom,
+                                 "payer": address,
+                                 "recipien": address,
+                                 "ids": tokenIds]
+        print(param)
+        
+        let url = nodeUrl + transferUrl
+        AF.request(url, method: .post, parameters: param).responseString { response in
+            switch response.result {
+            case .success(let jsonString):
+                print(jsonString)
+                if let responseModel = TokensModel.deserialize(from: jsonString) {
+                    if let data = responseModel.data {
+//                        callback(data)
+                        #warning("稍后再写")
                     }
                 }
 

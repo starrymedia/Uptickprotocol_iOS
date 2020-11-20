@@ -16,7 +16,8 @@ extension DmaIRISSession {
                          denom: String,
                          mnemonics: String,
                          chainId: String,
-                         broadcastUrl: String) {
+                         broadcastUrl: String,
+                         _ callback: @escaping (_ res: String) -> ()) {
         
         var coin = Coin()
         coin.amount = value
@@ -25,9 +26,7 @@ extension DmaIRISSession {
         var msgSend = BankMsgSend()
         msgSend.fromAddress = from
         msgSend.toAddress = to
-        msgSend.amount = [coin]
-    
-       
+        msgSend.amount.append(coin)
         
         var txBody = TxUtils.getBody(meno: "", timeoutHeight: 0)
         if let any = TxUtils.getProtobufAny(message: msgSend, typePrefix: "") {
@@ -45,7 +44,7 @@ extension DmaIRISSession {
                          mnemonics: mnemonics) { tx in
             print("tx:\(tx)")
             TxService.broadcast(url: broadcastUrl, tx: tx) { res in
-                print(res)
+                callback(res)
             }
         }
     }
