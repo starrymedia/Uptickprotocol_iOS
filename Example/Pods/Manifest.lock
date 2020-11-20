@@ -2,9 +2,20 @@ PODS:
   - Alamofire (5.4.0)
   - BigInt (3.1.0):
     - SipHash (~> 1.2)
+  - CGRPCZlib (1.0.0-alpha.20)
+  - CNIOAtomics (2.23.0)
+  - CNIOBoringSSL (2.9.2)
+  - CNIOBoringSSLShims (2.9.2):
+    - CNIOBoringSSL (= 2.9.2)
+  - CNIODarwin (2.23.0)
+  - CNIOHTTPParser (2.23.0)
+  - CNIOLinux (2.23.0)
+  - CNIOSHA1 (2.23.0)
+  - CNIOWindows (2.23.0)
   - CryptoSwift (0.15.0)
   - DmaIRIS_SDK_IOS (0.1.0):
     - Alamofire (~> 5.2)
+    - gRPC-Swift (= 1.0.0-alpha.20)
     - HandyJSON (= 5.0.0-beta)
     - web3swift (~> 1.1.10)
   - FBSnapshotTestCase (2.1.4):
@@ -12,7 +23,16 @@ PODS:
   - FBSnapshotTestCase/Core (2.1.4)
   - FBSnapshotTestCase/SwiftSupport (2.1.4):
     - FBSnapshotTestCase/Core
+  - gRPC-Swift (1.0.0-alpha.20):
+    - CGRPCZlib (= 1.0.0-alpha.20)
+    - Logging (< 2, >= 1.4.0)
+    - SwiftNIO (< 3, >= 2.22.0)
+    - SwiftNIOHTTP2 (< 2, >= 1.14.1)
+    - SwiftNIOSSL (< 3, >= 2.8.0)
+    - SwiftNIOTransportServices (< 2, >= 1.6.0)
+    - SwiftProtobuf (< 2, >= 1.9.0)
   - HandyJSON (5.0.0-beta)
+  - Logging (1.4.0)
   - PromiseKit (6.13.1):
     - PromiseKit/CorePromise (= 6.13.1)
     - PromiseKit/Foundation (= 6.13.1)
@@ -27,6 +47,45 @@ PODS:
     - CryptoSwift (~> 0.11)
   - secp256k1_swift (1.0.3)
   - SipHash (1.2.2)
+  - SwiftNIO (2.23.0):
+    - CNIOAtomics (= 2.23.0)
+    - CNIODarwin (= 2.23.0)
+    - CNIOLinux (= 2.23.0)
+    - CNIOSHA1 (= 2.23.0)
+    - CNIOWindows (= 2.23.0)
+    - SwiftNIOConcurrencyHelpers (= 2.23.0)
+  - SwiftNIOConcurrencyHelpers (2.23.0):
+    - CNIOAtomics (= 2.23.0)
+  - SwiftNIOFoundationCompat (2.23.0):
+    - SwiftNIO (= 2.23.0)
+  - SwiftNIOHPACK (1.15.0):
+    - SwiftNIO (< 3, >= 2.11.0)
+    - SwiftNIOConcurrencyHelpers (< 3, >= 2.11.0)
+    - SwiftNIOHTTP1 (< 3, >= 2.11.0)
+  - SwiftNIOHTTP1 (2.23.0):
+    - CNIOHTTPParser (= 2.23.0)
+    - SwiftNIO (= 2.23.0)
+    - SwiftNIOConcurrencyHelpers (= 2.23.0)
+  - SwiftNIOHTTP2 (1.15.0):
+    - SwiftNIO (< 3, >= 2.11.0)
+    - SwiftNIOConcurrencyHelpers (< 3, >= 2.11.0)
+    - SwiftNIOHPACK (= 1.15.0)
+    - SwiftNIOHTTP1 (< 3, >= 2.11.0)
+    - SwiftNIOTLS (< 3, >= 2.11.0)
+  - SwiftNIOSSL (2.9.2):
+    - CNIOBoringSSL (= 2.9.2)
+    - CNIOBoringSSLShims (= 2.9.2)
+    - SwiftNIO (< 3, >= 2.15.0)
+    - SwiftNIOConcurrencyHelpers (< 3, >= 2.15.0)
+    - SwiftNIOTLS (< 3, >= 2.15.0)
+  - SwiftNIOTLS (2.23.0):
+    - SwiftNIO (= 2.23.0)
+  - SwiftNIOTransportServices (1.9.0):
+    - SwiftNIO (< 3, >= 2.22.0)
+    - SwiftNIOConcurrencyHelpers (< 3, >= 2.22.0)
+    - SwiftNIOFoundationCompat (< 3, >= 2.22.0)
+    - SwiftNIOTLS (< 3, >= 2.22.0)
+  - SwiftProtobuf (1.13.0)
   - SwiftRLP (1.0.1):
     - BigInt (~> 3.1)
   - web3swift (1.1.10):
@@ -41,19 +100,41 @@ PODS:
 DEPENDENCIES:
   - DmaIRIS_SDK_IOS (from `../`)
   - FBSnapshotTestCase (~> 2.1.4)
+  - gRPC-Swift (= 1.0.0-alpha.20)
 
 SPEC REPOS:
   trunk:
     - Alamofire
     - BigInt
+    - CGRPCZlib
+    - CNIOAtomics
+    - CNIOBoringSSL
+    - CNIOBoringSSLShims
+    - CNIODarwin
+    - CNIOHTTPParser
+    - CNIOLinux
+    - CNIOSHA1
+    - CNIOWindows
     - CryptoSwift
     - FBSnapshotTestCase
+    - gRPC-Swift
     - HandyJSON
+    - Logging
     - PromiseKit
     - Result
     - scrypt
     - secp256k1_swift
     - SipHash
+    - SwiftNIO
+    - SwiftNIOConcurrencyHelpers
+    - SwiftNIOFoundationCompat
+    - SwiftNIOHPACK
+    - SwiftNIOHTTP1
+    - SwiftNIOHTTP2
+    - SwiftNIOSSL
+    - SwiftNIOTLS
+    - SwiftNIOTransportServices
+    - SwiftProtobuf
     - SwiftRLP
     - web3swift
 
@@ -64,18 +145,39 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   Alamofire: 3b6a534a3df22db367e4dedeeca73d1ddfcf0e2f
   BigInt: 76b5dfdfa3e2e478d4ffdf161aeede5502e2742f
+  CGRPCZlib: 9421db015a274b3cd5cce57334826881f61c0785
+  CNIOAtomics: 9f81e08a07afa84d14f93828071f5f28d2c120be
+  CNIOBoringSSL: 0148c2789bab42bcc6e52eb45a8ac0c1a004ece0
+  CNIOBoringSSLShims: 28455716e829ee9ef14db643c00a43901c6f0686
+  CNIODarwin: 1c9538456b597430c897f5a31398b9b94c84b7a0
+  CNIOHTTPParser: da679ec58791620a89c2153bfd2ff2f05786f54d
+  CNIOLinux: e4487ef3f25ce7b0019224cbf621ae2153d1f8bb
+  CNIOSHA1: cdd2e93752f5273b528946560337ca092cdbe0aa
+  CNIOWindows: a0f8814c907c2621b66bc2789682d5e889602b45
   CryptoSwift: 769f58a9e89f64e8796c2e59ce5f002dc81a2438
-  DmaIRIS_SDK_IOS: 3367a625ef39edd5b1d1c9099c9db893ee1f27ae
+  DmaIRIS_SDK_IOS: a79835a7dcb7af891b693112dd594bb88877b142
   FBSnapshotTestCase: 094f9f314decbabe373b87cc339bea235a63e07a
+  gRPC-Swift: 074c94af029b6bf70bab68cd0e278428a4470997
   HandyJSON: b84ac9904050a0897a0802092b7cb8808e0a4e9a
+  Logging: beeb016c9c80cf77042d62e83495816847ef108b
   PromiseKit: 28fda91c973cc377875d8c0ea4f973013c05b6db
   Result: bd966fac789cc6c1563440b348ab2598cc24d5c7
   scrypt: 3fe5b1a3b0976f97cd87488673a8f7c65708cc84
   secp256k1_swift: 4fc5c4b2d2c6d21ee8ccb868cdc92da12f38bed9
   SipHash: fad90a4683e420c52ef28063063dbbce248ea6d4
+  SwiftNIO: 6de64e420297508cfcf7582e556c7ab027ac8bc7
+  SwiftNIOConcurrencyHelpers: 6ddf30c130f872fae39c590f8fa88517b336ee0b
+  SwiftNIOFoundationCompat: 15cc9abc4922445833f69972237e252d810eb839
+  SwiftNIOHPACK: 4f7a01905cac8eb583f0fb60915c9855071f79dd
+  SwiftNIOHTTP1: fee56f32e365ab83dbfbe2fe7a251f563b1bc480
+  SwiftNIOHTTP2: f88c52a54507911d27a34ae5a5ea58938ee37876
+  SwiftNIOSSL: fc672dc6a26e6ab78edd729568cd5a44aabb3409
+  SwiftNIOTLS: 905a7e7e26a3f7d9661da34e0edf01be086c596d
+  SwiftNIOTransportServices: 801923921fbecdcde1e1c1ff38e812167d01ead1
+  SwiftProtobuf: fd4693388a96c8c2df35d3b063272b0e7c499d00
   SwiftRLP: 9de2c9512a9a6bf0909cd84cc143a7ff1aff7820
   web3swift: 843dd5295d2ae755e6f80e9e0bdabe2868a5c7d8
 
-PODFILE CHECKSUM: 9585aaf966c5c963972b020397a0b7c54ce6a7b6
+PODFILE CHECKSUM: 9b6e4d12b29307057556f8ea2893502477685e06
 
 COCOAPODS: 1.10.0

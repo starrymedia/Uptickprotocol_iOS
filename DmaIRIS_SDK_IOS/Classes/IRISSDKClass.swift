@@ -7,6 +7,9 @@
 
 import Foundation
 import Alamofire
+import HandyJSON
+
+
 
 open class IRISSDKClass: NSObject {
     open func textSDK() {
@@ -15,4 +18,17 @@ open class IRISSDKClass: NSObject {
             debugPrint(response)
         }
     }
+    
+
 }
+
+/**
+   * 获取平台上架中的所有资产种类
+   * @return
+   */
+//  public JsonResult<List<String>> allAsset() {
+//      String url = nodeURI + allAsset;
+//      Map<String, String> param = new HashMap<>();
+//      String str = HttpClientUtil.getInstance().get(url, param);
+//      return JSONObject.parseObject(str, JsonResult.class);
+//  }
