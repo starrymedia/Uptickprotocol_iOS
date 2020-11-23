@@ -17,7 +17,6 @@ extension DmaIRISSession {
                            owner: String,
                            minUnit: String,
                            chainId: String,
-                           mnemonics: String,
                            broadcastUrl: String,
                            privateKey: String) {
     
@@ -40,7 +39,7 @@ extension DmaIRISSession {
                                  amount: txAmount,
                                  denom: txDenom)
         
-        TxService.signTx(txBody: txBody, fee: fee, chainId: chainId, mnemonics: mnemonics) { tx in
+        TxService.signTx(txBody: txBody, fee: fee, chainId: chainId, privateKey: privateKey) { tx in
             
             TxService.broadcast(url: broadcastUrl, tx: tx) { res in
                 print(res)
@@ -55,7 +54,6 @@ extension DmaIRISSession {
                     owner: String,
                     amount: UInt64,
                     chainId: String,
-                    mnemonics: String,
                     broadcastUrl: String,
                     privateKey: String) {
         
@@ -74,7 +72,7 @@ extension DmaIRISSession {
         
         let fee = TxUtils.getFee(gasLimit: txGasLimit, amount: txAmount, denom: txDenom)
         
-        TxService.signTx(txBody: txBody, fee: fee, chainId: chainId, mnemonics: mnemonics) { tx in
+        TxService.signTx(txBody: txBody, fee: fee, chainId: chainId, privateKey: privateKey) { tx in
             
             TxService.broadcast(url: broadcastUrl, tx: tx) { res in
                 print(res)
@@ -106,7 +104,7 @@ extension DmaIRISSession {
         
         let fee = TxUtils.getFee(gasLimit: txGasLimit, amount: txAmount, denom: txDenom)
         
-        TxService.signTx(txBody: txBody, fee: fee, chainId: chainId, mnemonics: mnemonics) { tx in
+        TxService.signTx(txBody: txBody, fee: fee, chainId: chainId, privateKey: privateKey) { tx in
             
             TxService.broadcast(url: broadcastUrl, tx: tx) { res in
                 print(res)

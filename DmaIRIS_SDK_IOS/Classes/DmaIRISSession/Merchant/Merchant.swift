@@ -11,7 +11,7 @@ import Alamofire
 
 public let MerchantSession = Merchant.default
 
-let nodeUrl = "http://192.168.1.104:8090"
+let nodeUrl = "http://52.81.146.252:8090"
 
 let onsaleUrl = "/api/1/merchant/onsale"//上架
 let offsaleUrl = "/api/1/merchant/offsale"//下架
@@ -127,7 +127,7 @@ public class Merchant {
             print("publicKey error")
             return
         }
-        let publicKeyString = publicKeyData?.base64EncodedString()
+        let publicKeyString = publicKeyData.base64EncodedString()
         let address = WalletManager.exportBech32Address(mnemonics: mnemonics)
 
         var param: Parameters = ["pubKey": publicKeyString ?? "",
@@ -173,7 +173,7 @@ public class Merchant {
             print("publicKey error")
             return
         }
-        let publicKeyString = publicKeyData?.base64EncodedString()
+        let publicKeyString = publicKeyData.base64EncodedString()
         let address = WalletManager.exportBech32Address(mnemonics: mnemonics)
 
         let param: Parameters = ["pubKey": publicKeyString ?? "",
@@ -210,7 +210,7 @@ public class Merchant {
             print("publicKey error")
             return
         }
-        let publicKeyString = publicKeyData?.base64EncodedString()
+        let publicKeyString = publicKeyData.base64EncodedString()
         let address = WalletManager.exportBech32Address(mnemonics: mnemonics)
 
         let param: Parameters = ["pubKey": publicKeyString ?? "",

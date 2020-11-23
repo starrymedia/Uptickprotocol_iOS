@@ -7,9 +7,14 @@
 
 import Foundation
 
+public typealias FPErrorCallback = (_ error: String) -> ()
+
 extension DmaIRISSession {
     
-    public func queryBalance(address: String, denom: String,_ callback: @escaping (_ balance: Coin) -> Void) {
+    public func queryBalance(address: String,
+                             denom: String,
+                             successCallback: @escaping (_ balance: Coin) -> (),
+                             errorCallback: @escaping FPErrorCallback) {
                 
         let client = BankQueryClient(channel: self.channel)
         var req = BankQueryBalanceRequest()
@@ -19,9 +24,10 @@ extension DmaIRISSession {
         res.response.whenComplete { result in
             switch result {
             case .success(let value):
-                callback(value.balance)
+                successCallback(value.balance)
             case .failure(let error):
                 print(error)
+                errorCallback(error.localizedDescription)
             }
         }
     }
@@ -33,6 +39,7 @@ extension DmaIRISSession {
         req.address = address
         let res = client.allBalances(req)
         res.response.whenComplete { result in
+            print("queryAllBalance:\(result)")
             switch result {
             case .success(let value):
                 callback(value.balances)

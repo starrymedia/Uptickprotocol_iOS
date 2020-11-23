@@ -10,7 +10,7 @@ import web3swift
 import BigInt
 
 class ECKeyPair {
-    
+    //teteteteettet
     func create(privateKey: String) {
         guard let keystoreV3 = try!EthereumKeystoreV3.init(privateKey: Data.fromHex(privateKey)!) else{ return }
         let keystoreManager = KeystoreManager.init([keystoreV3])

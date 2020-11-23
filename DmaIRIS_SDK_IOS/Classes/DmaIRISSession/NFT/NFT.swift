@@ -13,7 +13,6 @@ extension DmaIRISSession {
                            name: String,
                            schema: String,
                            id: String,
-                           mnemonics: String,
                            chainId: String,
                            privateKey: String,
                            broadcastUrl: String) {
@@ -40,7 +39,7 @@ extension DmaIRISSession {
         TxService.signTx(txBody: txBody,
                          fee: fee,
                          chainId: chainId,
-                         mnemonics: mnemonics) { tx in
+                         privateKey: privateKey) { tx in
             print("tx:\(tx)")
             //广播交易
             TxService.broadcast(url: broadcastUrl, tx: tx) { res in
@@ -58,7 +57,6 @@ extension DmaIRISSession {
                      uri: String,
                      tokenIds: [String],
                      chainId: String,
-                     mnemonics: String,
                      broadcastUrl: String,
                      privateKey: String) {
 
@@ -89,7 +87,7 @@ extension DmaIRISSession {
         TxService.signTx(txBody: txBody,
                          fee: fee,
                          chainId: chainId,
-                         mnemonics: mnemonics) { tx in
+                         privateKey: privateKey) { tx in
             
             TxService.broadcast(url: broadcastUrl, tx: tx) { res in
                 print(res)
@@ -103,7 +101,6 @@ extension DmaIRISSession {
                  id: String,
                  denom: String,
                  chainId: String,
-                 mnemonics: String,
                  broadcastUrl: String,
                  privateKey: String) {
         
@@ -121,7 +118,7 @@ extension DmaIRISSession {
                                  amount: txAmount,
                                  denom: txDenom)
         
-        TxService.signTx(txBody: txBody, fee: fee, chainId: chainId, mnemonics: mnemonics) { tx in
+        TxService.signTx(txBody: txBody, fee: fee, chainId: chainId, privateKey: privateKey) { tx in
             
             TxService.broadcast(url: broadcastUrl, tx: tx) { res in
                 print(res)
@@ -152,7 +149,6 @@ extension DmaIRISSession {
                             uri: String,
                             tokenIds: [String],
                             chainId: String,
-                            mnemonics: String,
                             broadcastUrl: String,
                             privateKey: String) {
         
@@ -183,7 +179,7 @@ extension DmaIRISSession {
         TxService.signTx(txBody: txBody,
                          fee: fee,
                          chainId: chainId,
-                         mnemonics: mnemonics) { tx in
+                         privateKey: privateKey) { tx in
             
             TxService.broadcast(url: broadcastUrl, tx: tx) { res in
                 print(res)

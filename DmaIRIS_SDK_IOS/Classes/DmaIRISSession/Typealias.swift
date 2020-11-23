@@ -57,4 +57,4 @@ public typealias Coin = Cosmos_Base_V1beta1_Coin
 typealias PubKey = Cosmos_Crypto_Secp256k1_PubKey
 
 typealias ProtobufAny = Google_Protobuf_Any
-
+typealias BytesValue = Google_Protobuf_BytesValue

@@ -14,7 +14,7 @@ extension DmaIRISSession {
                          to: String,
                          value: String,
                          denom: String,
-                         mnemonics: String,
+                         privateKey: String,
                          chainId: String,
                          broadcastUrl: String,
                          _ callback: @escaping (_ res: String) -> ()) {
@@ -41,7 +41,7 @@ extension DmaIRISSession {
         TxService.signTx(txBody: txBody,
                          fee: fee,
                          chainId: chainId,
-                         mnemonics: mnemonics) { tx in
+                         privateKey: privateKey) { tx in
             print("tx:\(tx)")
             TxService.broadcast(url: broadcastUrl, tx: tx) { res in
                 callback(res)

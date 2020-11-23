@@ -15,6 +15,7 @@ import SwiftProtobuf
 public let WalletManager = EthWallet.default
 
 open class EthWallet: NSObject {
+    
 //    let url:String = "http://192.168.1.104:8545"
     
     public static let `default` = EthWallet()
@@ -25,18 +26,18 @@ open class EthWallet: NSObject {
     var url:String?
     
     public func exportPublicKey(_ mnemonics: String) throws -> Data? {
-
+        
         let prefixPath = "m/44'/118'/0'/0"
         guard let keystore = try? BIP32Keystore(mnemonics: mnemonics, prefixPath: prefixPath) else {
             throw AbstractKeystoreError.encryptionError("Failed to get keystore")
         }
-        guard let serializeRootNodeString = try? keystore?.serializeRootNodeToString() else {
+        guard let serializeRootNodeString = try? keystore.serializeRootNodeToString() else {
             throw AbstractKeystoreError.encryptionError("Failed to serializeRootNodeToString")
         }
-        guard let rootNode = HDNode(serializeRootNodeString!) else {
+        guard let rootNode = HDNode(serializeRootNodeString) else {
             throw AbstractKeystoreError.encryptionError("Failed to deserialize a root node")
         }
-        guard rootNode.depth == (keystore!.rootPrefix.components(separatedBy: "/").count - 1) else {
+        guard rootNode.depth == (keystore.rootPrefix.components(separatedBy: "/").count - 1) else {
             throw AbstractKeystoreError.encryptionError("Derivation depth mismatch")
         }
         guard let index = UInt32(prefixPath.components(separatedBy: "/").last!) else {
@@ -49,20 +50,24 @@ open class EthWallet: NSObject {
 
     }
     
- 
-    
-
     public func exportBech32Address(privateKey: String) -> String {
-        guard let data = Data.fromHex(privateKey) else { return "privateKey error" }
-        guard let pubkeyHexData = Web3.Utils.privateToPublic(data, compressed: true) else { return "pubkeyHexData error" }
-        let str = toBech32(pubkeyHexData: pubkeyHexData)
-        return str
+        if let pubkeyHexData = self.exportPublicKey(privateKey: privateKey) {
+            let str = toBech32(pubkeyHexData: pubkeyHexData)
+            return str
+        }
+        return ""
+    }
+    
+    public func exportPublicKey(privateKey: String) -> Data? {
+        guard let data = Data.fromHex(privateKey) else { return nil }
+        guard let pubkeyHexData = Web3.Utils.privateToPublic(data, compressed: true) else { return nil }
+        return pubkeyHexData
     }
 
     
    public func exportBech32Address(mnemonics: String) -> String {
         guard let publicKey = try? exportPublicKey(mnemonics) else { return "privateKey error" }
-        guard let pubkeyHexData = Data(base64Encoded: publicKey!.base64EncodedString()) else { return "pubkeyHexData error" }
+        guard let pubkeyHexData = Data(base64Encoded: publicKey.base64EncodedString()) else { return "pubkeyHexData error" }
         let str = toBech32(pubkeyHexData: pubkeyHexData)
         return str
     }
@@ -73,59 +78,28 @@ open class EthWallet: NSObject {
         let str = Bech32().encode("iaa", values: data!)
         return str
     }
-    
-    public func signatureString(signDoc: String,mnemonics:String) -> String? {
-        
-        guard let hash = Data(base64Encoded: signDoc)?.sha256() else {
-            print("signDoc error")
-            return "signDoc error"
-        }
-        
-        guard let privateKey = self.exportAddressAndPrivateKeyFromMnemonics(mnemonics: mnemonics).privateKey else {
-            print("privateKey error")
-            return "privateKey error"
-        }
-
-        guard let privateKeyData = Data.fromHex(privateKey) else {
-            print("privateKeyData error")
-            return "privateKeyData error"
-        }
-        let sign = SECP256K1.signForRecovery(hash: hash, privateKey: privateKeyData, useExtraEntropy: false)
-        
-        guard let serializedSignature = sign.serializedSignature else {
-            print("sign serializedSignature error")
-            return "sign serializedSignature error"
-        }
-        guard let signature = SECP256K1.unmarshalSignature(signatureData: serializedSignature) else {
-            print("signature error")
-            return "signature error"
-        }
-        print("r:\(signature.r.base64EncodedString() )")
-        print("s:\(signature.s.base64EncodedString() )")
-        let data = signature.r + signature.s
-        return data.base64EncodedString()
-    }
   
     /// 获取助记词
     ///
     /// - Parameter seedLen: 随机长度
     /// - Returns: 返回助记词
     func exportMnemonics() -> (String?) {
-        guard let mnemonics = try?BIP39.generateMnemonics(bitsOfEntropy: 128) else {return ("")}
+        guard let mnemonics = try? BIP39.generateMnemonics(bitsOfEntropy: 128) else {return ("")}
         return mnemonics
     }
     
     /// 钱包生成   0代表助记词 1代表私钥 2代表地址
     ///
     /// - Returns: 0代表助记词 1代表私钥 2代表地址
-    func create() -> (mnemonics:String?,privateKey:String?,address:String?) {
+    public func create() -> (mnemonics:String?,privateKey:String?,address:String?) {
+        
         let prefixPath = "m/44'/118'/0'/0"
-        guard let mnemonics = try?BIP39.generateMnemonics(bitsOfEntropy: 256) else {return (nil,nil,nil)}
-        let keystore = try! BIP32Keystore(mnemonics: mnemonics!, prefixPath: prefixPath)
-
-        let account = keystore?.addresses![0]
-        let privateKey = try!keystore?.UNSAFE_getPrivateKeyData(password: "web3swift", account: account!).toHexString()
-        let address = account?.address
+        guard let mnemonics = try? BIP39.generateMnemonics(bitsOfEntropy: 256) else {return ("","","")}
+        guard let keystore = try? BIP32Keystore(mnemonics: mnemonics, prefixPath: prefixPath) else {return ("","","")}
+        let account = keystore.addresses![0]
+        guard let privateKey = try? keystore.UNSAFE_getPrivateKeyData(password: "web3swift", account: account).toHexString() else {return ("","","")}
+        let address = self.exportBech32Address(privateKey: privateKey)
+        
         return (mnemonics,privateKey,address)
     }
     
@@ -136,12 +110,20 @@ open class EthWallet: NSObject {
    public func exportAddressAndPrivateKeyFromMnemonics(mnemonics:String) -> (privateKey:String?,address:String?) {
     
         let prefixPath = "m/44'/118'/0'/0"
-        let keystore = try! BIP32Keystore(mnemonics: mnemonics, prefixPath: prefixPath)
-
-//        let keystore = try!BIP32Keystore.init(mnemonics:mnemonics)
-        let account = keystore?.addresses![0]
-        let privateKey = try!keystore?.UNSAFE_getPrivateKeyData(password: "web3swift", account: account!).toHexString()
-        let address = account?.address
+        var privateKey = ""
+        var address = ""
+    
+        if let keystore = try? BIP32Keystore(mnemonics: mnemonics, prefixPath: prefixPath) {
+            if let account = keystore.addresses?[0] {
+                if let privateKeyString = try? keystore.UNSAFE_getPrivateKeyData(password: "web3swift", account: account).toHexString() {
+                    privateKey = privateKeyString
+                }
+            }
+        }
+        
+        if let publicKeyData = try? self.exportPublicKey(mnemonics) {
+            address = self.toBech32(pubkeyHexData: publicKeyData)
+        }
         return (privateKey,address)
     }
     
