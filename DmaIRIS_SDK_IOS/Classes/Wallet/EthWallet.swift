@@ -75,10 +75,16 @@ open class EthWallet: NSObject {
     public func toBech32(pubkeyHexData: Data) -> String {
         let hash = RIPEMD160.hash(message: (pubkeyHexData.sha256()))
         let data = try? SegwitAddrCoder().convertBits(instart: 0, from: 8, to: 5, pad: true, idata: hash)
+        print(data?.base64EncodedString())
         let str = Bech32().encode("iaa", values: data!)
         return str
     }
   
+    public func fromBech32(address: String) -> Data? {
+        guard let addressData = try? Bech32().decode(address).checksum else { return nil }
+        let data = try? SegwitAddrCoder().convertBits(instart: 0, from: 5, to: 8, pad: true, idata: addressData)
+        return data
+    }
     /// 获取助记词
     ///
     /// - Parameter seedLen: 随机长度

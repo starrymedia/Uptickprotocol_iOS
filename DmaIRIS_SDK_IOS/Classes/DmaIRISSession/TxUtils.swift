@@ -12,7 +12,7 @@ public let txGasLimit:UInt64 = 200000
 public let txAmount = "1"
 public let txDenom = "ubif"
 
-class TxUtils {
+open class TxUtils {
    
     class func getFee(gasLimit: UInt64, amount: String, denom: String) -> TxFee {
         //设置交易费
@@ -40,5 +40,26 @@ class TxUtils {
             return nil
         }
         return protobufAny
+    }
+    
+    
+    public static var identifier: String {
+
+        var string = ""
+
+        let dateFormatter = DateFormatter()
+
+        dateFormatter.dateFormat = "yyyyMMddHHmmssSSS"
+
+        string.append(dateFormatter.string(from: NSDate() as Date))
+
+        var uuid = UIDevice.current.identifierForVendor?.uuidString ?? ""
+        var array = uuid.split(separator: "-")
+        string += array.last ?? ""
+        let random = arc4random_uniform(UInt32(64 - string.count - 6))
+        let str = "\(random)"
+        print("random\(str)")
+        string += str
+        return string
     }
 }

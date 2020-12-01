@@ -17,7 +17,8 @@ extension DmaIRISSession {
                          privateKey: String,
                          chainId: String,
                          broadcastUrl: String,
-                         _ callback: @escaping (_ res: String) -> ()) {
+                         successCallback: @escaping (_ res: String) -> (),
+                         errorCallBack: @escaping FPErrorCallback) {
         
         var coin = Coin()
         coin.amount = value
@@ -43,9 +44,12 @@ extension DmaIRISSession {
                          chainId: chainId,
                          privateKey: privateKey) { tx in
             print("tx:\(tx)")
-            TxService.broadcast(url: broadcastUrl, tx: tx) { res in
-                callback(res)
+            TxService.broadcast(url: broadcastUrl, tx: tx) { result in
+                successCallback(result)
+            } errorCallBack: { error in
+                errorCallBack(error)
             }
+
         }
     }
 }

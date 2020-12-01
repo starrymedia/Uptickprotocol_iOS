@@ -117,46 +117,76 @@ public class Merchant {
     }
     
     public func onsale(denom: String,
-                       tokenids: [String],
+                       tokenids: String,
                        price: String,
                        coin: String,
                        privateKey: String,
-                       mnemonics: String) {
+                       successCallback: @escaping (_ value: String) -> (),
+                       errorCallback: @escaping FPErrorCallback) {
         
-        guard let publicKeyData = try? WalletManager.exportPublicKey(mnemonics) else {
+        guard let publicKeyData = try? WalletManager.exportPublicKey(privateKey: privateKey) else {
             print("publicKey error")
             return
         }
-        let publicKeyString = publicKeyData.base64EncodedString()
-        let address = WalletManager.exportBech32Address(mnemonics: mnemonics)
+        let publicKeyString = publicKeyData.base64EncodedString() ?? ""
+        let address = WalletManager.exportBech32Address(privateKey: privateKey)
 
-        var param: Parameters = ["pubKey": publicKeyString ?? "",
-                                 "nftDenom": denom,
-                                 "owner": address]
-        
-        var labels = [[String: String]]()
-        for tokenId in tokenids {
-            let label = ["coin": coin,
-                         "nftId": tokenId,
-                         "price": price]
+        var params = MerchantOnSale(pubKey: publicKeyString,
+                                    nftDenom: denom,
+                                    owner: address)
+        var labels = [MerchantOnSaleLabels]()
+        for tokenId in tokenids.split(separator: ",") {
+            let label = MerchantOnSaleLabels(coin: coin,
+                                             nftId: String(tokenId),
+                                             price: price)
             labels.append(label)
         }
-        param["labels"] = labels
-        
-        print(param)
+        params.labels = labels
+        print(params)
         
         let url = nodeUrl + onsaleUrl
-        AF.request(url, method: .post, parameters: param).responseString { response in
+        AF.request(url, method: .post, parameters: params, encoder: JSONParameterEncoder.default).responseString { response in
             switch response.result {
             case .success(let jsonString):
                 print(jsonString)
-                if let responseModel = TokensModel.deserialize(from: jsonString) {
-                    if let data = responseModel.data {
-//                        callback(data)
-                        #warning("稍后再写")
+                if let responseModel = MerchantResponseModel.deserialize(from: jsonString) {
+                    
+                    if responseModel.success == true {
+                        
+                        if let data = responseModel.data {
+                            
+                            if let hashData = Data(base64Encoded: data)?.sha256() {
+                                
+                                params.signatures = TxService.signatureString(hashData: hashData, privateKey: privateKey)?.base64EncodedString()
+                                
+                                AF.request(url, method: .post, parameters: params, encoder: JSONParameterEncoder.default).responseString { response in
+                                    switch response.result {
+                                    case .success(let jsonString):
+                                        print(jsonString)
+                                        if let responseModel = MerchantResponseModel.deserialize(from: jsonString) {
+                                            
+                                            if responseModel.success == true {
+                                                successCallback(jsonString)
+                                            } else {
+                                                errorCallback(responseModel.msg ?? "")
+                                            }
+                                        }
+                                    case .failure(let error):
+                                        print(error)
+                                        errorCallback(error.localizedDescription)
+                                    }
+                                }
+                            }
+                            
+                        } else {
+                            errorCallback(response.error?.localizedDescription ?? "\(transferUrl) error")
+                        }
+                        
+                    } else {
+                        errorCallback(responseModel.msg ?? "")
                     }
                 }
-
+                
             case .failure(let error):
                 print(error)
             }
@@ -203,37 +233,66 @@ public class Merchant {
     //MARK:- 购买
     public func transfer(denom: String,
                         tokenIds: [String],
-                       privateKey: String,
-                       mnemonics: String) {
+                        privateKey: String,
+                        successCallback: @escaping (_ value: String) -> (),
+                        errorCallback: @escaping FPErrorCallback) {
         
-        guard let publicKeyData = try? WalletManager.exportPublicKey(mnemonics) else {
+        guard let publicKeyData = try? WalletManager.exportPublicKey(privateKey: privateKey) else {
             print("publicKey error")
             return
         }
         let publicKeyString = publicKeyData.base64EncodedString()
-        let address = WalletManager.exportBech32Address(mnemonics: mnemonics)
+        let address = WalletManager.exportBech32Address(privateKey: privateKey)
 
-        let param: Parameters = ["pubKey": publicKeyString ?? "",
-                                 "nftDenom": denom,
-                                 "payer": address,
-                                 "recipien": address,
-                                 "ids": tokenIds]
-        print(param)
+        var param = MerchantTransfer(payerPubKey: publicKeyString,
+                                     nftDenom: denom,
+                                     payer: address,
+                                     recipien: address,
+                                     ids: tokenIds)
         
         let url = nodeUrl + transferUrl
-        AF.request(url, method: .post, parameters: param).responseString { response in
+        AF.request(url, method: .post, parameters: param, encoder: JSONParameterEncoder.default).responseString { response in
             switch response.result {
             case .success(let jsonString):
                 print(jsonString)
-                if let responseModel = TokensModel.deserialize(from: jsonString) {
-                    if let data = responseModel.data {
-//                        callback(data)
-                        #warning("稍后再写")
+                if let responseModel = MerchantResponseModel.deserialize(from: jsonString) {
+                    if responseModel.success == true {
+                        
+                        if let data = responseModel.data {
+                            
+                            if let hashData = Data(base64Encoded: data)?.sha256() {
+                                param.signatures = TxService.signatureString(hashData: hashData, privateKey: privateKey)?.base64EncodedString()
+                                AF.request(url, method: .post, parameters: param, encoder: JSONParameterEncoder.default).responseString { response in
+                                    switch response.result {
+                                    case .success(let jsonString):
+                                        print(jsonString)
+                                        if let responseModel = MerchantResponseModel.deserialize(from: jsonString) {
+                                            
+                                            if responseModel.success == true {
+                                                successCallback(jsonString)
+                                            } else {
+                                                errorCallback(responseModel.msg ?? "")
+                                            }
+                                        }
+                                    case .failure(let error):
+                                        print(error)
+                                        errorCallback(error.localizedDescription)
+                                    }
+                                }
+                            }
+                            
+                        } else {
+                            errorCallback(response.error?.localizedDescription ?? "\(transferUrl) error")
+                        }
+                        
+                    } else {
+                        errorCallback(responseModel.msg ?? "")
                     }
                 }
 
             case .failure(let error):
                 print(error)
+                errorCallback(error.localizedDescription)
             }
         }
     }
@@ -296,5 +355,37 @@ public struct TokensModel: HandyJSON {
 }
 
 
+struct MerchantTransfer: Encodable {
+    
+    let payerPubKey: String
+    let nftDenom: String
+    let payer: String
+    let recipien: String
+    var signatures: String?
+    let ids: [String]
+}
+
+public struct MerchantResponseModel: HandyJSON {
+    public init() {}
+    var code: Int?
+    var success: Bool?
+    var msg: String?
+    var data: String?
+}
  
+
+struct MerchantOnSale: Encodable {
+    
+    let pubKey: String
+    let nftDenom: String
+    let owner: String
+    var signatures: String?
+    var labels: [MerchantOnSaleLabels]?
+}
+ 
+struct MerchantOnSaleLabels: Encodable {
+    let coin: String
+    let nftId: String
+    let price: String
+}
  

@@ -43,6 +43,8 @@ extension DmaIRISSession {
             
             TxService.broadcast(url: broadcastUrl, tx: tx) { res in
                 print(res)
+            } errorCallBack: { error in
+                
             }
             
         }
@@ -76,6 +78,8 @@ extension DmaIRISSession {
             
             TxService.broadcast(url: broadcastUrl, tx: tx) { res in
                 print(res)
+            }errorCallBack: { error in
+                
             }
             
         }
@@ -108,6 +112,8 @@ extension DmaIRISSession {
             
             TxService.broadcast(url: broadcastUrl, tx: tx) { res in
                 print(res)
+            }errorCallBack: { error in
+                
             }
             
         }

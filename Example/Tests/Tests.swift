@@ -32,6 +32,27 @@ class Tests: XCTestCase {
 
     }
     
+    func testIdentifer() {
+        //202011261027434051352998F1807110-E77E-47DD-BBB1-BE11C0B445FE
+
+        print("============")
+        var tokenids = [String]()
+        for _ in 0..<10 {
+            tokenids.append(TxUtils.identifier)
+            print(TxUtils.identifier)
+            print(TxUtils.identifier.count)
+        }
+        print(tokenids.joined(separator: ","))
+        print("============")
+
+    }
+    
+    func testQueryTokens() {
+        IRIS.queryTokens(denom: txDenom) { nftDenom in
+            print(nftDenom)
+        }
+    }
+    
     func testPerformanceExample() {
         // This is an example of a performance test case.
         self.measure() {

@@ -155,31 +155,31 @@ public struct Irismod_Nft_Denom {
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  var id: String = String()
+    public var id: String = String()
 
-  var name: String = String()
+    public var name: String = String()
 
-  var schema: String = String()
+    public var schema: String = String()
 
-  var creator: Data = SwiftProtobuf.Internal.emptyData
+    public var creator: Data = SwiftProtobuf.Internal.emptyData
 
     public var unknownFields = SwiftProtobuf.UnknownStorage()
 
     public init() {}
 }
 
-struct Irismod_Nft_IDCollection {
+public struct Irismod_Nft_IDCollection {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  var denom: String = String()
+    public var denom: String = String()
 
-  var ids: [String] = []
+    public var ids: [String] = []
 
-  var unknownFields = SwiftProtobuf.UnknownStorage()
+    public var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  init() {}
+    public init() {}
 }
 
 public struct Irismod_Nft_Owner {
@@ -187,9 +187,9 @@ public struct Irismod_Nft_Owner {
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  var address: Data = SwiftProtobuf.Internal.emptyData
+    public var address: Data = SwiftProtobuf.Internal.emptyData
 
-  var idCollections: [Irismod_Nft_IDCollection] = []
+    public var idCollections: [Irismod_Nft_IDCollection] = []
 
     public var unknownFields = SwiftProtobuf.UnknownStorage()
 
@@ -604,13 +604,13 @@ extension Irismod_Nft_Denom: SwiftProtobuf.Message, SwiftProtobuf._MessageImplem
 }
 
 extension Irismod_Nft_IDCollection: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".IDCollection"
-  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    public static let protoMessageName: String = _protobuf_package + ".IDCollection"
+    public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "denom"),
     2: .same(proto: "ids"),
   ]
 
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    mutating public func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
       switch fieldNumber {
       case 1: try decoder.decodeSingularStringField(value: &self.denom)
@@ -620,7 +620,7 @@ extension Irismod_Nft_IDCollection: SwiftProtobuf.Message, SwiftProtobuf._Messag
     }
   }
 
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     if !self.denom.isEmpty {
       try visitor.visitSingularStringField(value: self.denom, fieldNumber: 1)
     }
@@ -630,7 +630,7 @@ extension Irismod_Nft_IDCollection: SwiftProtobuf.Message, SwiftProtobuf._Messag
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: Irismod_Nft_IDCollection, rhs: Irismod_Nft_IDCollection) -> Bool {
+    public static func ==(lhs: Irismod_Nft_IDCollection, rhs: Irismod_Nft_IDCollection) -> Bool {
     if lhs.denom != rhs.denom {return false}
     if lhs.ids != rhs.ids {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}

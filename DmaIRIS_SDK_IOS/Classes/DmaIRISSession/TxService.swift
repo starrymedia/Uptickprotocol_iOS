@@ -25,6 +25,7 @@ open class TxService {
             print("publicKeyData error")
             return
         }
+        print(WalletManager.toBech32(pubkeyHexData: publicKeyData))
         //获取地址
         let address = WalletManager.exportBech32Address(privateKey: privateKey)
         IRIS.queryAccount(address: address) { (address, sequence, accountNumber) in
@@ -84,6 +85,7 @@ open class TxService {
 
                 if let sigBytes = TxService.signatureString(hashData: hashData, privateKey: privateKey) {
                     if let bytesValue = try? BytesValue(sigBytes) {
+                        print(bytesValue)
                         txSign.signatures.append(bytesValue.value)
                     }
                 }
@@ -98,7 +100,8 @@ open class TxService {
     
     class func broadcast(url: String,
                    tx: Tx,
-                   _ callback: @escaping (_ res: String) -> ()) {
+                   successCallback: @escaping (_ res: String) -> (),
+                   errorCallBack: @escaping FPErrorCallback) {
                
         guard let txString = try? tx.serializedData().base64EncodedString() else {
             print("broadcast tx error")
@@ -119,11 +122,12 @@ open class TxService {
                         if let model = BroadcastModel.deserialize(from: jsonString) {
                             print(model)
                             if let hash = model.result?.hash {
-                                callback(hash)
+                                successCallback(hash)
                             }
                         }
                     case .failure(let error):
                         print(error)
+                        errorCallBack(error.errorDescription ?? "broadcast error")
                     }
         }
     }

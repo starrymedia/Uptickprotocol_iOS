@@ -15,14 +15,22 @@ extension DmaIRISSession {
                            id: String,
                            chainId: String,
                            privateKey: String,
-                           broadcastUrl: String) {
+                           broadcastUrl: String,
+                           successCallback: @escaping (_ string: String) -> (),
+                           errorCallback: @escaping FPErrorCallback) {
+        
+        
+        
         //创建Nft.MsgIssueDenom
         var msgIssueDenom = NftMsgIssueDenom()
-        #warning("有疑问")
-        msgIssueDenom.sender = try! Bech32().decode(sender).checksum
         msgIssueDenom.name = name
         msgIssueDenom.schema = schema
         msgIssueDenom.id = id
+        if let data = try? WalletManager.fromBech32(address: sender) {
+            if let bytesValue = try? BytesValue(data) {
+                msgIssueDenom.sender = bytesValue.value
+            }
+        }
 
         //创建TxBody
         var txBody = TxUtils.getBody(meno: "", timeoutHeight: 0)
@@ -44,34 +52,47 @@ extension DmaIRISSession {
             //广播交易
             TxService.broadcast(url: broadcastUrl, tx: tx) { res in
                 print(res)
+                successCallback(res)
+            } errorCallBack: { error in
+                errorCallback(error)
             }
         }
     }
     
     //MARK:- 批量创建NFT资产
-    func mintNFTMuch(sender: String,
-                     recipient: String,
-                     name: String,
-                     data: String,
-                     denom: String,
-                     uri: String,
-                     tokenIds: [String],
-                     chainId: String,
-                     broadcastUrl: String,
-                     privateKey: String) {
+    public func mintNFTMuch( sender: String,
+                             recipient: String,
+                             name: String,
+                             data: String,
+                             denom: String,
+                             uri: String,
+                             tokenIds: [String],
+                             chainId: String,
+                             broadcastUrl: String,
+                             privateKey: String,
+                             successCallback: @escaping (_ string: String) -> (),
+                             errorCallback: @escaping FPErrorCallback) {
 
-        #warning("有疑问")
         var txBody = TxUtils.getBody(meno: "", timeoutHeight: 0)
         for tokenId in tokenIds {
             var mintNft = NftMsgMintNFT()
             mintNft.data = data
-            #warning("有疑问")
-            mintNft.recipient = try! Bech32().decode(recipient).checksum
-            mintNft.sender = try! Bech32().decode(sender).checksum
             mintNft.denom = denom
             mintNft.uri = uri
             mintNft.name = name
             mintNft.id = tokenId
+            if let data = try? WalletManager.fromBech32(address: sender) {
+                if let bytesValue = try? BytesValue(data) {
+                    mintNft.sender = bytesValue.value
+                }
+            }
+            
+            if let data = try? WalletManager.fromBech32(address: recipient) {
+                if let bytesValue = try? BytesValue(data) {
+                    mintNft.recipient = bytesValue.value
+                }
+            }
+
             
             if let any =  TxUtils.getProtobufAny(message: mintNft,typePrefix: "") {
                 txBody.messages.append(any)
@@ -79,11 +100,10 @@ extension DmaIRISSession {
         }
                 
         
-        #warning("有疑问")
         let limit:UInt64 = 50000 + txGasLimit*UInt64(tokenIds.count)
         let fee = TxUtils.getFee(gasLimit: limit,
-                                 amount: "1",
-                                 denom: "uiris")
+                                 amount: txAmount,
+                                 denom: txDenom)
         TxService.signTx(txBody: txBody,
                          fee: fee,
                          chainId: chainId,
@@ -91,6 +111,9 @@ extension DmaIRISSession {
             
             TxService.broadcast(url: broadcastUrl, tx: tx) { res in
                 print(res)
+                successCallback(res)
+            } errorCallBack: { error in
+                errorCallback(error)
             }
         }
         
@@ -105,9 +128,13 @@ extension DmaIRISSession {
                  privateKey: String) {
         
         var msgBurnNFT = NftMsgBurnNFT()
-        msgBurnNFT.sender = try! Bech32().decode(sender).checksum
         msgBurnNFT.denom = denom
         msgBurnNFT.id = id
+        if let data = try? WalletManager.fromBech32(address: sender) {
+            if let bytesValue = try? BytesValue(data) {
+                msgBurnNFT.sender = bytesValue.value
+            }
+        }
         
         var txBody = TxUtils.getBody(meno: "", timeoutHeight: 0)
         if let any = TxUtils.getProtobufAny(message: msgBurnNFT, typePrefix: "") {
@@ -122,6 +149,8 @@ extension DmaIRISSession {
             
             TxService.broadcast(url: broadcastUrl, tx: tx) { res in
                 print(res)
+            }errorCallBack: { error in
+                
             }
         }
         
@@ -143,27 +172,33 @@ extension DmaIRISSession {
     ///   - privateKey: 私钥
     public func transferNFT(sender: String,
                             recipient: String,
-                            name: String,
-                            data: String,
                             denom: String,
-                            uri: String,
-                            tokenIds: [String],
+                            tokenIds: String,
                             chainId: String,
                             broadcastUrl: String,
-                            privateKey: String) {
+                            privateKey: String,
+                            successCallback: @escaping (_ string: String) -> (),
+                            errorCallback: @escaping FPErrorCallback) {
         
-        #warning("有疑问")
         var txBody = TxUtils.getBody(meno: "", timeoutHeight: 0)
-        for tokenId in tokenIds {
+        for tokenId in tokenIds.split(separator: ",") {
             var transferNFT = NftMsgTransferNFT()
-            transferNFT.data = data
-            #warning("有疑问")
-            transferNFT.recipient = try! Bech32().decode(recipient).checksum
-            transferNFT.sender = try! Bech32().decode(sender).checksum
+            transferNFT.data = ""
             transferNFT.denom = denom
-            transferNFT.uri = uri
-            transferNFT.name = name
-            transferNFT.id = tokenId
+            transferNFT.uri = ""
+            transferNFT.name = ""
+            transferNFT.id = String(tokenId)
+            if let data = try? WalletManager.fromBech32(address: sender) {
+                if let bytesValue = try? BytesValue(data) {
+                    transferNFT.sender = bytesValue.value
+                }
+            }
+            
+            if let data = try? WalletManager.fromBech32(address: recipient) {
+                if let bytesValue = try? BytesValue(data) {
+                    transferNFT.recipient = bytesValue.value
+                }
+            }
             
             if let any = TxUtils.getProtobufAny(message: transferNFT,typePrefix: "") {
                 txBody.messages.append(any)
@@ -171,11 +206,10 @@ extension DmaIRISSession {
         }
                 
         
-        #warning("有疑问")
         let limit:UInt64 = 50000 + txGasLimit*UInt64(tokenIds.count)
         let fee = TxUtils.getFee(gasLimit: limit,
                                  amount: "1",
-                                 denom: "uiris")
+                                 denom: txDenom)
         TxService.signTx(txBody: txBody,
                          fee: fee,
                          chainId: chainId,
@@ -183,13 +217,16 @@ extension DmaIRISSession {
             
             TxService.broadcast(url: broadcastUrl, tx: tx) { res in
                 print(res)
+                successCallback(res)
+            } errorCallBack: { error in
+                errorCallback(error)
             }
         }
         
     }
     
     //MARK:- 根据分类查询 分类详细信息
-    public func token(denom: String,_ callback: @escaping (_ denom: NftDenom) -> Void) {
+    public func queryTokens(denom: String,_ callback: @escaping (_ denom: NftDenom) -> Void) {
         var request = NftQueryDenomRequest()
         request.denom = denom
         
@@ -206,7 +243,7 @@ extension DmaIRISSession {
     }
     
     //MARK:- 查询链上所有分类信息
-    public func denoms(_ callback: @escaping (_ denoms: [NftDenom]) -> Void) {
+    public func queryDenoms(_ callback: @escaping (_ denoms: [NftDenom]) -> Void) {
         let request = NftQueryDenomsRequest()
         let client = NftQueryClient(channel: self.channel)
         let response = client.denoms(request).response
@@ -221,7 +258,7 @@ extension DmaIRISSession {
     }
     
     //MARK:- 根据分类查询资产
-    public func collection(denom: String, _ callback: @escaping (_ collection: NftCollection) -> ()) {
+    public func queryCollection(denom: String, _ callback: @escaping (_ collection: NftCollection) -> ()) {
         var request = NftQueryCollectionRequest()
         request.denom = denom
         
@@ -240,9 +277,9 @@ extension DmaIRISSession {
     
     
     //MARK:- 根据资产ID以及demom查询基础信息
-    public func nFT(id: String,
-                    denom: String,
-                    _ callback: @escaping (_ collection: NftBaseNFT) -> ()) {
+    public func queryNFT(id: String,
+                         denom: String,
+                         _ callback: @escaping (_ collection: NftBaseNFT) -> ()) {
         
         var request = NftQueryNFTRequest()
         request.denom = denom
@@ -262,19 +299,23 @@ extension DmaIRISSession {
     }
     
     //MARK:- 根据地址和分类查询拥有的NFT 资产
-    public func owner(address: String,
-                      denom: String,
+    public func queryOwner(address: String,
+                           denom: String,
                       _ callback: @escaping (_ owner: NftOwner) -> ()) {
 
         var request = NftQueryOwnerRequest()
-        request.owner = try! Bech32().decode(address).checksum
         request.denom = denom
-        
+        if let data = try? WalletManager.fromBech32(address: address) {
+            if let bytesValue = try? BytesValue(data) {
+                request.owner = bytesValue.value
+            }
+        }
         let client = NftQueryClient(channel: self.channel)
         let response = client.owner(request).response
         response.whenComplete { result in
             switch result {
             case .success(let value):
+                print(value)
                 callback(value.owner)
             case .failure(let error):
                 print(error)
@@ -283,12 +324,16 @@ extension DmaIRISSession {
     }
     
     //MARK:- 根据地址和分类查询拥有资产总数
-    public func supply(address: String,
-                       denom: String,
+    public func querySupply(address: String,
+                            denom: String,
                        _ callback: @escaping (_ amount: UInt64) -> ()) {
 
         var request = NftQuerySupplyRequest()
-        request.owner = try! Bech32().decode(address).checksum
+        if let data = try? WalletManager.fromBech32(address: address) {
+            if let bytesValue = try? BytesValue(data) {
+                request.owner = bytesValue.value
+            }
+        }
         request.denom = denom
         
         let response = NftQueryClient(channel: self.channel).supply(request).response
