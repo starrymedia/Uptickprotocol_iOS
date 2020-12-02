@@ -13,11 +13,6 @@ PODS:
   - CNIOSHA1 (2.23.0)
   - CNIOWindows (2.23.0)
   - CryptoSwift (0.15.0)
-  - DmaIRIS_SDK_IOS (0.1.0):
-    - Alamofire (~> 5.2)
-    - gRPC-Swift (= 1.0.0-alpha.20)
-    - HandyJSON (= 5.0.0-beta)
-    - web3swift (~> 1.1.10)
   - FBSnapshotTestCase (2.1.4):
     - FBSnapshotTestCase/SwiftSupport (= 2.1.4)
   - FBSnapshotTestCase/Core (2.1.4)
@@ -88,6 +83,11 @@ PODS:
   - SwiftProtobuf (1.13.0)
   - SwiftRLP (1.0.1):
     - BigInt (~> 3.1)
+  - UptickProtocolIRISnet (0.1.0):
+    - Alamofire (~> 5.2)
+    - gRPC-Swift (= 1.0.0-alpha.20)
+    - HandyJSON (= 5.0.0-beta)
+    - web3swift (~> 1.1.10)
   - web3swift (1.1.10):
     - BigInt (~> 3.1)
     - CryptoSwift (~> 0.11)
@@ -98,11 +98,13 @@ PODS:
     - SwiftRLP (~> 1.0.1)
 
 DEPENDENCIES:
-  - DmaIRIS_SDK_IOS (from `../`)
   - FBSnapshotTestCase (~> 2.1.4)
+  - UptickProtocolIRISnet (from `../`)
 
 SPEC REPOS:
   https://mirrors.tuna.tsinghua.edu.cn/git/CocoaPods/Specs.git:
+    - Alamofire
+    - BigInt
     - CGRPCZlib
     - CNIOAtomics
     - CNIOBoringSSL
@@ -112,8 +114,15 @@ SPEC REPOS:
     - CNIOLinux
     - CNIOSHA1
     - CNIOWindows
+    - CryptoSwift
     - gRPC-Swift
+    - HandyJSON
     - Logging
+    - PromiseKit
+    - Result
+    - scrypt
+    - secp256k1_swift
+    - SipHash
     - SwiftNIO
     - SwiftNIOConcurrencyHelpers
     - SwiftNIOFoundationCompat
@@ -124,22 +133,13 @@ SPEC REPOS:
     - SwiftNIOTLS
     - SwiftNIOTransportServices
     - SwiftProtobuf
-  trunk:
-    - Alamofire
-    - BigInt
-    - CryptoSwift
-    - FBSnapshotTestCase
-    - HandyJSON
-    - PromiseKit
-    - Result
-    - scrypt
-    - secp256k1_swift
-    - SipHash
     - SwiftRLP
     - web3swift
+  trunk:
+    - FBSnapshotTestCase
 
 EXTERNAL SOURCES:
-  DmaIRIS_SDK_IOS:
+  UptickProtocolIRISnet:
     :path: "../"
 
 SPEC CHECKSUMS:
@@ -155,7 +155,6 @@ SPEC CHECKSUMS:
   CNIOSHA1: cdd2e93752f5273b528946560337ca092cdbe0aa
   CNIOWindows: a0f8814c907c2621b66bc2789682d5e889602b45
   CryptoSwift: 769f58a9e89f64e8796c2e59ce5f002dc81a2438
-  DmaIRIS_SDK_IOS: 0efc1ff55e2cd1dce3a6e85785e6ea1d1136fc87
   FBSnapshotTestCase: 094f9f314decbabe373b87cc339bea235a63e07a
   gRPC-Swift: 074c94af029b6bf70bab68cd0e278428a4470997
   HandyJSON: b84ac9904050a0897a0802092b7cb8808e0a4e9a
@@ -176,8 +175,9 @@ SPEC CHECKSUMS:
   SwiftNIOTransportServices: 801923921fbecdcde1e1c1ff38e812167d01ead1
   SwiftProtobuf: fd4693388a96c8c2df35d3b063272b0e7c499d00
   SwiftRLP: 9de2c9512a9a6bf0909cd84cc143a7ff1aff7820
+  UptickProtocolIRISnet: 0400b3b9f335c4db044065ed4875d6bf0cea4df8
   web3swift: 843dd5295d2ae755e6f80e9e0bdabe2868a5c7d8
 
-PODFILE CHECKSUM: 4223378ea8f95f7f0b52b54e50db51d9515beaec
+PODFILE CHECKSUM: bd544a6d81b968d27cafef84c33b79bf1a09ad74
 
 COCOAPODS: 1.10.0

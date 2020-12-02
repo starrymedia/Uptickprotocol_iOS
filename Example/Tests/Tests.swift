@@ -1,5 +1,5 @@
 import XCTest
-import DmaIRIS_SDK_IOS
+import UptickProtocolIRISnet
 import Pods_DmaIRIS_SDK_IOS_Tests
 
 class Tests: XCTestCase {

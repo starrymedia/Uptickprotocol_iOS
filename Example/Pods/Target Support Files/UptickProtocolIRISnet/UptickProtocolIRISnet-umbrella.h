@@ -10,3 +10,7 @@
 #endif
 #endif
 
+
+FOUNDATION_EXPORT double UptickProtocolIRISnetVersionNumber;
+FOUNDATION_EXPORT const unsigned char UptickProtocolIRISnetVersionString[];
+

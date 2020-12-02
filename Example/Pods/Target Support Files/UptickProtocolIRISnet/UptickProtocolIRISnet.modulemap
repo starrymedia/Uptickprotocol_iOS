@@ -1,0 +1,6 @@
+framework module UptickProtocolIRISnet {
+  umbrella header "UptickProtocolIRISnet-umbrella.h"
+
+  export *
+  module * { export * }
+}

@@ -7,7 +7,7 @@
 //
 
 import UIKit
-import DmaIRIS_SDK_IOS
+import UptickProtocolIRISnet
 import GRPC
 import Logging
 import web3swift
