@@ -29,7 +29,22 @@ class ViewController: UIViewController {
         let privateKey="1779b474da9ef4aef67271f455dd58054d3181863b91f63910074f3cb9123591";
         let RpcURI = "http://52.81.146.252:26657"
         
-
+        IRIS.transferNFT(sender: sender,
+                         recipient: recipient,
+                         denom: denom,
+                         tokenIds: tokenIds,
+                         chainId: "testing",
+                         broadcastUrl: rpcUrl,
+                         privateKey: privateKey) { value in
+           
+        } errorCallback: { error in
+         
+        }
+//        MerchantSession.getTokensByAddress(address: address,
+//                                           denom: model.address ?? "") { datas in
+//         } errorCallback: { error in
+//
+//         }
         //        MerchantSession.onsale(denom: "vttt",
 //                               tokenids: "starry7e1f1e96c9d34b5da73f32b9f31cd0f9",
 //                               price: "1",

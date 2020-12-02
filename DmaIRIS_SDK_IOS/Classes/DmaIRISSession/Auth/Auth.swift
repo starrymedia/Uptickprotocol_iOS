@@ -10,7 +10,9 @@ import Foundation
 extension DmaIRISSession {
     
     //MARK:- Auth
-    public func queryAccount(address: String,_ callback: @escaping (_ address: String, _ sequence: UInt64, _ accountNumber: UInt64) -> ()) {
+    public func queryAccount(address: String,
+                             successCallback: @escaping (_ address: String, _ sequence: UInt64, _ accountNumber: UInt64) -> (),
+                             errorCallback: @escaping FPErrorCallback) {
         
         let client = AuthQueryClient(channel: self.channel)
         var req = AuthQueryAccountRequest()
@@ -22,12 +24,13 @@ extension DmaIRISSession {
             case .success(let response):
                 print(response.account.value)
                 if let baseAccount = try? AuthBaseAccount(serializedData: response.account.value) {
-                    callback(baseAccount.address,
+                    successCallback(baseAccount.address,
                              baseAccount.sequence,
                              baseAccount.accountNumber)
                 }
             case .failure(let error):
                 print(error)
+//                errorCallback(error)
             }
         }
      }

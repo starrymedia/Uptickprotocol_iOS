@@ -9,7 +9,7 @@ import Foundation
 
 extension DmaIRISSession {
     
-    //MARK:- transfer
+    //MARK:- 更换同质化Token Owner
     public func transfer(from: String,
                          to: String,
                          value: String,

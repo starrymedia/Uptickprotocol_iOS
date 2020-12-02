@@ -85,12 +85,13 @@ open class EthWallet: NSObject {
         let data = try? SegwitAddrCoder().convertBits(instart: 0, from: 5, to: 8, pad: true, idata: addressData)
         return data
     }
+    
     /// 获取助记词
     ///
     /// - Parameter seedLen: 随机长度
     /// - Returns: 返回助记词
     func exportMnemonics() -> (String?) {
-        guard let mnemonics = try? BIP39.generateMnemonics(bitsOfEntropy: 128) else {return ("")}
+        guard let mnemonics = try? BIP39.generateMnemonics(bitsOfEntropy: 256) else {return ("")}
         return mnemonics
     }
     
@@ -170,85 +171,6 @@ open class EthWallet: NSObject {
         guard let jsonData = try? JSONEncoder().encode(keystoreV3.keystoreParams) else {return nil}
         let keystoreJson = String(data: jsonData, encoding: .utf8)
         return keystoreJson!
-    }
-
-    /// 通过地址查询钱包余额
-    ///
-    /// - Parameter address: 地址
-    /// - Returns: 余额
-    func balance(address:String) -> ContractResult {
-        let web3 = Web3.new(URL(string: url!)!)
-        web3?.provider.network = nil
-        let account = EthereumAddress(address)
-
-        let balanceResult = web3?.eth.getBalance(address: account!)
-        switch balanceResult {
-        case .success(let balance)?:
-
-            return ContractResult.success(value:["balance":Web3.Utils.formatToPrecision(balance) as Any])
-        case .failure(_)?:
-            return ContractResult.failure(error: "查询失败")
-        case .none:
-            return ContractResult.failure(error: "查询失败")
-        }
-    }
-
-    /// 转账
-    ///
-    /// - Parameters:
-    ///   - privatekey: 私钥
-    ///   - to: 转账对象
-    ///   - value: 转账金额 例如eg:0.1代表0.1eth
-    ///   - gasPrice: gas价格 例如Demo
-    ///   - gasLimit: gas限制 例如Demo
-    /// - Returns: 哈希值
-    func transfer(privatekey:String,to:String,value:String,gasPrice:String,gasLimit:String) -> ContractResult {
-        let keyJsonString = self.exportKeystoreFromPrivateKeyAndPassword(privateKey: privatekey, passWord: "")
-        let keystore = EthereumKeystoreV3.init(keyJsonString!)
-        let keystoreManager = KeystoreManager.init([keystore!])
-        let account = keystoreManager.addresses![0]
-
-        let web3 = Web3.new(URL(string: url!)!)
-        web3?.provider.network = nil
-        web3?.addKeystoreManager(keystoreManager)
-
-
-
-        let toAddress = EthereumAddress(to)
-
-        let random = web3?.eth.getTransactionCount(address: account)
-        switch random {
-        case .success(let res)?:
-
-            var transaction = EthereumTransaction(gasPrice: BigUInt(gasPrice)!,
-                                                  gasLimit: BigUInt(gasLimit)!,
-                                                  to: toAddress!,
-                                                  value: Web3.Utils.parseToBigUInt(value, units: .eth)!,
-                                                  data: Data())
-            transaction.nonce = res
-            do {
-                try Web3Signer.signTX(transaction: &transaction, keystore: keystore!, account: account, password: "")
-            } catch {
-                print("签名失败")
-            }
-            let encoded:Data? = transaction.encode()
-
-            let sendTransation = web3?.eth.sendRawTransaction(encoded!)
-
-            switch sendTransation {
-            case .success(let res)?:
-                return ContractResult.success(value:["hash":res.hash])
-            case .failure(let error)?:
-                return ContractResult.failure(error: error)
-            case .none:
-                return ContractResult.failure(error: "转账失败")
-            }
-
-        case .failure(let error)?:
-            return ContractResult.failure(error: error)
-        case .none:
-            return ContractResult.failure(error: "获取random失败")
-        }
     }
     
 }

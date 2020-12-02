@@ -94,6 +94,8 @@ open class TxService {
             print("txSign:\(txSign)")
             callback(txSign)
 
+        } errorCallback: { error in
+            print(error)
         }
 
     }
@@ -120,7 +122,6 @@ open class TxService {
                     case .success(let jsonString):
                         print(jsonString)
                         if let model = BroadcastModel.deserialize(from: jsonString) {
-                            print(model)
                             if let hash = model.result?.hash {
                                 successCallback(hash)
                             }
@@ -148,8 +149,8 @@ open class TxService {
             print("signature error")
             return nil
         }
-        print("r:\(signature.r.base64EncodedString() )")
-        print("s:\(signature.s.base64EncodedString() )")
+//        print("r:\(signature.r.base64EncodedString() )")
+//        print("s:\(signature.s.base64EncodedString() )")
         let data = signature.r + signature.s
         return data
     }
