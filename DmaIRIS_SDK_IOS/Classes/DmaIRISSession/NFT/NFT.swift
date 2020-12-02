@@ -301,7 +301,8 @@ extension DmaIRISSession {
     //MARK:- 根据地址和分类查询拥有的NFT 资产
     public func queryOwner(address: String,
                            denom: String,
-                      _ callback: @escaping (_ owner: NftOwner) -> ()) {
+                           successCallback: @escaping (_ owner: NftOwner) -> (),
+                           errorCallback: @escaping FPErrorCallback) {
 
         var request = NftQueryOwnerRequest()
         request.denom = denom
@@ -316,9 +317,9 @@ extension DmaIRISSession {
             switch result {
             case .success(let value):
                 print(value)
-                callback(value.owner)
+                successCallback(value.owner)
             case .failure(let error):
-                print(error)
+                errorCallback(error.localizedDescription ?? "")
             }
         }
     }

@@ -68,23 +68,23 @@ class ViewController: UIViewController {
 //        }
 ////
 //        iaa1ufnjelwg276r2xjj7cvs7le5esca59tmtcl7ve
-        IRIS.queryOwner(address: to, denom: "") { value in
-            print(value)
-
-            var tokenIds = [String]()
-            for collection in value.idCollections {
-                tokenIds.append(contentsOf: collection.ids)
-            }
-            print(tokenIds)
-        }
-        
-//        MerchantSession.getAllAsset { values in
-//            print(values)
-//        }
-//
-//        MerchantSession.getAssetByDenom(denom: "bdyc") { value in
+//        IRIS.queryOwner(address: to, denom: "") { value in
 //            print(value)
+//
+//            var tokenIds = [String]()
+//            for collection in value.idCollections {
+//                tokenIds.append(contentsOf: collection.ids)
+//            }
+//            print(tokenIds)
 //        }
+        
+        MerchantSession.getAllAsset { values in
+            print(values)
+        }
+//
+        MerchantSession.getAssetByDenom(denom: "ces11") { value in
+            print(value)
+        }
         
 //
 //        IRIS.mintNFTMuch(sender: from,

@@ -60,6 +60,6 @@ open class TxUtils {
         let str = "\(random)"
         print("random\(str)")
         string += str
-        return string
+        return string.lowercased()
     }
 }

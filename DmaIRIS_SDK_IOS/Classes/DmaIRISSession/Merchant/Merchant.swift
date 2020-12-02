@@ -98,26 +98,34 @@ public class Merchant {
     }
     
     //MARK:- 根据钱包地址以及类型查询已上架的所有NFT
-    public func getTokensByAddress(address: String, denom: String, _ callback: @escaping (_ token: [TokenDataModel]) -> ()) {
+    public func getTokensByAddress(address: String,
+                                   denom: String,
+                                   successCallback: @escaping (_ token: [TokenDataModel]) -> (),
+                                   errorCallback: @escaping FPErrorCallback) {
+        
         let url = nodeUrl + getTokensByAddressUrl + "?address=\(address)&denom=\(denom)"
         AF.request(url).responseString { response in
             switch response.result {
             case .success(let jsonString):
                 print(jsonString)
                 if let responseModel = TokensModel.deserialize(from: jsonString) {
-                    if let data = responseModel.data {
-                        callback(data)
+                    if responseModel.success {
+                        if let data = responseModel.data {
+                            successCallback(data)
+                        }
+                    } else {
+                        errorCallback(responseModel.msg ?? "getTokensByAddress error")
                     }
                 }
 
             case .failure(let error):
-                print(error)
+                errorCallback(error.localizedDescription)
             }
         }
     }
     
     public func onsale(denom: String,
-                       tokenids: String,
+                       tokenids: [String],
                        price: String,
                        coin: String,
                        privateKey: String,
@@ -135,9 +143,9 @@ public class Merchant {
                                     nftDenom: denom,
                                     owner: address)
         var labels = [MerchantOnSaleLabels]()
-        for tokenId in tokenids.split(separator: ",") {
+        for tokenId in tokenids {
             let label = MerchantOnSaleLabels(coin: coin,
-                                             nftId: String(tokenId),
+                                             nftId: tokenId,
                                              price: price)
             labels.append(label)
         }
@@ -196,36 +204,39 @@ public class Merchant {
     //MARK:- 下架
     public func offsale(denom: String,
                         tokenIds: [String],
-                       privateKey: String,
-                       mnemonics: String) {
+                        privateKey: String,
+                        successCallback: @escaping () -> (),
+                        errorCallback: @escaping FPErrorCallback) {
         
-        guard let publicKeyData = try? WalletManager.exportPublicKey(mnemonics) else {
+        guard let publicKeyData = try? WalletManager.exportPublicKey(privateKey: privateKey) else {
             print("publicKey error")
             return
         }
-        let publicKeyString = publicKeyData.base64EncodedString()
-        let address = WalletManager.exportBech32Address(mnemonics: mnemonics)
+        let publicKeyString = publicKeyData.base64EncodedString() ?? ""
+        let address = WalletManager.exportBech32Address(privateKey: privateKey)
 
-        let param: Parameters = ["pubKey": publicKeyString ?? "",
-                                 "nftDenom": denom,
-                                 "owner": address,
-                                 "ids": tokenIds]
+        let param = MerchantOffSale(pubKey: publicKeyString,
+                                    nftDenom: denom,
+                                    owner: address,
+                                    ids: tokenIds)
         print(param)
         
         let url = nodeUrl + offsaleUrl
-        AF.request(url, method: .post, parameters: param).responseString { response in
+        AF.request(url, method: .post, parameters: param, encoder: JSONParameterEncoder.default).responseString { response in
             switch response.result {
             case .success(let jsonString):
                 print(jsonString)
                 if let responseModel = TokensModel.deserialize(from: jsonString) {
-                    if let data = responseModel.data {
-//                        callback(data)
-                        #warning("稍后再写")
+                    if responseModel.success {
+                        successCallback()
+                    } else {
+                        errorCallback(responseModel.msg ?? "")
                     }
                 }
 
             case .failure(let error):
                 print(error)
+                errorCallback(error.localizedDescription ?? "")
             }
         }
     }
@@ -339,7 +350,7 @@ public struct TokenModel: HandyJSON {
 public struct TokenDataModel: HandyJSON {
     public init() {}
     var assetDenom: String?
-    var tokenid: String?
+    public var tokenid: String?
     var owner: String?
     var price: String?
     var coin: String?
@@ -351,7 +362,7 @@ public struct TokensModel: HandyJSON {
     var code: Int?
     var data: [TokenDataModel]?
     var msg: String?
-    var success: Bool?
+    var success: Bool = true
 }
 
 
@@ -387,5 +398,13 @@ struct MerchantOnSaleLabels: Encodable {
     let coin: String
     let nftId: String
     let price: String
+}
+
+struct MerchantOffSale: Encodable {
+    
+    let pubKey: String
+    let nftDenom: String
+    let owner: String
+    var ids: [String]?
 }
  
