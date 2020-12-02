@@ -1,7 +1,4 @@
-<<<<<<< HEAD
-# DmaIRIS_SDK_IOS
-=======
-# DmaIRIS_SDK_IOS
+# UptickProtocolIRISnet
 
 [![CI Status](https://img.shields.io/travis/447690182@qq.com/DmaIRIS_SDK_IOS.svg?style=flat)](https://travis-ci.org/447690182@qq.com/DmaIRIS_SDK_IOS)
 [![Version](https://img.shields.io/cocoapods/v/DmaIRIS_SDK_IOS.svg?style=flat)](https://cocoapods.org/pods/DmaIRIS_SDK_IOS)
