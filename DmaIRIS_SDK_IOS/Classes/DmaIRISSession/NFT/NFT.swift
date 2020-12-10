@@ -45,7 +45,6 @@ extension DmaIRISSession {
 
         //签名交易
         TxService.signTx(txBody: txBody,
-                         fee: fee,
                          chainId: chainId,
                          privateKey: privateKey) { tx in
             print("tx:\(tx)")
@@ -105,7 +104,6 @@ extension DmaIRISSession {
                                  amount: txAmount,
                                  denom: txDenom)
         TxService.signTx(txBody: txBody,
-                         fee: fee,
                          chainId: chainId,
                          privateKey: privateKey) { tx in
             
@@ -145,7 +143,7 @@ extension DmaIRISSession {
                                  amount: txAmount,
                                  denom: txDenom)
         
-        TxService.signTx(txBody: txBody, fee: fee, chainId: chainId, privateKey: privateKey) { tx in
+        TxService.signTx(txBody: txBody, chainId: chainId, privateKey: privateKey) { tx in
             
             TxService.broadcast(url: broadcastUrl, tx: tx) { res in
                 print(res)
@@ -211,7 +209,6 @@ extension DmaIRISSession {
                                  amount: "1",
                                  denom: txDenom)
         TxService.signTx(txBody: txBody,
-                         fee: fee,
                          chainId: chainId,
                          privateKey: privateKey) { tx in
             

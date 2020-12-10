@@ -68,5 +68,52 @@ open class TxUtils {
         return string.lowercased()
     }
     
+    public class func toWei(tokenSymblol: String,
+                            amount: Double,
+                            successCallback: @escaping (_ amount: UInt64) -> (),
+                            errorCallBack: @escaping FPErrorCallback) {
+     
+        IRIS.token(denom: tokenSymblol) { scale in
+            print(scale)
+            var amount = Decimal(amount)
+            var result = Decimal()
+            NSDecimalMultiplyByPowerOf10(&result, &amount, Int16(scale), .plain)
+
+            var rounded = Decimal()
+            NSDecimalRound(&rounded, &result, 0, .down)
+            let resultstring = NSDecimalString(&rounded, nil)
+            if let decimalToInt = UInt64(resultstring) {
+                successCallback(decimalToInt)
+            } else {
+                errorCallBack("error")
+            }
+        } errorCallBack: { error in
+            print(error)
+            errorCallBack(error)
+        }
+    }
+    
+    public class func forWei(tokenSymblol: String,
+                            amount: UInt64,
+                            successCallback: @escaping (_ amount: Double) -> (),
+                            errorCallBack: @escaping FPErrorCallback) {
+     
+        IRIS.token(denom: tokenSymblol) { scale in
+            print(scale)
+            var amount = Decimal(amount)
+            var result = Decimal()
+            NSDecimalMultiplyByPowerOf10(&result, &amount, -Int16(scale), .plain)
+            let resultstring = NSDecimalString(&result, nil)
+            if let decimalToDouble = Double(resultstring) {
+                successCallback(decimalToDouble)
+            } else {
+                errorCallBack("error")
+            }
+        } errorCallBack: { error in
+            print(error)
+            errorCallBack(error)
+        }
+    }
+    
   
 }

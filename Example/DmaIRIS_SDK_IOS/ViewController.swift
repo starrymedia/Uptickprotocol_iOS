@@ -32,6 +32,20 @@ class ViewController: UIViewController {
 
         
         
+                IRIS.transfer(from: from,
+                      to: to,
+                      value: "20",
+                      denom: "ubif",
+                      privateKey: privateKey,
+                      chainId: "testing",
+                      broadcastUrl: RpcURI) { res in
+
+
+            print("res=====\(res)")
+        } errorCallBack:{_ in
+
+        }
+        
         
 //        MerchantSession.getTokensByAddress(address: address,
 //                                           denom: model.address ?? "") { datas in
@@ -86,14 +100,11 @@ class ViewController: UIViewController {
 //            print(tokenIds)
 //        }
         
-        MerchantSession.getAllAsset { values in
-            print(values)
-        }
+
+//        MerchantSession.getAssetByDenom(denom: "ces11") { value in
+//            print(value)
+//        }
 //
-        MerchantSession.getAssetByDenom(denom: "ces11") { value in
-            print(value)
-        }
-        
 //
 //        IRIS.mintNFTMuch(sender: from,
 //                         recipient: from,
@@ -140,21 +151,12 @@ class ViewController: UIViewController {
 //        }
         
 //
-//        IRIS.transfer(from: from,
-//                      to: to,
-//                      value: "2000000",
-//                      denom: "ubif",
-//                      privateKey: privateKey,
-//                      chainId: "testing",
-//                      broadcastUrl: RpcURI) { res in
-//            print("res=====\(res)")
-//        } errorCallBack:{_ in
-//
-//        }
 ////
 //        IRIS.queryBalance(address: to,denom: "ubif") { cion in
 //            print("cion:\(cion)")
-//
+////            37809011
+////            43809011
+////            45809011
 //        } errorCallback: { error in
 //            print(error)
 //        }

@@ -39,7 +39,7 @@ extension DmaIRISSession {
                                  amount: txAmount,
                                  denom: txDenom)
         
-        TxService.signTx(txBody: txBody, fee: fee, chainId: chainId, privateKey: privateKey) { tx in
+        TxService.signTx(txBody: txBody, chainId: chainId, privateKey: privateKey) { tx in
             
             TxService.broadcast(url: broadcastUrl, tx: tx) { res in
                 print(res)
@@ -74,7 +74,7 @@ extension DmaIRISSession {
         
         let fee = TxUtils.getFee(gasLimit: txGasLimit, amount: txAmount, denom: txDenom)
         
-        TxService.signTx(txBody: txBody, fee: fee, chainId: chainId, privateKey: privateKey) { tx in
+        TxService.signTx(txBody: txBody, chainId: chainId, privateKey: privateKey) { tx in
             
             TxService.broadcast(url: broadcastUrl, tx: tx) { res in
                 print(res)
@@ -108,7 +108,7 @@ extension DmaIRISSession {
         
         let fee = TxUtils.getFee(gasLimit: txGasLimit, amount: txAmount, denom: txDenom)
         
-        TxService.signTx(txBody: txBody, fee: fee, chainId: chainId, privateKey: privateKey) { tx in
+        TxService.signTx(txBody: txBody, chainId: chainId, privateKey: privateKey) { tx in
             
             TxService.broadcast(url: broadcastUrl, tx: tx) { res in
                 print(res)
@@ -125,20 +125,26 @@ extension DmaIRISSession {
     ///   - denom: 分类ID
     ///   - callback: token信息
     /// - Returns:
-    public func token(denom: String,_ callback: @escaping (_ token: Data) -> ()) {
-        var request = TokenQueryTokenRequest()
+    public func token(denom: String,
+                      successCallback: @escaping (_ scale: UInt32) -> (),
+                      errorCallBack: @escaping FPErrorCallback) {
+        
+        var request = Irismod_Token_QueryTokenRequest()
         request.denom = denom
         
         let client = TokenQueryClient(channel: self.channel)
-        let response = client.token(request).response
-        response.whenComplete { result in
+        let res = client.token(request)
+        
+        res.response.whenComplete { result in
             switch result {
             case .success(let value):
-                if let data = try? value.token.serializedData() {
-                    callback(data)
+                if let token = try? Irismod_Token_Token(serializedData: value.token.value) {
+                    successCallback(token.scale)
+                } else {
+                    errorCallBack("error")
                 }
             case .failure(let error):
-                print(error)
+                errorCallBack(error.localizedDescription)
             }
         }
     }

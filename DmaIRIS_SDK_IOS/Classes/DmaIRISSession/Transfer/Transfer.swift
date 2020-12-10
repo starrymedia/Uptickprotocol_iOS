@@ -40,7 +40,6 @@ extension DmaIRISSession {
         
         //调用签名方法
         TxService.signTx(txBody: txBody,
-                         fee: fee,
                          chainId: chainId,
                          privateKey: privateKey) { tx in
             print("tx:\(tx)")

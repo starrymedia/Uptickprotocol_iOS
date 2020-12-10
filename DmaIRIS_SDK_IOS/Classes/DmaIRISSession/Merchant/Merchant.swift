@@ -11,7 +11,7 @@ import Alamofire
 
 public let MerchantSession = Merchant.default
 
-let nodeUrl = "http://52.81.146.252:8090"
+let nodeUrl = "http://52.81.146.252:8091"
 
 let onsaleUrl = "/api/1/merchant/onsale"//上架
 let offsaleUrl = "/api/1/merchant/offsale"//下架
