@@ -46,20 +46,27 @@ open class TxUtils {
     public static var identifier: String {
 
         var string = ""
-
-        let dateFormatter = DateFormatter()
-
-        dateFormatter.dateFormat = "yyyyMMddHHmmssSSS"
-
-        string.append(dateFormatter.string(from: NSDate() as Date))
-
-        var uuid = UIDevice.current.identifierForVendor?.uuidString ?? ""
-        var array = uuid.split(separator: "-")
-        string += array.last ?? ""
-        let random = arc4random_uniform(UInt32(64 - string.count - 6))
-        let str = "\(random)"
-        print("random\(str)")
-        string += str
+        
+//        var uuid = UIDevice.current.identifierForVendor?.uuidString ?? ""
+//        var array = uuid.split(separator: "-")
+//        string += array.last ?? ""
+//
+//        let dateFormatter = DateFormatter()
+//        dateFormatter.dateFormat = "HHmmssSSS"
+//        string.append(dateFormatter.string(from: NSDate() as Date))
+        let uuidRef = CFUUIDCreate(nil)
+        let uuidStringRef = CFUUIDCreateString(nil,uuidRef)
+        string = uuidStringRef as! String
+        string = string.replacingOccurrences(of: "-", with: "")
+//        let random = arc4random_uniform(UInt32(64 - string.count - 6))
+//        let str = "\(random)"
+//        print("random\(str)")
+//        string += str
+        
+        
+        
         return string.lowercased()
     }
+    
+  
 }

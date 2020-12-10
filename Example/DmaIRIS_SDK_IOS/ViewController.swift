@@ -30,6 +30,9 @@ class ViewController: UIViewController {
         let RpcURI = "http://52.81.146.252:26657"
         
 
+        
+        
+        
 //        MerchantSession.getTokensByAddress(address: address,
 //                                           denom: model.address ?? "") { datas in
 //         } errorCallback: { error in
@@ -206,7 +209,7 @@ class ViewController: UIViewController {
 //            debugPrint(response)
 //        }
      }
-    
+ 
  
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()

@@ -143,7 +143,6 @@ open class EthWallet: NSObject {
         let keystoreManager = KeystoreManager.init([keystoreV3])
         let keystore = keystoreManager.bip32keystores
     
-    
         guard let address = keystoreManager.addresses?.first?.address else {return ""}
         return address
     }

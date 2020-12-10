@@ -52,6 +52,22 @@ open class TxService {
                 signerInfo.publicKey = any
             }
             
+            var gasLimint = Decimal(20000)
+            var gasPrice = Decimal(2.98)
+            
+            var gasPriceUp = Decimal()
+            NSDecimalRound(&gasPriceUp, &gasPrice, 0, .up)
+            print(gasPriceUp)
+            
+            var amount = Decimal()
+            NSDecimalMultiply(&amount, &gasLimint, &gasPriceUp, .plain)
+            print(amount)
+//            let amountString = dec
+//            let fee = TxUtils.getFee(gasLimit: txGasLimit,
+//                                     amount: amount,
+//                                     denom: txDenom)
+
+
             //认证信息
             var authInfo = TxAuthInfo()
             //签名信息
@@ -155,6 +171,30 @@ open class TxService {
         return data
     }
     
+    
+    func simulateRequest(signTx: Tx) {
+
+        let client = Cosmos_Base_Simulate_V1beta1_SimulateServiceClient(channel: IRIS.channel)
+        var req = Cosmos_Base_Simulate_V1beta1_SimulateRequest()
+        req.tx = signTx
+
+        let res = client.simulate(req)
+        res.response.whenComplete { result in
+            switch result {
+            case .success(let response):
+                print(response)
+//                if let baseAccount = try? AuthBaseAccount(serializedData: response.account.value) {
+//                    successCallback(baseAccount.address,
+//                             baseAccount.sequence,
+//                             baseAccount.accountNumber)
+//                }
+            case .failure(let error):
+                print(error)
+//                errorCallback(error)
+            }
+        }
+    }
+
 }
 
 struct BroadcastModel: HandyJSON {

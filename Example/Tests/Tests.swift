@@ -33,16 +33,46 @@ class Tests: XCTestCase {
     }
     
     func testIdentifer() {
-        //202011261027434051352998F1807110-E77E-47DD-BBB1-BE11C0B445FE
 
         print("============")
         var tokenids = [String]()
-        for _ in 0..<10 {
-            tokenids.append(TxUtils.identifier)
-            print(TxUtils.identifier)
-            print(TxUtils.identifier.count)
+        
+        for _ in 0..<1000 {
+            let iden = TxUtils.identifier
+            if tokenids.contains(iden) {
+                print("error")
+                return
+            }
+            tokenids.append(iden)
+            print(iden)
+            print(iden.count)
         }
-        print(tokenids.joined(separator: ","))
+//        print(tokenids.joined(separator: ","))
+        print("============")
+
+    }
+    
+    func testAmount() {
+        
+        //        BigDecimal amount = BigDecimal.valueOf(gasLimint).multiply(new BigDecimal(options.getDefaultGasPrice())).setScale(0, BigDecimal.ROUND_UP);
+        print("============")
+
+//        while true {
+//
+//        }
+        
+        var gasLimint = Decimal(20000)
+        var gasPrice = Decimal(2.98)
+        
+        var gasPriceUp = Decimal()
+        NSDecimalRound(&gasPriceUp, &gasPrice, 0, .up)
+        print(gasPriceUp)
+        
+        var amount = Decimal()
+        NSDecimalMultiply(&amount, &gasLimint, &gasPriceUp, .plain)
+        print(amount)
+        var amountString = NSDecimalString(&amount, nil)
+        print(amountString)
         print("============")
 
     }

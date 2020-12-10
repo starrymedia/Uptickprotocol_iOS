@@ -100,7 +100,7 @@ public class Merchant {
     //MARK:- 根据钱包地址以及类型查询已上架的所有NFT
     public func getTokensByAddress(address: String,
                                    denom: String,
-                                   successCallback: @escaping (_ token: [TokenDataModel]) -> (),
+                                   successCallback: @escaping (_ token: [TokenDataModel]? ) -> (),
                                    errorCallback: @escaping FPErrorCallback) {
         
         let url = nodeUrl + getTokensByAddressUrl + "?address=\(address)&denom=\(denom)"
@@ -110,9 +110,7 @@ public class Merchant {
                 print(jsonString)
                 if let responseModel = TokensModel.deserialize(from: jsonString) {
                     if responseModel.success {
-                        if let data = responseModel.data {
-                            successCallback(data)
-                        }
+                        successCallback(responseModel.data)
                     } else {
                         errorCallback(responseModel.msg ?? "getTokensByAddress error")
                     }
