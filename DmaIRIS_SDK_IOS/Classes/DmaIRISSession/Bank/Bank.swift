@@ -13,7 +13,7 @@ extension DmaIRISSession {
     
     public func queryBalance(address: String,
                              denom: String,
-                             successCallback: @escaping (_ balance: Coin) -> (),
+                             successCallback: @escaping (_ balance: String) -> (),
                              errorCallback: @escaping FPErrorCallback) {
                 
         let client = BankQueryClient(channel: self.channel)
@@ -24,7 +24,13 @@ extension DmaIRISSession {
         res.response.whenComplete { result in
             switch result {
             case .success(let value):
-                successCallback(value.balance)
+               
+                TxUtils.forWei(tokenSymblol: denom,
+                               amount: UInt64(value.balance.amount) ?? 0) { amount in
+                    successCallback(amount)
+                } errorCallBack: { error in
+                    errorCallback(error)
+                }
             case .failure(let error):
                 print(error)
                 errorCallback(error.localizedDescription)
@@ -32,7 +38,10 @@ extension DmaIRISSession {
         }
     }
     
-    public func queryAllBalance(address: String, _ callback: @escaping (_ list: [Coin] ) -> Void) {
+    public func queryAllBalance(address: String,
+                                denom: String,
+                                successCallback: @escaping (_ balances: [Coin]) -> (),
+                                errorCallback: @escaping FPErrorCallback) {
                 
         let client = BankQueryClient(channel: self.channel)
         var req = BankQueryAllBalancesRequest()
@@ -42,7 +51,7 @@ extension DmaIRISSession {
             print("queryAllBalance:\(result)")
             switch result {
             case .success(let value):
-                callback(value.balances)
+                successCallback(value.balances)
             case .failure(let error):
                 print(error)
             }

@@ -18,6 +18,7 @@ open class TxService {
     class func signTx(txBody: TxBody,
                 chainId: String,
                 privateKey: String,
+                number: Int = 1,
                 _ callback: @escaping (_ tx: Tx) -> Void) {
 
         //获取公钥
@@ -52,146 +53,66 @@ open class TxService {
                 signerInfo.publicKey = any
             }
             
-//            var gasLimint = Decimal(txGasLimit)
-//            var gasPrice = Decimal(0.025)
-//            var gasPriceUp = Decimal()
-//            NSDecimalRound(&gasPriceUp, &gasPrice, 0, .up)
-//            print(gasPriceUp)
-//
-//            var amount = Decimal()
-//            NSDecimalMultiply(&amount, &gasLimint, &gasPriceUp, .plain)
-//            print(amount)
-//            var amountString = NSDecimalString(&amount, nil)
-//            let fee = TxUtils.getFee(gasLimit: txGasLimit,
-//                                     amount: amountString,
-//                                     denom: txDenom)
-//
-//
-//            //认证信息
-//            var authInfo = TxAuthInfo()
-//            //签名信息
-//            authInfo.signerInfos.append(signerInfo)
-//            //交易费
-//            authInfo.fee = fee
-//            //链ID
-//            let chainId = chainId
-//            if chainId.isEmpty {
-//                print("chainId ie empty")
-//                return
-//            }
-//            //签名实体
-//            var signdoc = TxSignDoc()
-//            //交易体
-//            signdoc.bodyBytes = try! txBody.serializedData()
-//            //认证信息
-//            signdoc.authInfoBytes = try! authInfo.serializedData()
-//
-//            //地址编号
-//            signdoc.accountNumber = accountNumber
-//            //链ID
-//            signdoc.chainID = chainId
-//
-//            var txSign = Tx()
-//            txSign.body = txBody
-//            txSign.authInfo = authInfo
-//
-//            //签名算法
-//            if let hashData = try? signdoc.serializedData().sha256() {
-//
-//                if let sigBytes = TxService.signatureString(hashData: hashData, privateKey: privateKey) {
-//                    if let bytesValue = try? BytesValue(sigBytes) {
-//                        print(bytesValue)
-//                        txSign.signatures.append(bytesValue.value)
-//                    }
-//                }
-//
-//            }
+            let gasLimit:UInt64 = 50000 + txGasLimit*UInt64(number)
+            var gasLimint = Decimal(gasLimit)
+            var gasPrice = Decimal(0.025)
+            var gasPriceUp = Decimal()
+            NSDecimalRound(&gasPriceUp, &gasPrice, 0, .up)
+            print(gasPriceUp)
+            var amount = Decimal()
+            NSDecimalMultiply(&amount, &gasLimint, &gasPriceUp, .plain)
+            print(amount)
+            let amountString = NSDecimalString(&amount, nil)
+            let fee = TxUtils.getFee(gasLimit: gasLimit,
+                                     amount: amountString,
+                                     denom: txDenom)
 
-            var gasLimit:UInt64 = 200000
-            let dispatchQueue = DispatchQueue(label: "serial")
-            let semaphoreSignal = DispatchSemaphore(value: 0)
-            dispatchQueue.async {
-               
-                let txSign = setSignTx(signerInfo: signerInfo,
-                                       chainId: chainId,
-                                       txBody: txBody,
-                                       accountNumber: accountNumber,
-                                       privateKey: privateKey,
-                                       gasLimit: gasLimit)
-               
-               TxService.simulateRequest(signTx: txSign) { gasUsed in
-                    print("1===:\(gasUsed)")
-                    print("1===:\(gasLimit)")
-                if gasLimit == gasUsed {
-                    print("1=============")
-                } else {
-                    gasLimit = gasUsed
-                }
-                   semaphoreSignal.signal()
 
-               } errorCallBack: { _ in
-                   
-               }
-               
+            //认证信息
+            var authInfo = TxAuthInfo()
+            //签名信息
+            authInfo.signerInfos.append(signerInfo)
+            //交易费
+            authInfo.fee = fee
+            //链ID
+            let chainId = chainId
+            if chainId.isEmpty {
+                print("chainId ie empty")
+                return
             }
-            
-            dispatchQueue.async {
-                semaphoreSignal.wait()
+            //签名实体
+            var signdoc = TxSignDoc()
+            //交易体
+            signdoc.bodyBytes = try! txBody.serializedData()
+            //认证信息
+            signdoc.authInfoBytes = try! authInfo.serializedData()
 
-                let txSign = setSignTx(signerInfo: signerInfo,
-                                       chainId: chainId,
-                                       txBody: txBody,
-                                       accountNumber: accountNumber,
-                                       privateKey: privateKey,
-                                       gasLimit: gasLimit)
-               
-               TxService.simulateRequest(signTx: txSign) { gasUsed in
-                    print("2===:\(gasUsed)")
-                    print("2===:\(gasLimit)")
-                if gasLimit == gasUsed {
-                    print("2=============")
-                } else {
-                    gasLimit = gasUsed
+            //地址编号
+            signdoc.accountNumber = accountNumber
+            //链ID
+            signdoc.chainID = chainId
+
+            var txSign = Tx()
+            txSign.body = txBody
+            txSign.authInfo = authInfo
+
+            //签名算法
+            if let hashData = try? signdoc.serializedData().sha256() {
+
+                if let sigBytes = TxService.signatureString(hashData: hashData, privateKey: privateKey) {
+                    if let bytesValue = try? BytesValue(sigBytes) {
+                        print(bytesValue)
+                        txSign.signatures.append(bytesValue.value)
+                    }
                 }
-                   semaphoreSignal.signal()
 
-               } errorCallBack: { _ in
-                   
-               }
-               
             }
-            
-            dispatchQueue.async {
-                semaphoreSignal.wait()
-                let txSign = setSignTx(signerInfo: signerInfo,
-                                       chainId: chainId,
-                                       txBody: txBody,
-                                       accountNumber: accountNumber,
-                                       privateKey: privateKey,
-                                       gasLimit: gasLimit)
-               
-               TxService.simulateRequest(signTx: txSign) { gasUsed in
-                   print("3===:\(gasUsed)")
-            print("3===:\(gasLimit)")
-                if gasLimit == gasUsed {
-                    print("3=============")
-                } else {
-                    gasLimit = gasUsed
-                }
-                   semaphoreSignal.signal()
+            callback(txSign)
 
-               } errorCallBack: { _ in
-                   
-               }
-               
-            }
-            
-     
-            
-      
-            
-
-            
+//             var gasLimit:UInt64 = 200000
+//            let semaphoreSignal = DispatchSemaphore(value: 1)
+//            let lock = NSLock.init()
+//
 //            for index in 0..<10 {
 //                print(index)
 //                print(gasLimit)
@@ -223,11 +144,11 @@ open class TxService {
 //                    }
 //
 //            }
-//
+
         } errorCallback: { error in
             print(error)
         }
-        
+
     }
     
     class func setSignTx(signerInfo: TxSignerInfo,
@@ -351,6 +272,7 @@ open class TxService {
         req.tx = signTx
 
         let res = client.simulate(req)
+
         res.response.whenComplete { result in
             switch result {
             case .success(let response):
@@ -362,8 +284,6 @@ open class TxService {
             }
         }
     }
-    
-    
 
 }
 

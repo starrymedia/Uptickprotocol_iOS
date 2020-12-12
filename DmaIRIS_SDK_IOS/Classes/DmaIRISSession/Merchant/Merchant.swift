@@ -11,7 +11,9 @@ import Alamofire
 
 public let MerchantSession = Merchant.default
 
+//let nodeUrl = "http://52.81.146.252:8090"
 let nodeUrl = "http://52.81.146.252:8091"
+//"http://52.81.146.252:8091";
 
 let onsaleUrl = "/api/1/merchant/onsale"//上架
 let offsaleUrl = "/api/1/merchant/offsale"//下架
@@ -130,26 +132,56 @@ public class Merchant {
                        successCallback: @escaping (_ value: String) -> (),
                        errorCallback: @escaping FPErrorCallback) {
         
+
+        TxUtils.toWei(tokenSymblol: coin, amount: Double(price) ?? 0.00) { amount in
+            
+            self.onsaleRequset(denom: denom,
+                               tokenids: tokenids,
+                               price: amount,
+                               coin: coin,
+                               privateKey: privateKey) { value in
+                successCallback(value)
+            } errorCallback: { error in
+                errorCallback(error)
+            }
+
+        } errorCallBack: { error in
+            
+            errorCallback(error)
+
+        }
+
+   
+    }
+    
+    func onsaleRequset(denom: String,
+                       tokenids: [String],
+                       price: String,
+                       coin: String,
+                       privateKey: String,
+                       successCallback: @escaping (_ value: String) -> (),
+                       errorCallback: @escaping FPErrorCallback) {
+        
         guard let publicKeyData = try? WalletManager.exportPublicKey(privateKey: privateKey) else {
             print("publicKey error")
             return
         }
         let publicKeyString = publicKeyData.base64EncodedString() ?? ""
         let address = WalletManager.exportBech32Address(privateKey: privateKey)
-
         var params = MerchantOnSale(pubKey: publicKeyString,
-                                    nftDenom: denom,
+                                    nftId: denom,
                                     owner: address)
+        
         var labels = [MerchantOnSaleLabels]()
         for tokenId in tokenids {
             let label = MerchantOnSaleLabels(coin: coin,
-                                             nftId: tokenId,
+                                             tokenId: tokenId,
                                              price: price)
             labels.append(label)
         }
         params.labels = labels
         print(params)
-        
+
         let url = nodeUrl + onsaleUrl
         AF.request(url, method: .post, parameters: params, encoder: JSONParameterEncoder.default).responseString { response in
             switch response.result {
@@ -214,9 +246,9 @@ public class Merchant {
         let address = WalletManager.exportBech32Address(privateKey: privateKey)
 
         let param = MerchantOffSale(pubKey: publicKeyString,
-                                    nftDenom: denom,
+                                    nftId: denom,
                                     owner: address,
-                                    ids: tokenIds)
+                                    tokenIds: tokenIds)
         print(param)
         
         let url = nodeUrl + offsaleUrl
@@ -254,7 +286,7 @@ public class Merchant {
         let address = WalletManager.exportBech32Address(privateKey: privateKey)
 
         var param = MerchantTransfer(payerPubKey: publicKeyString,
-                                     nftDenom: denom,
+                                     nftTd: denom,
                                      payer: address,
                                      recipien: address,
                                      ids: tokenIds)
@@ -348,7 +380,7 @@ public struct TokenModel: HandyJSON {
 public struct TokenDataModel: HandyJSON {
     public init() {}
     var assetDenom: String?
-    public var tokenid: String?
+    public var tokenId: String?
     var owner: String?
     var price: String?
     var coin: String?
@@ -367,7 +399,7 @@ public struct TokensModel: HandyJSON {
 struct MerchantTransfer: Encodable {
     
     let payerPubKey: String
-    let nftDenom: String
+    let nftTd: String
     let payer: String
     let recipien: String
     var signatures: String?
@@ -386,7 +418,7 @@ public struct MerchantResponseModel: HandyJSON {
 struct MerchantOnSale: Encodable {
     
     let pubKey: String
-    let nftDenom: String
+    let nftId: String
     let owner: String
     var signatures: String?
     var labels: [MerchantOnSaleLabels]?
@@ -394,15 +426,15 @@ struct MerchantOnSale: Encodable {
  
 struct MerchantOnSaleLabels: Encodable {
     let coin: String
-    let nftId: String
+    let tokenId: String
     let price: String
 }
 
 struct MerchantOffSale: Encodable {
     
     let pubKey: String
-    let nftDenom: String
+    let nftId: String
     let owner: String
-    var ids: [String]?
+    var tokenIds: [String]?
 }
  

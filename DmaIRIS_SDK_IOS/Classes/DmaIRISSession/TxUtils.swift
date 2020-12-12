@@ -46,31 +46,17 @@ open class TxUtils {
     public static var identifier: String {
 
         var string = ""
-        
-//        var uuid = UIDevice.current.identifierForVendor?.uuidString ?? ""
-//        var array = uuid.split(separator: "-")
-//        string += array.last ?? ""
-//
-//        let dateFormatter = DateFormatter()
-//        dateFormatter.dateFormat = "HHmmssSSS"
-//        string.append(dateFormatter.string(from: NSDate() as Date))
         let uuidRef = CFUUIDCreate(nil)
         let uuidStringRef = CFUUIDCreateString(nil,uuidRef)
         string = uuidStringRef as! String
         string = string.replacingOccurrences(of: "-", with: "")
-//        let random = arc4random_uniform(UInt32(64 - string.count - 6))
-//        let str = "\(random)"
-//        print("random\(str)")
-//        string += str
-        
-        
         
         return string.lowercased()
     }
     
     public class func toWei(tokenSymblol: String,
                             amount: Double,
-                            successCallback: @escaping (_ amount: UInt64) -> (),
+                            successCallback: @escaping (_ amount: String) -> (),
                             errorCallBack: @escaping FPErrorCallback) {
      
         IRIS.token(denom: tokenSymblol) { scale in
@@ -82,11 +68,9 @@ open class TxUtils {
             var rounded = Decimal()
             NSDecimalRound(&rounded, &result, 0, .down)
             let resultstring = NSDecimalString(&rounded, nil)
-            if let decimalToInt = UInt64(resultstring) {
-                successCallback(decimalToInt)
-            } else {
-                errorCallBack("error")
-            }
+           
+            successCallback(resultstring)
+
         } errorCallBack: { error in
             print(error)
             errorCallBack(error)
@@ -95,7 +79,7 @@ open class TxUtils {
     
     public class func forWei(tokenSymblol: String,
                             amount: UInt64,
-                            successCallback: @escaping (_ amount: Double) -> (),
+                            successCallback: @escaping (_ amount: String) -> (),
                             errorCallBack: @escaping FPErrorCallback) {
      
         IRIS.token(denom: tokenSymblol) { scale in
@@ -104,11 +88,7 @@ open class TxUtils {
             var result = Decimal()
             NSDecimalMultiplyByPowerOf10(&result, &amount, -Int16(scale), .plain)
             let resultstring = NSDecimalString(&result, nil)
-            if let decimalToDouble = Double(resultstring) {
-                successCallback(decimalToDouble)
-            } else {
-                errorCallBack("error")
-            }
+            successCallback(resultstring)
         } errorCallBack: { error in
             print(error)
             errorCallBack(error)

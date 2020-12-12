@@ -99,13 +99,15 @@ extension DmaIRISSession {
         }
                 
         
-        let limit:UInt64 = 50000 + txGasLimit*UInt64(tokenIds.count)
-        let fee = TxUtils.getFee(gasLimit: limit,
-                                 amount: txAmount,
-                                 denom: txDenom)
+//        let limit:UInt64 = 50000 + txGasLimit*UInt64(tokenIds.count)
+//        let fee = TxUtils.getFee(gasLimit: limit,
+//                                 amount: txAmount,
+//                                 denom: txDenom)
+        
         TxService.signTx(txBody: txBody,
                          chainId: chainId,
-                         privateKey: privateKey) { tx in
+                         privateKey: privateKey,
+                         number: tokenIds.count) { tx in
             
             TxService.broadcast(url: broadcastUrl, tx: tx) { res in
                 print(res)

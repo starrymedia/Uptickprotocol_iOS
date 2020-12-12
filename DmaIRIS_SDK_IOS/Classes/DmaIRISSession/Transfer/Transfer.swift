@@ -20,6 +20,37 @@ extension DmaIRISSession {
                          successCallback: @escaping (_ res: String) -> (),
                          errorCallBack: @escaping FPErrorCallback) {
         
+        TxUtils.toWei(tokenSymblol: denom, amount: Double(value) ?? 0.00) { amount in
+            
+            self.transferRequest(from: from,
+                                 to: to,
+                                 value: amount,
+                                 denom: denom,
+                                 privateKey: privateKey,
+                                 chainId: chainId,
+                                 broadcastUrl: broadcastUrl) { res in
+                successCallback(res)
+            } errorCallBack: { error in
+                errorCallBack(error)
+            }
+        } errorCallBack: { error in
+            errorCallBack(error)
+        }
+
+    }
+    
+    
+    //MARK:- 更换同质化Token Owner
+    public func transferRequest(from: String,
+                                 to: String,
+                                 value: String,
+                                 denom: String,
+                                 privateKey: String,
+                                 chainId: String,
+                                 broadcastUrl: String,
+                                 successCallback: @escaping (_ res: String) -> (),
+                                 errorCallBack: @escaping FPErrorCallback) {
+        
         var coin = Coin()
         coin.amount = value
         coin.denom = denom
@@ -33,10 +64,6 @@ extension DmaIRISSession {
         if let any = TxUtils.getProtobufAny(message: msgSend, typePrefix: "") {
             txBody.messages.append(any)
         }
-        
-        let fee = TxUtils.getFee(gasLimit: txGasLimit,
-                                 amount: txAmount,
-                                 denom: txDenom)
         
         //调用签名方法
         TxService.signTx(txBody: txBody,

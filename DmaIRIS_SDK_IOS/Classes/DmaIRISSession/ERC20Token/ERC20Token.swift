@@ -127,15 +127,15 @@ extension DmaIRISSession {
     /// - Returns:
     public func token(denom: String,
                       successCallback: @escaping (_ scale: UInt32) -> (),
-                      errorCallBack: @escaping FPErrorCallback) {
-        
-        var request = Irismod_Token_QueryTokenRequest()
+                      errorCallBack: @escaping FPErrorCallback)  {
+       
+        var request = TokenQueryTokenRequest()
         request.denom = denom
         
         let client = TokenQueryClient(channel: self.channel)
-        let res = client.token(request)
+        let response = client.token(request).response
         
-        res.response.whenComplete { result in
+        response.whenComplete { result in
             switch result {
             case .success(let value):
                 if let token = try? Irismod_Token_Token(serializedData: value.token.value) {
