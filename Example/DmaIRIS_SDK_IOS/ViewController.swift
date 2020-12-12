@@ -14,7 +14,6 @@ import web3swift
 import secp256k1_swift
 import Alamofire
 
-let RpcURI = "http://52.81.146.252:26657"
 
 class ViewController: UIViewController {
 
@@ -22,22 +21,21 @@ class ViewController: UIViewController {
         super.viewDidLoad()
         
         let mnemonic="little vibrant order rebel buddy decide notable pistol save pretty basic uncover opera split ancient surround ball iron sport eager onion lawn inch obvious"
-        let from="iaa1xywd0k3cj5lc8ugujpxp45ejpvmhh3303zu5pq"
-       
-        let to = "iaa1l5vst8vayx08aw85uy8j3hpngs7cwluen2gym5";
+        let from="iaa1fu5xru6umtfqthe588z6zk37gdknulr55ee5qf"
+        let to = "iaa1nhu8qvj232mwxllwwxs4m9zz5pqcxazpmxtm8z";
         let value="10000";
-        let privateKey="1779b474da9ef4aef67271f455dd58054d3181863b91f63910074f3cb9123591";
-        let RpcURI = "http://52.81.146.252:26657"
-        
+        let privateKey="0f6f503144fd27a530f0ed5867fc19aae3a86bd41a021ddffd065519bbf11fed";
+        let RpcURI = "http://34.80.22.255:26657"
+
 
         
         
                 IRIS.transfer(from: from,
                       to: to,
-                      value: "20",
+                      value: "1",
                       denom: "ubif",
                       privateKey: privateKey,
-                      chainId: "testing",
+                      chainId: "bifrost-1",
                       broadcastUrl: RpcURI) { res in
 
 

@@ -53,102 +53,58 @@ open class TxService {
                 signerInfo.publicKey = any
             }
             
-            let gasLimit:UInt64 = 50000 + txGasLimit*UInt64(number)
-            var gasLimint = Decimal(gasLimit)
-            var gasPrice = Decimal(0.025)
-            var gasPriceUp = Decimal()
-            NSDecimalRound(&gasPriceUp, &gasPrice, 0, .up)
-            print(gasPriceUp)
-            var amount = Decimal()
-            NSDecimalMultiply(&amount, &gasLimint, &gasPriceUp, .plain)
-            print(amount)
-            let amountString = NSDecimalString(&amount, nil)
-            let fee = TxUtils.getFee(gasLimit: gasLimit,
-                                     amount: amountString,
-                                     denom: txDenom)
+       
 
-
-            //认证信息
-            var authInfo = TxAuthInfo()
-            //签名信息
-            authInfo.signerInfos.append(signerInfo)
-            //交易费
-            authInfo.fee = fee
-            //链ID
-            let chainId = chainId
-            if chainId.isEmpty {
-                print("chainId ie empty")
-                return
+            let gasLimit = UInt64(200)
+            TxService.forRequestSimulate(signerInfo: signerInfo,
+                                         chainId: chainId,
+                                         txBody: txBody,
+                                         accountNumber: accountNumber,
+                                         privateKey: privateKey,
+                                         gasLimit: gasLimit) { tx in
+                callback(tx)
+            } errorCallBack: { eror in
+                print(eror)
             }
-            //签名实体
-            var signdoc = TxSignDoc()
-            //交易体
-            signdoc.bodyBytes = try! txBody.serializedData()
-            //认证信息
-            signdoc.authInfoBytes = try! authInfo.serializedData()
 
-            //地址编号
-            signdoc.accountNumber = accountNumber
-            //链ID
-            signdoc.chainID = chainId
 
-            var txSign = Tx()
-            txSign.body = txBody
-            txSign.authInfo = authInfo
-
-            //签名算法
-            if let hashData = try? signdoc.serializedData().sha256() {
-
-                if let sigBytes = TxService.signatureString(hashData: hashData, privateKey: privateKey) {
-                    if let bytesValue = try? BytesValue(sigBytes) {
-                        print(bytesValue)
-                        txSign.signatures.append(bytesValue.value)
-                    }
-                }
-
-            }
-            callback(txSign)
-
-//             var gasLimit:UInt64 = 200000
-//            let semaphoreSignal = DispatchSemaphore(value: 1)
-//            let lock = NSLock.init()
-//
-//            for index in 0..<10 {
-//                print(index)
-//                print(gasLimit)
-//                DispatchQueue.global().async {
-//                    semaphoreSignal.wait()
-//
-//                     let txSign = setSignTx(signerInfo: signerInfo,
-//                                            chainId: chainId,
-//                                            txBody: txBody,
-//                                            accountNumber: accountNumber,
-//                                            privateKey: privateKey,
-//                                            gasLimit: gasLimit)
-//
-//                    TxService.simulateRequest(signTx: txSign) { gasUsed in
-//                        print(gasUsed)
-//                        if gasLimit == gasUsed {
-//                            callback(txSign)
-//                            print(gasLimit)
-//                        } else {
-//                            gasLimit = gasUsed
-//                            print(gasLimit)
-//                         }
-//                        semaphoreSignal.signal()
-//
-//                    } errorCallBack: { _ in
-//
-//                    }
-//
-//                    }
-//
-//            }
 
         } errorCallback: { error in
             print(error)
         }
 
+    }
+    
+    class func forRequestSimulate(signerInfo: TxSignerInfo,
+                               chainId: String,
+                               txBody:TxBody,
+                               accountNumber: UInt64,
+                               privateKey: String,
+                               gasLimit: UInt64,
+                               successCallback: @escaping (_ txSign: Tx) -> (),
+                               errorCallBack: @escaping FPErrorCallback) {
+        var myGasLimit = gasLimit
+        let txSign = setSignTx(signerInfo: signerInfo,
+                               chainId: chainId,
+                               txBody: txBody,
+                               accountNumber: accountNumber,
+                               privateKey: privateKey,
+                               gasLimit: gasLimit)
+
+       TxService.simulateRequest(signTx: txSign) { gasUsed in
+        if myGasLimit == gasUsed {
+            print("result gasUsed:\(gasUsed)")
+            print("result myGasLimit:\(myGasLimit)")
+            successCallback(txSign)
+        } else {
+            print("gasUsed:\(gasUsed)")
+            print("myGasLimit:\(myGasLimit)")
+            myGasLimit = gasUsed
+            self.forRequestSimulate(signerInfo: signerInfo, chainId: chainId, txBody: txBody, accountNumber: accountNumber, privateKey: privateKey, gasLimit: myGasLimit, successCallback: successCallback, errorCallBack: errorCallBack)
+        }
+       } errorCallBack: { _ in
+
+       }
     }
     
     class func setSignTx(signerInfo: TxSignerInfo,
