@@ -32,7 +32,7 @@ class ViewController: UIViewController {
         
                 IRIS.transfer(from: from,
                       to: to,
-                      value: "1",
+                      value: "100",
                       denom: "ubif",
                       privateKey: privateKey,
                       chainId: "bifrost-1",
@@ -44,6 +44,14 @@ class ViewController: UIViewController {
 
         }
         
+        IRIS.queryBalance(address: from, denom: "ubif") { cion in
+            print("cion:\(cion)")
+//            37809011
+//            43809011
+//            45809011
+        } errorCallback: { error in
+            print(error)
+        }
         
 //        MerchantSession.getTokensByAddress(address: address,
 //                                           denom: model.address ?? "") { datas in
@@ -150,14 +158,7 @@ class ViewController: UIViewController {
         
 //
 ////
-//        IRIS.queryBalance(address: to,denom: "ubif") { cion in
-//            print("cion:\(cion)")
-////            37809011
-////            43809011
-////            45809011
-//        } errorCallback: { error in
-//            print(error)
-//        }
+
 
 
 

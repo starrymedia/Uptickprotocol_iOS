@@ -55,7 +55,7 @@ open class TxService {
             
        
 
-            let gasLimit = UInt64(200)
+            let gasLimit = UInt64(20000)
             TxService.forRequestSimulate(signerInfo: signerInfo,
                                          chainId: chainId,
                                          txBody: txBody,
