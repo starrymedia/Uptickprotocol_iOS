@@ -28,48 +28,47 @@ class ViewController: UIViewController {
         let RpcURI = "http://34.80.22.255:26657"
 
 
-        //        self.host = "34.80.22.255"
-        //        self.port = 9090
-        IRIS.host = "34.80.22.255"
-        IRIS.port = 9090
-        MerchantSession.nodeUrl = "http://52.81.146.252:8091"
+        IRISServive.host = "34.80.22.255"
+        IRISServive.port = 9090
+        IRISServive.chainId = "bifrost-1"
+        MerchantService.nodeUrl = "http://52.81.146.252:8091"
+        BroadcastService.rpcUrl = "http://34.80.22.255:26657"
+
+
+//        MerchantSession.getAllAsset { value in
+//            print(value)
+//        }
         
-        MerchantSession.getAllAsset { value in
-            print(value)
-        }
-        
-        
-//                IRIS.transfer(from: from,
-//                      to: to,
-//                      value: "100",
-//                      denom: "ubif",
-//                      privateKey: privateKey,
-//                      chainId: "bifrost-1",
-//                      broadcastUrl: RpcURI) { res in
+
+//        NFTService.transfer(from: from,
+//                  to: to,
+//                  value: "100",
+//                  denom: "ubif",
+//                  privateKey: privateKey) { res in
 //
 //
 //            print("res=====\(res)")
-//        } errorCallBack:{_ in
+//            } errorCallBack:{_ in
 //
+//            }
+        
+//        IRISSession.queryBalance(address: from, denom: "ubif") { cion in
+//            print("cion:\(cion)")
+////            37809011
+////            43809011
+////            45809011
+//        } errorCallback: { error in
+//            print(error)
 //        }
-        
-        IRIS.queryBalance(address: from, denom: "ubif") { cion in
-            print("cion:\(cion)")
-//            37809011
-//            43809011
-//            45809011
-        } errorCallback: { error in
-            print(error)
-        }
-        
-        IRIS.queryBalance(address: from, denom: "ubif") { cion in
-            print("cion:\(cion)")
-//            37809011
-//            43809011
-//            45809011
-        } errorCallback: { error in
-            print(error)
-        }
+//        
+//        IRISSession.queryBalance(address: from, denom: "ubif") { cion in
+//            print("cion:\(cion)")
+////            37809011
+////            43809011
+////            45809011
+//        } errorCallback: { error in
+//            print(error)
+//        }
 //        MerchantSession.getTokensByAddress(address: address,
 //                                           denom: model.address ?? "") { datas in
 //         } errorCallback: { error in
@@ -192,11 +191,7 @@ class ViewController: UIViewController {
 
 //
 //
-//        IRIS.queryAccount(address: address) { (address, sequence, accountNumber) in
-//            print("address:\(address)")
-//            print("sequence:\(sequence)")
-//            print("accountNumber:\(accountNumber)")
-//        }
+
         
         
 //

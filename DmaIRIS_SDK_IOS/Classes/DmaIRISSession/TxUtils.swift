@@ -59,7 +59,7 @@ open class TxUtils {
                             successCallback: @escaping (_ amount: String) -> (),
                             errorCallBack: @escaping FPErrorCallback) {
      
-        IRIS.token(denom: tokenSymblol) { scale in
+        ERC20TokenService.token(denom: tokenSymblol) { scale in
             print(scale)
             var amount = Decimal(amount)
             var result = Decimal()
@@ -77,12 +77,19 @@ open class TxUtils {
         }
     }
     
+    
+    /// 转换链上单位
+    /// - Parameters:
+    ///   - tokenSymblol:分类ID
+    ///   - amount: 金额
+    ///   - successCallback: 金额字符串
+    ///   - errorCallBack: 错误信息
     public class func forWei(tokenSymblol: String,
                             amount: UInt64,
                             successCallback: @escaping (_ amount: String) -> (),
                             errorCallBack: @escaping FPErrorCallback) {
      
-        IRIS.token(denom: tokenSymblol) { scale in
+        ERC20TokenService.token(denom: tokenSymblol) { scale in
             print(scale)
             var amount = Decimal(amount)
             var result = Decimal()
@@ -93,6 +100,15 @@ open class TxUtils {
             print(error)
             errorCallBack(error)
         }
+    }
+    
+    public class func fromBech32(_ address: String) -> Data? {
+        if let data = try? WalletManager.fromBech32(address: address) {
+            if let bytesValue = try? BytesValue(data) {
+                return bytesValue.value
+            }
+        }
+        return nil
     }
     
   

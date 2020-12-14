@@ -20,6 +20,8 @@ class Tests: XCTestCase {
    
     }
     
+
+    
     func testSignatureString() {
 
         let privateKey = "1779b474da9ef4aef67271f455dd58054d3181863b91f63910074f3cb9123591"
@@ -47,20 +49,13 @@ class Tests: XCTestCase {
             print(iden)
             print(iden.count)
         }
-//        print(tokenids.joined(separator: ","))
         print("============")
 
     }
     
     func testAmount() {
         
-        //        BigDecimal amount = BigDecimal.valueOf(gasLimint).multiply(new BigDecimal(options.getDefaultGasPrice())).setScale(0, BigDecimal.ROUND_UP);
         print("============")
-
-//        while true {
-//
-//        }
-        
         var gasLimint = Decimal(20000)
         var gasPrice = Decimal(2.98)
         
@@ -76,12 +71,7 @@ class Tests: XCTestCase {
         print("============")
 
     }
-    
-    func testQueryTokens() {
-        IRIS.queryTokens(denom: txDenom) { nftDenom in
-            print(nftDenom)
-        }
-    }
+
     
     func testPerformanceExample() {
         // This is an example of a performance test case.

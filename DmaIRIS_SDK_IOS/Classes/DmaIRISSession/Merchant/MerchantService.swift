@@ -18,7 +18,7 @@ let getTokenUrl = "/api/1/query/getToken"//获取已上架NFT信息
 let allAssetByAddressUrl = "/api/1/query/allAssetByAddress"//根据钱包地址查询已上架的所有资产种类
 let getTokensByAddressUrl = "/api/1/query/getTokensByAddress"//根据钱包地址以及类型查询已上架的所有NFT
 
-public let MerchantSession = Merchant.default
+public let MerchantService = Merchant.default
 
 public class Merchant {
     

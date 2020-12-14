@@ -9,12 +9,12 @@ import Foundation
 import Alamofire
 import HandyJSON
 
-public let BroadcastSession = Broadcast.default
+public let BroadcastService = Broadcast.default
 
 open class Broadcast {
     
     public static let `default` = Broadcast()
-    open var rpcUrl = "http://34.80.22.255:26657"
+    open var rpcUrl = ""
 
     public func broadcast(tx: Tx,
                          successCallback: @escaping (_ res: String) -> (),

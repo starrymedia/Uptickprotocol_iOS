@@ -16,7 +16,6 @@ open class TxService {
     
 
     class func signTx(txBody: TxBody,
-                chainId: String,
                 privateKey: String,
                 number: Int = 1,
                 _ callback: @escaping (_ tx: Tx) -> Void) {
@@ -29,7 +28,7 @@ open class TxService {
         print(WalletManager.toBech32(pubkeyHexData: publicKeyData))
         //获取地址
         let address = WalletManager.exportBech32Address(privateKey: privateKey)
-        IRIS.queryAccount(address: address) { (address, sequence, accountNumber) in
+        AuthService.queryAccount(address: address) { (address, sequence, accountNumber) in
             print("address:\(address)")
             print("sequence:\(sequence)")
             print("accountNumber:\(accountNumber)")
@@ -57,7 +56,7 @@ open class TxService {
 
             let gasLimit = UInt64(20000)
             TxService.forRequestSimulate(signerInfo: signerInfo,
-                                         chainId: chainId,
+                                         chainId: IRISServive.chainId,
                                          txBody: txBody,
                                          accountNumber: accountNumber,
                                          privateKey: privateKey,
@@ -168,7 +167,7 @@ open class TxService {
                                successCallback: @escaping (_ gasUsed: UInt64) -> (),
                                errorCallBack: @escaping FPErrorCallback) {
 
-        let client = SimulateServiceClient(channel: IRIS.channel)
+        let client = SimulateServiceClient(channel: IRISServive.channel)
         var req = SimulateRequest()
         req.tx = signTx
 

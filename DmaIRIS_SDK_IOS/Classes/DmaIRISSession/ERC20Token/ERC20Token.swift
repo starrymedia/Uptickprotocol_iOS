@@ -7,18 +7,30 @@
 
 import Foundation
 
-extension DmaIRISSession {
-    
-    //MARK:- 创建同质化Token
+public let ERC20TokenService = ERC20TokenSession.default
+
+open class ERC20TokenSession {
+        
+    public static let `default` = ERC20TokenSession()
+
+    /// 创建同质化Token
+    /// - Parameters:
+    ///   - initialSupply: 初始化数量
+    ///   - maxSupply: 最大数量
+    ///   - name: 名称
+    ///   - symbol: 简称
+    ///   - mintable: 是否可增发
+    ///   - owner: token所有者钱包地址
+    ///   - privateKey: 私钥
     public func issueToken(initialSupply: UInt64,
                            maxSupply: UInt64,
                            name: String,
                            symbol: String,
+                           mintable: Bool,
                            owner: String,
-                           minUnit: String,
-                           chainId: String,
-                           broadcastUrl: String,
-                           privateKey: String) {
+                           privateKey: String,
+                           successCallback: @escaping (_ res: String) -> (),
+                           errorCallBack: @escaping FPErrorCallback) {
     
         var token = TokenMsgIssueToken()
         token.symbol = symbol
@@ -27,44 +39,54 @@ extension DmaIRISSession {
         token.mintable = true
         token.scale = 6
         token.name = name
-        token.minUnit = minUnit
-        token.owner = try! Bech32().decode(owner).checksum
+        token.minUnit = symbol
+        token.mintable = mintable
+        
+        if let ownerValue = TxUtils.fromBech32(owner) {
+            token.owner = ownerValue
+        }
         
         var txBody = TxUtils.getBody(meno: "", timeoutHeight: 0)
         if let any = TxUtils.getProtobufAny(message: token, typePrefix: "") {
             txBody.messages.append(any)
         }
         
-        let fee = TxUtils.getFee(gasLimit: txGasLimit,
-                                 amount: txAmount,
-                                 denom: txDenom)
-        TxService.signTx(txBody: txBody, chainId: chainId, privateKey: privateKey) { tx in
-            
-            BroadcastSession.broadcast(tx: tx) { res in
+        TxService.signTx(txBody: txBody, privateKey: privateKey) { tx in
+            BroadcastService.broadcast(tx: tx) { res in
                 print(res)
+                successCallback(res)
             } errorCallBack: { error in
-                
+                errorCallBack(error)
             }
             
         }
     }
     
-    //MARK:- 根据简称 增发同质化Token
-    public func mint(to: String,
-                    symbol: String,
-                    owner: String,
-                    amount: UInt64,
-                    chainId: String,
-                    broadcastUrl: String,
-                    privateKey: String) {
+    /// 根据简称 增发同质化Token
+    /// - Parameters:
+    ///   - to: 地址
+    ///   - symbol: 简称
+    ///   - owner: token所有者钱包地址
+    ///   - amount: 价格
+    ///   - privateKey: 私钥
+    public func mintToken(to: String,
+                          symbol: String,
+                          owner: String,
+                          amount: UInt64,
+                          privateKey: String,
+                          successCallback: @escaping (_ res: String) -> (),
+                          errorCallBack: @escaping FPErrorCallback) {
         
         
         var token = TokenMsgMintToken()
         token.symbol = symbol
         token.amount = amount
-        token.owner = try! Bech32().decode(owner).checksum
-        token.to = try! Bech32().decode(to).checksum
-        
+        if let ownerValue = TxUtils.fromBech32(owner) {
+            token.owner = ownerValue
+        }
+        if let toValue = TxUtils.fromBech32(to) {
+            token.to = toValue
+        }
         
         var txBody = TxUtils.getBody(meno: "", timeoutHeight: 0)
         if let any = TxUtils.getProtobufAny(message: token, typePrefix: "") {
@@ -73,14 +95,12 @@ extension DmaIRISSession {
         
         let fee = TxUtils.getFee(gasLimit: txGasLimit, amount: txAmount, denom: txDenom)
         
-        TxService.signTx(txBody: txBody, chainId: chainId, privateKey: privateKey) { tx in
-            
-            
-//            BroadcastSession.broadcast(tx: tx) { res in
-//                print(res)
-//            }errorCallBack: { error in
-//
-//            }
+        TxService.signTx(txBody: txBody, privateKey: privateKey) { tx in
+            BroadcastService.broadcast(tx: tx) { res in
+                successCallback(res)
+            } errorCallBack: { error in
+                errorCallBack(error)
+            }
             
         }
     }
@@ -89,17 +109,18 @@ extension DmaIRISSession {
     public func transferTokenOwner(from: String,
                                    to: String,
                                    symbol: String,
-                                   chainId: String,
-                                   mnemonics: String,
-                                   broadcastUrl: String,
-                                   privateKey: String) {
+                                   privateKey: String,
+                                   successCallback: @escaping (_ res: String) -> (),
+                                   errorCallBack: @escaping FPErrorCallback) {
 
-        
         var token = TokenMsgTransferTokenOwner()
         token.symbol = symbol
-        token.srcOwner = try! Bech32().decode(from).checksum
-        token.dstOwner = try! Bech32().decode(to).checksum
-        
+        if let fromValue = TxUtils.fromBech32(from) {
+            token.srcOwner = fromValue
+        }
+        if let toValue = TxUtils.fromBech32(to) {
+            token.dstOwner = toValue
+        }
         
         var txBody = TxUtils.getBody(meno: "", timeoutHeight: 0)
         if let any = TxUtils.getProtobufAny(message: token, typePrefix: "") {
@@ -108,18 +129,16 @@ extension DmaIRISSession {
         
         let fee = TxUtils.getFee(gasLimit: txGasLimit, amount: txAmount, denom: txDenom)
         
-        TxService.signTx(txBody: txBody, chainId: chainId, privateKey: privateKey) { tx in
-            
-            BroadcastSession.broadcast(tx: tx) { res in
-                print(res)
-            }errorCallBack: { error in
-                
+        TxService.signTx(txBody: txBody, privateKey: privateKey) { tx in
+            BroadcastService.broadcast(tx: tx) { res in
+                successCallback(res)
+            } errorCallBack: { error in
+                errorCallBack(error)
             }
             
         }
     }
     
-    //MARK:- 根据denom(创建时的symbol)查询token信息
     /// 根据denom(创建时的symbol)查询token信息
     /// - Parameters:
     ///   - denom: 分类ID
@@ -132,29 +151,34 @@ extension DmaIRISSession {
         var request = TokenQueryTokenRequest()
         request.denom = denom
         
-        let client = TokenQueryClient(channel: self.channel)
+        let client = TokenQueryClient(channel: IRISServive.channel)
         let response = client.token(request).response
         
         response.whenComplete { result in
             switch result {
             case .success(let value):
-                if let token = try? Irismod_Token_Token(serializedData: value.token.value) {
+                if let token = try? Token(serializedData: value.token.value) {
                     successCallback(token.scale)
                 } else {
-                    errorCallBack("error")
+                    errorCallBack("token error")
                 }
             case .failure(let error):
-                errorCallBack(error.localizedDescription)
+                errorCallBack("\(error)")
             }
         }
     }
     
     //MARK:- 根据地址查询拥有的token种类
-    public func tokens(address: String,_ callback: @escaping (_ tokens: [Token]) -> ()) {
-        var request = TokenQueryTokensRequest()
-        request.owner = try! Bech32().decode(address).checksum
+    public func tokens(address: String,
+                       successCallback: @escaping (_ tokens: [Token]) -> (),
+                       errorCallBack: @escaping FPErrorCallback) {
         
-        let client = TokenQueryClient(channel: self.channel)
+        var request = TokenQueryTokensRequest()
+
+        if let addressValue = TxUtils.fromBech32(address) {
+            request.owner = addressValue
+        }
+        let client = TokenQueryClient(channel: IRISServive.channel)
         let response = client.tokens(request).response
         response.whenComplete { result in
             switch result {
@@ -162,30 +186,31 @@ extension DmaIRISSession {
                 let dataList = value.tokens
                 var tokens = [Token]()
                 for data in dataList {
-                    #warning("token有疑问")
                     if let token = try? Token(serializedData: data.value) {
                         tokens.append(token)
                     }
                 }
-                callback(tokens)
+                successCallback(tokens)
             case .failure(let error):
-                print(error)
+                errorCallBack("\(error)")
             }
         }
     }
     
     //MARK:- 创建token，估算交易费
-    public func fees(denom: String, _ callback: @escaping (_ issueFee: Coin) -> ()) {
+    public func fees(denom: String,
+                     successCallback: @escaping (_ issueFee: Coin) -> (),
+                     errorCallBack: @escaping FPErrorCallback) {
         var request = TokenQueryFeesRequest()
         request.symbol = denom
         
-        let response = TokenQueryClient(channel: self.channel).fees(request).response
+        let response = TokenQueryClient(channel: IRISServive.channel).fees(request).response
         response.whenComplete { result in
             switch result {
             case .success(let value):
-                callback(value.issueFee)
+                successCallback(value.issueFee)
             case .failure(let error):
-                print(error)
+                errorCallBack("\(error)")
             }
         }
     }
