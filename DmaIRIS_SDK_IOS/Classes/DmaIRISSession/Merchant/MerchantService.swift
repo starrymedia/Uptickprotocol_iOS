@@ -6,8 +6,6 @@
 //
 
 import Foundation
-import HandyJSON
-import Alamofire
 
 let onsaleUrl = "/api/1/merchant/onsale"//上架
 let offsaleUrl = "/api/1/merchant/offsale"//下架
@@ -28,72 +26,78 @@ public class Merchant {
     init() {}
 
     //MARK:- 获取平台上架中的所有资产种类
-    public func getAllAsset(_ callback: @escaping (_ denoms: [String]) -> ()) {
+    public func getAllAsset(successCallback: @escaping (_ denoms: [String]? ) -> (),
+                            errorCallback: @escaping FPErrorCallback) {
         let url = nodeUrl + allAssetUrl
-        AF.request(url).responseString { response in
-            switch response.result {
-            case .success(let jsonString):
-                if let responseModel = AllAssetModel.deserialize(from: jsonString) {
-                    callback(responseModel.data ?? [])
-                }
-            case .failure(let error):
-                print(error)
+        IRISAF.getRequest(url: url) { jsonString in
+            if let responseModel = AllAssetModel.deserialize(from: jsonString) {
+                successCallback(responseModel.data ?? [])
+            } else {
+                errorCallback("getAllAsset error")
             }
+        } errorCallBack: { error in
+            errorCallback(error)
         }
+
     }
     
     //MARK:- 根据资产种类获取上架的NFT
-    public func getAssetByDenom(denom: String, _ callback: @escaping (_ asset: AssetDenom) -> ()) {
+    public func getAssetByDenom(denom: String,
+                                successCallback: @escaping (_ asset: AssetDenom ) -> (),
+                                errorCallback: @escaping FPErrorCallback) {
         let url = nodeUrl + getAssetByDenomUrl + "?denom=\(denom)"
-        
-        AF.request(url).responseString { response in
-            switch response.result {
-            case .success(let jsonString):
-                print(jsonString)
-                if let responseModel = AssetModel.deserialize(from: jsonString) {
-                    if let data = responseModel.data {
-                        callback(data)
-                    }
+        IRISAF.getRequest(url: url) { jsonString in
+            if let responseModel = AssetModel.deserialize(from: jsonString) {
+                if let data = responseModel.data {
+                    successCallback(data)
                 }
-            case .failure(let error):
-                print(error)
+            } else {
+                errorCallback("getAssetByDenom error")
             }
+        } errorCallBack: { error in
+            errorCallback(error)
         }
     }
     
     //MARK:- 根据denom tokenid 获取已上架NFT信息
-    public func getToken(denom: String, tokenId: String, _ callback: @escaping (_ token: TokenDataModel) -> ()) {
+    public func getToken(denom: String, tokenId: String,
+                         successCallback: @escaping (_ token: TokenDataModel ) -> (),
+                         errorCallback: @escaping FPErrorCallback) {
         let url = nodeUrl + getTokenUrl + "?denom=\(denom)&tokenId=\(tokenId)"
-        AF.request(url).responseString { response in
-            switch response.result {
-            case .success(let jsonString):
-                print(jsonString)
-                if let responseModel = TokenModel.deserialize(from: jsonString) {
-                    if let data = responseModel.data {
-                        callback(data)
-                    }
+        
+        IRISAF.getRequest(url: url) { jsonString in
+            if let responseModel = TokenModel.deserialize(from: jsonString) {
+                if let data = responseModel.data {
+                    successCallback(data)
                 }
-            case .failure(let error):
-                print(error)
+            } else {
+                errorCallback("getToken error")
             }
+        } errorCallBack: { error in
+            errorCallback(error)
         }
     }
     
     
     //MARK:- 根据钱包地址查询已上架的所有资产种类
-    public func getAllAssetByAddress(address: String, _ callback: @escaping (_ token: [String]) -> ()) {
+    public func getAllAssetByAddress(address: String,
+                                     successCallback: @escaping (_ token: [String] ) -> (),
+                                     errorCallback: @escaping FPErrorCallback) {
+        
         let url = nodeUrl + allAssetByAddressUrl + "?address=\(address)"
-        AF.request(url).responseString { response in
-            switch response.result {
-            case .success(let jsonString):
-                print(jsonString)
-                if let responseModel = AllAssetModel.deserialize(from: jsonString) {
-                    callback(responseModel.data ?? [])
+        
+        IRISAF.getRequest(url: url) { jsonString in
+            if let responseModel = AllAssetModel.deserialize(from: jsonString) {
+                if responseModel.success {
+                    successCallback(responseModel.data ?? [])
+                } else {
+                    errorCallback(responseModel.msg ?? "getToken error")
                 }
-
-            case .failure(let error):
-                print(error)
+            } else {
+                errorCallback("getToken error")
             }
+        } errorCallBack: { error in
+            errorCallback(error)
         }
     }
     
@@ -104,21 +108,19 @@ public class Merchant {
                                    errorCallback: @escaping FPErrorCallback) {
         
         let url = nodeUrl + getTokensByAddressUrl + "?address=\(address)&denom=\(denom)"
-        AF.request(url).responseString { response in
-            switch response.result {
-            case .success(let jsonString):
-                print(jsonString)
-                if let responseModel = TokensModel.deserialize(from: jsonString) {
-                    if responseModel.success {
-                        successCallback(responseModel.data)
-                    } else {
-                        errorCallback(responseModel.msg ?? "getTokensByAddress error")
-                    }
+        
+        IRISAF.getRequest(url: url) { jsonString in
+            if let responseModel = TokensModel.deserialize(from: jsonString) {
+                if responseModel.success {
+                    successCallback(responseModel.data)
+                } else {
+                    errorCallback(responseModel.msg ?? "getTokensByAddress error")
                 }
-
-            case .failure(let error):
-                errorCallback(error.localizedDescription)
+            } else {
+                errorCallback("getToken error")
             }
+        } errorCallBack: { error in
+            errorCallback(error)
         }
     }
     
@@ -181,51 +183,49 @@ public class Merchant {
         print(params)
 
         let url = nodeUrl + onsaleUrl
-        AF.request(url, method: .post, parameters: params, encoder: JSONParameterEncoder.default).responseString { response in
-            switch response.result {
-            case .success(let jsonString):
-                print(jsonString)
-                if let responseModel = MerchantResponseModel.deserialize(from: jsonString) {
-                    
-                    if responseModel.success == true {
-                        
-                        if let data = responseModel.data {
+
+        self.onSaleRequest(url: url, parameters: params, privateKey: privateKey) { jsonString in
+            successCallback(jsonString)
+        } errorCallback: { error in
+            errorCallback(error)
+        }
+    }
+    
+    func onSaleRequest(url: String,
+                       parameters: MerchantOnSale,
+                       privateKey: String,
+                       successCallback: @escaping (_ jsonString: String) -> (),
+                       errorCallback: @escaping FPErrorCallback) {
+        
+        var params = parameters
+        IRISAF.postRequest(url: url, parameters: params) { jsonString in
+            if let responseModel = MerchantResponseModel.deserialize(from: jsonString) {
+                if responseModel.success == true {
+                    if let data = responseModel.data {
+                        if let hashData = Data(base64Encoded: data)?.sha256() {
+                            params.signatures = WalletManager.signatureString(hashData: hashData, privateKey: privateKey)?.base64EncodedString()
                             
-                            if let hashData = Data(base64Encoded: data)?.sha256() {
-                                
-                                params.signatures = WalletManager.signatureString(hashData: hashData, privateKey: privateKey)?.base64EncodedString()
-                                
-                                AF.request(url, method: .post, parameters: params, encoder: JSONParameterEncoder.default).responseString { response in
-                                    switch response.result {
-                                    case .success(let jsonString):
-                                        print(jsonString)
-                                        if let responseModel = MerchantResponseModel.deserialize(from: jsonString) {
-                                            
-                                            if responseModel.success == true {
-                                                successCallback(jsonString)
-                                            } else {
-                                                errorCallback(responseModel.msg ?? "")
-                                            }
-                                        }
-                                    case .failure(let error):
-                                        print(error)
-                                        errorCallback(error.localizedDescription)
+                            IRISAF.postRequest(url: url, parameters: params) { jsonString in
+                                if let responseModel = MerchantResponseModel.deserialize(from: jsonString) {
+                                    if responseModel.success == true {
+                                        successCallback(jsonString)
+                                    } else {
+                                        errorCallback(responseModel.msg ?? "")
                                     }
                                 }
+                            } errorCallBack: { error in
+                                errorCallback(error)
                             }
-                            
-                        } else {
-                            errorCallback(response.error?.localizedDescription ?? "\(transferUrl) error")
                         }
-                        
-                    } else {
-                        errorCallback(responseModel.msg ?? "")
                     }
+                } else {
+                    errorCallback(responseModel.msg ?? "")
                 }
-                
-            case .failure(let error):
-                print(error)
+            } else {
+                errorCallback("\(onsaleUrl) error")
             }
+        } errorCallBack: { error in
+            errorCallback(error)
         }
     }
     
@@ -247,25 +247,18 @@ public class Merchant {
                                     nftId: denom,
                                     owner: address,
                                     tokenIds: tokenIds)
-        print(param)
         
         let url = nodeUrl + offsaleUrl
-        AF.request(url, method: .post, parameters: param, encoder: JSONParameterEncoder.default).responseString { response in
-            switch response.result {
-            case .success(let jsonString):
-                print(jsonString)
-                if let responseModel = TokensModel.deserialize(from: jsonString) {
-                    if responseModel.success {
-                        successCallback()
-                    } else {
-                        errorCallback(responseModel.msg ?? "")
-                    }
+        IRISAF.postRequest(url: url, parameters: param) { jsonString in
+            if let responseModel = TokensModel.deserialize(from: jsonString) {
+                if responseModel.success {
+                    successCallback()
+                } else {
+                    errorCallback(responseModel.msg ?? "")
                 }
-
-            case .failure(let error):
-                print(error)
-                errorCallback(error.localizedDescription ?? "")
             }
+        } errorCallBack: { error in
+            errorCallback("\(error)")
         }
     }
     
@@ -290,149 +283,62 @@ public class Merchant {
                                      ids: tokenIds)
         
         let url = nodeUrl + transferUrl
-        AF.request(url, method: .post, parameters: param, encoder: JSONParameterEncoder.default).responseString { response in
-            switch response.result {
-            case .success(let jsonString):
-                print(jsonString)
-                if let responseModel = MerchantResponseModel.deserialize(from: jsonString) {
-                    if responseModel.success == true {
+
+        self.transferRequest(url: url, parameters: param, privateKey: privateKey) { jsonString in
+            successCallback(jsonString)
+        } errorCallback: { error in
+            errorCallback(error)
+        }
+
+    }
+    
+    func transferRequest(url: String,
+                         parameters: MerchantTransfer,
+                         privateKey: String,
+                         successCallback: @escaping (_ jsonString: String) -> (),
+                         errorCallback: @escaping FPErrorCallback) {
+        
+        var param = parameters
+        IRISAF.postRequest(url: url, parameters: param) { jsonString in
+            
+            if let responseModel = MerchantResponseModel.deserialize(from: jsonString) {
+                if responseModel.success == true {
+                    
+                    if let data = responseModel.data {
                         
-                        if let data = responseModel.data {
-                            
-                            if let hashData = Data(base64Encoded: data)?.sha256() {
-                                param.signatures = WalletManager.signatureString(hashData: hashData, privateKey: privateKey)?.base64EncodedString()
-                                AF.request(url, method: .post, parameters: param, encoder: JSONParameterEncoder.default).responseString { response in
-                                    switch response.result {
-                                    case .success(let jsonString):
-                                        print(jsonString)
-                                        if let responseModel = MerchantResponseModel.deserialize(from: jsonString) {
-                                            
-                                            if responseModel.success == true {
-                                                successCallback(jsonString)
-                                            } else {
-                                                errorCallback(responseModel.msg ?? "")
-                                            }
-                                        }
-                                    case .failure(let error):
-                                        print(error)
-                                        errorCallback(error.localizedDescription)
+                        if let hashData = Data(base64Encoded: data)?.sha256() {
+                            param.signatures = WalletManager.signatureString(hashData: hashData, privateKey: privateKey)?.base64EncodedString()
+                      
+                            IRISAF.postRequest(url: url, parameters: param) { jsonString in
+                                if let responseModel = MerchantResponseModel.deserialize(from: jsonString) {
+                                    
+                                    if responseModel.success == true {
+                                        successCallback(jsonString)
+                                    } else {
+                                        errorCallback(responseModel.msg ?? "")
                                     }
                                 }
+                            } errorCallBack: { error in
+                                errorCallback(error)
                             }
-                            
-                        } else {
-                            errorCallback(response.error?.localizedDescription ?? "\(transferUrl) error")
+
                         }
                         
                     } else {
-                        errorCallback(responseModel.msg ?? "")
+                        errorCallback("\(transferUrl) error")
                     }
+                    
+                } else {
+                    errorCallback(responseModel.msg ?? "")
                 }
-
-            case .failure(let error):
-                print(error)
-                errorCallback(error.localizedDescription)
             }
+
+
+        } errorCallBack: { error in
+            errorCallback(error)
         }
+
     }
+
 }
 
-struct AllAssetModel: HandyJSON {
-    var code: Int?
-    var data: [String]?
-    var msg: String?
-    var success: Bool?
-}
-
-public struct AssetModel: HandyJSON {
-    public init() {}
-    var code: Int?
-    var data: AssetDenom?
-    var msg: String?
-    var success: Bool?
-}
-
-public struct AssetDenom: HandyJSON {
-    public init() {}
-    var denom: String?
-    var tokens: [AssetDenomToken]?
-}
-
-struct AssetDenomToken: HandyJSON {
-    var owner: String?
-    var tokenid: String?
-    var assetDenom: String?
-    var price: String?
-    var time: String?
-    var coin: String?
- }
-
-public struct TokenModel: HandyJSON {
-    public init() {}
-    var code: Int?
-    var data: TokenDataModel?
-    var msg: String?
-    var success: Bool?
-}
-
-public struct TokenDataModel: HandyJSON {
-    public init() {}
-    var assetDenom: String?
-    public var tokenId: String?
-    var owner: String?
-    var price: String?
-    var coin: String?
-    var time: String?
-}
-
-public struct TokensModel: HandyJSON {
-    public init() {}
-    var code: Int?
-    var data: [TokenDataModel]?
-    var msg: String?
-    var success: Bool = true
-}
-
-
-struct MerchantTransfer: Encodable {
-    
-    let payerPubKey: String
-    let nftTd: String
-    let payer: String
-    let recipien: String
-    var signatures: String?
-    let ids: [String]
-}
-
-public struct MerchantResponseModel: HandyJSON {
-    public init() {}
-    var code: Int?
-    var success: Bool?
-    var msg: String?
-    var data: String?
-}
- 
-
-struct MerchantOnSale: Encodable {
-    
-    let pubKey: String
-    let nftId: String
-    let owner: String
-    var signatures: String?
-    var labels: [MerchantOnSaleLabels]?
-}
- 
-struct MerchantOnSaleLabels: Encodable {
-    let coin: String
-    let tokenId: String
-    let price: String
-}
-
-struct MerchantOffSale: Encodable {
-    
-    let pubKey: String
-    let nftId: String
-    let owner: String
-    var tokenIds: [String]?
-}
- 

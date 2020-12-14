@@ -29,7 +29,7 @@ open class ERC20TokenSession {
                            mintable: Bool,
                            owner: String,
                            privateKey: String,
-                           successCallback: @escaping (_ res: String) -> (),
+                           successCallback: @escaping (_ res: BroadcastModel) -> (),
                            errorCallBack: @escaping FPErrorCallback) {
     
         var token = TokenMsgIssueToken()
@@ -74,7 +74,7 @@ open class ERC20TokenSession {
                           owner: String,
                           amount: UInt64,
                           privateKey: String,
-                          successCallback: @escaping (_ res: String) -> (),
+                          successCallback: @escaping (_ res: BroadcastModel) -> (),
                           errorCallBack: @escaping FPErrorCallback) {
         
         
@@ -110,7 +110,7 @@ open class ERC20TokenSession {
                                    to: String,
                                    symbol: String,
                                    privateKey: String,
-                                   successCallback: @escaping (_ res: String) -> (),
+                                   successCallback: @escaping (_ res: BroadcastModel) -> (),
                                    errorCallBack: @escaping FPErrorCallback) {
 
         var token = TokenMsgTransferTokenOwner()

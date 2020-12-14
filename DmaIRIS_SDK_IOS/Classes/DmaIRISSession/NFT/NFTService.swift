@@ -27,7 +27,7 @@ open class NFTSession {
                          nftSchema: String,
                          nftId: String,
                          privateKey: String,
-                         successCallback: @escaping (_ res: String) -> (),
+                         successCallback: @escaping (_ res: BroadcastModel) -> (),
                          errorCallback: @escaping FPErrorCallback) {
         
         
@@ -82,7 +82,7 @@ open class NFTSession {
                              uri: String,
                              tokenIds: [String],
                              privateKey: String,
-                             successCallback: @escaping (_ string: String) -> (),
+                             successCallback: @escaping (_ res: BroadcastModel) -> (),
                              errorCallback: @escaping FPErrorCallback) {
 
         var txBody = TxUtils.getBody(meno: "", timeoutHeight: 0)
@@ -133,7 +133,7 @@ open class NFTSession {
                  nftId: String,
                  tokenId: String,
                  privateKey: String,
-                 successCallback: @escaping (_ string: String) -> (),
+                 successCallback: @escaping (_ string: BroadcastModel) -> (),
                  errorCallback: @escaping FPErrorCallback) {
         
         var msgBurnNFT = NftMsgBurnNFT()
@@ -178,7 +178,7 @@ open class NFTSession {
                             nftId: String,
                             tokenIds: String,
                             privateKey: String,
-                            successCallback: @escaping (_ string: String) -> (),
+                            successCallback: @escaping (_ res: BroadcastModel) -> (),
                             errorCallback: @escaping FPErrorCallback) {
         
         var txBody = TxUtils.getBody(meno: "", timeoutHeight: 0)

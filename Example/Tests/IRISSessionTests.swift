@@ -13,6 +13,12 @@ class IRISSessionTests: XCTestCase {
 
     override func setUpWithError() throws {
         // Put setup code here. This method is called before the invocation of each test method in the class.
+        IRISServive.host = "34.80.22.255"
+        IRISServive.port = 9090
+        IRISServive.chainId = "bifrost-1"
+        MerchantService.nodeUrl = "http://52.81.146.252:8091"
+        BroadcastService.rpcUrl = "http://34.80.22.255:26657"
+
     }
 
     override func tearDownWithError() throws {
@@ -29,6 +35,28 @@ class IRISSessionTests: XCTestCase {
         self.measure {
             // Put the code you want to measure the time of here.
         }
+    }
+    
+    func testBankTransfer() {
+        
+        let expectation = self.expectation(description: "testBankTransfer")
+
+        let from="iaa1fu5xru6umtfqthe588z6zk37gdknulr55ee5qf"
+        let to = "iaa1nhu8qvj232mwxllwwxs4m9zz5pqcxazpmxtm8z"
+        let privateKey="0f6f503144fd27a530f0ed5867fc19aae3a86bd41a021ddffd065519bbf11fed"
+        
+        BankService.transfer(from: from,
+                             to: to,
+                             value: "10",
+                             denom: "ubif",
+                             privateKey: privateKey) { res in
+            print("res=====\(res.toJSONString(prettyPrint: true)!)")
+            expectation.fulfill()
+        } errorCallBack:{ error in
+            print(error)
+            expectation.fulfill()
+        }
+        waitForExpectations(timeout: 30, handler: nil)
     }
     
     func testRequestQueryAccount() {
@@ -129,5 +157,18 @@ class IRISSessionTests: XCTestCase {
             expectation.fulfill()
         }
         waitForExpectations(timeout: 15, handler: nil)
+    }
+    
+    func testGetAllAsset() {
+        let expectation = self.expectation(description: "testGetAllAsset")
+        MerchantService.getAllAsset { lists in
+            print(lists!)
+            expectation.fulfill()
+        } errorCallback: { error in
+            print(error)
+            expectation.fulfill()
+        }
+        waitForExpectations(timeout: 15, handler: nil)
+
     }
 }

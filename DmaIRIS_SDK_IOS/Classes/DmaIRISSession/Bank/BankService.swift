@@ -15,15 +15,21 @@ open class BankSession {
     
     public static let `default` = BankSession()
 
-    //MARK:- 更换同质化Token Owner
+    /// 转账
+    /// - Parameters:
+    ///   - from: 发送人地址
+    ///   - to: 接收人地址
+    ///   - value: 金额
+    ///   - denom: 分类id
+    ///   - privateKey: 私钥
+    ///   - successCallback: successCallback description
+    ///   - errorCallBack: errorCallBack description
     public func transfer(from: String,
                          to: String,
                          value: String,
                          denom: String,
                          privateKey: String,
-                         chainId: String,
-                         broadcastUrl: String,
-                         successCallback: @escaping (_ res: String) -> (),
+                         successCallback: @escaping (_ res: BroadcastModel) -> (),
                          errorCallBack: @escaping FPErrorCallback) {
         
         TxUtils.toWei(tokenSymblol: denom, amount: Double(value) ?? 0.00) { amount in
@@ -32,9 +38,7 @@ open class BankSession {
                                  to: to,
                                  value: amount,
                                  denom: denom,
-                                 privateKey: privateKey,
-                                 chainId: chainId,
-                                 broadcastUrl: broadcastUrl) { res in
+                                 privateKey: privateKey) { res in
                 successCallback(res)
             } errorCallBack: { error in
                 errorCallBack(error)
@@ -52,9 +56,7 @@ open class BankSession {
                                  value: String,
                                  denom: String,
                                  privateKey: String,
-                                 chainId: String,
-                                 broadcastUrl: String,
-                                 successCallback: @escaping (_ res: String) -> (),
+                                 successCallback: @escaping (_ res: BroadcastModel) -> (),
                                  errorCallBack: @escaping FPErrorCallback) {
         
         var coin = Coin()
@@ -74,7 +76,6 @@ open class BankSession {
         //调用签名方法
         TxService.signTx(txBody: txBody,
                          privateKey: privateKey) { tx in
-            print("tx:\(tx)")
             BroadcastService.broadcast(tx: tx) { result in
                 successCallback(result)
             } errorCallBack: { error in
@@ -83,6 +84,7 @@ open class BankSession {
 
         }
     }
+    
     /// 根据分类ID查询余额
     /// - Parameters:
     ///   - address: 钱包地址

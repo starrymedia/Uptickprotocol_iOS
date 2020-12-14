@@ -54,13 +54,13 @@ open class TxUtils {
         return string.lowercased()
     }
     
+    /// 精度转换
     public class func toWei(tokenSymblol: String,
                             amount: Double,
                             successCallback: @escaping (_ amount: String) -> (),
                             errorCallBack: @escaping FPErrorCallback) {
      
         ERC20TokenService.token(denom: tokenSymblol) { scale in
-            print(scale)
             var amount = Decimal(amount)
             var result = Decimal()
             NSDecimalMultiplyByPowerOf10(&result, &amount, Int16(scale), .plain)
@@ -78,7 +78,7 @@ open class TxUtils {
     }
     
     
-    /// 转换链上单位
+    /// 精度转换
     /// - Parameters:
     ///   - tokenSymblol:分类ID
     ///   - amount: 金额

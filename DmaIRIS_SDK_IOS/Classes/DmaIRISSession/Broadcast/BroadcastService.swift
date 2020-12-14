@@ -6,8 +6,6 @@
 //
 
 import Foundation
-import Alamofire
-import HandyJSON
 
 public let BroadcastService = Broadcast.default
 
@@ -17,7 +15,7 @@ open class Broadcast {
     open var rpcUrl = ""
 
     public func broadcast(tx: Tx,
-                         successCallback: @escaping (_ res: String) -> (),
+                         successCallback: @escaping (_ broadcast: BroadcastModel) -> (),
                          errorCallBack: @escaping FPErrorCallback) {
                
         guard let txString = try? tx.serializedData().base64EncodedString() else {
@@ -29,47 +27,16 @@ open class Broadcast {
                                      method: "broadcast_tx_commit",
                                      params: BroadcastRequestParams(tx: txString))
 
-        AF.request(self.rpcUrl,
-                   method: .post,
-                   parameters: broadcast,
-                   encoder: JSONParameterEncoder.default).responseString { response in
-                    switch response.result {
-                    case .success(let jsonString):
-                        print(jsonString)
-                        if let model = BroadcastModel.deserialize(from: jsonString) {
-                            if let hash = model.result?.hash {
-                                successCallback(hash)
-                            }
-                        }
-                    case .failure(let error):
-                        print(error)
-                        errorCallBack(error.errorDescription ?? "broadcast error")
-                    }
+        IRISAF.postRequest(url: self.rpcUrl,parameters: broadcast) { jsonString in
+            if let model = BroadcastModel.deserialize(from: jsonString) {
+                successCallback(model)
+            } else {
+                errorCallBack("broadcast json error")
+            }
+        } errorCallBack: { error in
+            errorCallBack("\(error)")
         }
     }
     
 }
 
-struct BroadcastModel: HandyJSON {
-    var jsonrpc: String?
-    var id: String?
-    var result: BroadcastResult?
-}
-
-struct BroadcastResult: HandyJSON {
-    var hash: String?
-    var height: String?
-    var check_tx: BroadcastTx?
-    var deliver_tx: BroadcastTx?
-}
-
-struct BroadcastTx: HandyJSON {
-    var code: Int?
-    var data: Any?
-    var log: String?
-    var info: String?
-    var gas_wanted: String?
-    var gas_used: String?
-    var codespace: String?
-    var events: [Any]?
-}
