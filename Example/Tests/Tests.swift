@@ -26,7 +26,7 @@ class Tests: XCTestCase {
         let result = "DRu7j3PHuu7/FfIkh/GslYggaOW+V6wtILuarZm2d5xHUSVU8+DYA/X/rqkerC+STSLcOVq6pL53eMjsf3MpmQ=="
         let dataString = "CogBCoUBChwvY29zbW9zLmJhbmsudjFiZXRhMS5Nc2dTZW5kEmUKKmlhYTF4eXdkMGszY2o1bGM4dWd1anB4cDQ1ZWpwdm1oaDMzMDN6dTVwcRIqaWFhMXVmbmplbHdnMjc2cjJ4amo3Y3ZzN2xlNWVzY2E1OXRtdGNsN3ZlGgsKBHViaWYSAzEwMBJjClAKRgofL2Nvc21vcy5jcnlwdG8uc2VjcDI1NmsxLlB1YktleRIjCiEDhtQPSOhQCwNAa+QWzjiXPANa+UDj4EqsKcjt6v0dKLsSBAoCCAEYDRIPCgkKBHViaWYSATEQwJoMGgd0ZXN0aW5nIAg="
         let data = Data(base64Encoded: dataString)?.sha256()
-        let sign = TxService.signatureString(hashData: data!, privateKey: privateKey)
+        let sign = WalletManager.signatureString(hashData: data!, privateKey: privateKey)
         print("sign:\(sign!.base64EncodedString())")
         XCTAssert(sign?.base64EncodedString() == result, "Pass")
 

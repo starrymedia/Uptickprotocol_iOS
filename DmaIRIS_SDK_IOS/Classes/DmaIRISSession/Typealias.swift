@@ -8,7 +8,7 @@
 import Foundation
 import SwiftProtobuf
 
-typealias Tx = Cosmos_Tx_V1beta1_Tx
+public typealias Tx = Cosmos_Tx_V1beta1_Tx
 typealias TxFee = Cosmos_Tx_V1beta1_Fee
 typealias TxBody = Cosmos_Tx_V1beta1_TxBody
 typealias TxModeInfo = Cosmos_Tx_V1beta1_ModeInfo
@@ -58,3 +58,7 @@ typealias PubKey = Cosmos_Crypto_Secp256k1_PubKey
 
 typealias ProtobufAny = Google_Protobuf_Any
 typealias BytesValue = Google_Protobuf_BytesValue
+
+typealias SimulateServiceClient = Cosmos_Base_Simulate_V1beta1_SimulateServiceClient
+typealias SimulateRequest = Cosmos_Base_Simulate_V1beta1_SimulateRequest
+

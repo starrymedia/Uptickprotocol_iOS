@@ -20,7 +20,7 @@ fileprivate struct _GeneratedWithProtocGenSwiftVersion: SwiftProtobuf.ProtobufAP
 }
 
 /// Tx is the standard type used for broadcasting transactions.
-struct Cosmos_Tx_V1beta1_Tx {
+public struct Cosmos_Tx_V1beta1_Tx {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -57,9 +57,9 @@ struct Cosmos_Tx_V1beta1_Tx {
     set {_uniqueStorage()._signatures = newValue}
   }
 
-  var unknownFields = SwiftProtobuf.UnknownStorage()
+    public var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  init() {}
+    public init() {}
 
   fileprivate var _storage = _StorageClass.defaultInstance
 }
@@ -425,8 +425,8 @@ struct Cosmos_Tx_V1beta1_Fee {
 fileprivate let _protobuf_package = "cosmos.tx.v1beta1"
 
 extension Cosmos_Tx_V1beta1_Tx: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".Tx"
-  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    public static let protoMessageName: String = _protobuf_package + ".Tx"
+    public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "body"),
     2: .standard(proto: "auth_info"),
     3: .same(proto: "signatures"),
@@ -455,7 +455,7 @@ extension Cosmos_Tx_V1beta1_Tx: SwiftProtobuf.Message, SwiftProtobuf._MessageImp
     return _storage
   }
 
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    mutating public func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     _ = _uniqueStorage()
     try withExtendedLifetime(_storage) { (_storage: _StorageClass) in
       while let fieldNumber = try decoder.nextFieldNumber() {
@@ -469,7 +469,7 @@ extension Cosmos_Tx_V1beta1_Tx: SwiftProtobuf.Message, SwiftProtobuf._MessageImp
     }
   }
 
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     try withExtendedLifetime(_storage) { (_storage: _StorageClass) in
       if let v = _storage._body {
         try visitor.visitSingularMessageField(value: v, fieldNumber: 1)
@@ -484,7 +484,7 @@ extension Cosmos_Tx_V1beta1_Tx: SwiftProtobuf.Message, SwiftProtobuf._MessageImp
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: Cosmos_Tx_V1beta1_Tx, rhs: Cosmos_Tx_V1beta1_Tx) -> Bool {
+    public static func ==(lhs: Cosmos_Tx_V1beta1_Tx, rhs: Cosmos_Tx_V1beta1_Tx) -> Bool {
     if lhs._storage !== rhs._storage {
       let storagesAreEqual: Bool = withExtendedLifetime((lhs._storage, rhs._storage)) { (_args: (_StorageClass, _StorageClass)) in
         let _storage = _args.0

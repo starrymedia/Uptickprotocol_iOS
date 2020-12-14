@@ -172,5 +172,26 @@ open class EthWallet: NSObject {
         return keystoreJson!
     }
     
+    
+    public func signatureString(hashData: Data, privateKey: String) -> Data? {
+        
+        guard let privateKeyData = Data.fromHex(privateKey) else {
+            print("privateKeyData error")
+            return nil
+        }
+        let sign = SECP256K1.signForRecovery(hash: hashData, privateKey: privateKeyData, useExtraEntropy: false)
+        
+        guard let serializedSignature = sign.serializedSignature else {
+            print("sign serializedSignature error")
+            return nil
+        }
+        guard let signature = SECP256K1.unmarshalSignature(signatureData: serializedSignature) else {
+            print("signature error")
+            return nil
+        }
+        let data = signature.r + signature.s
+        return data
+    }
+    
 }
 

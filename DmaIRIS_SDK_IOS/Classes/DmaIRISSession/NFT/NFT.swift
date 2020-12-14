@@ -49,7 +49,7 @@ extension DmaIRISSession {
                          privateKey: privateKey) { tx in
             print("tx:\(tx)")
             //广播交易
-            TxService.broadcast(url: broadcastUrl, tx: tx) { res in
+            BroadcastSession.broadcast(tx: tx) { res in
                 print(res)
                 successCallback(res)
             } errorCallBack: { error in
@@ -109,7 +109,7 @@ extension DmaIRISSession {
                          privateKey: privateKey,
                          number: tokenIds.count) { tx in
             
-            TxService.broadcast(url: broadcastUrl, tx: tx) { res in
+            BroadcastSession.broadcast(tx: tx) { res in
                 print(res)
                 successCallback(res)
             } errorCallBack: { error in
@@ -147,7 +147,7 @@ extension DmaIRISSession {
         
         TxService.signTx(txBody: txBody, chainId: chainId, privateKey: privateKey) { tx in
             
-            TxService.broadcast(url: broadcastUrl, tx: tx) { res in
+            BroadcastSession.broadcast(tx: tx) { res in
                 print(res)
             }errorCallBack: { error in
                 
@@ -206,15 +206,15 @@ extension DmaIRISSession {
         }
                 
         
-        let limit:UInt64 = 50000 + txGasLimit*UInt64(tokenIds.count)
-        let fee = TxUtils.getFee(gasLimit: limit,
-                                 amount: "1",
-                                 denom: txDenom)
+//        let limit:UInt64 = 50000 + txGasLimit*UInt64(tokenIds.count)
+//        let fee = TxUtils.getFee(gasLimit: limit,
+//                                 amount: "1",
+//                                 denom: txDenom)
         TxService.signTx(txBody: txBody,
                          chainId: chainId,
                          privateKey: privateKey) { tx in
             
-            TxService.broadcast(url: broadcastUrl, tx: tx) { res in
+            BroadcastSession.broadcast(tx: tx) { res in
                 print(res)
                 successCallback(res)
             } errorCallBack: { error in

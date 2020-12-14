@@ -70,7 +70,7 @@ extension DmaIRISSession {
                          chainId: chainId,
                          privateKey: privateKey) { tx in
             print("tx:\(tx)")
-            TxService.broadcast(url: broadcastUrl, tx: tx) { result in
+            BroadcastSession.broadcast(tx: tx) { result in
                 successCallback(result)
             } errorCallBack: { error in
                 errorCallBack(error)

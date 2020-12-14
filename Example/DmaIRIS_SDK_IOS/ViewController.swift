@@ -28,21 +28,30 @@ class ViewController: UIViewController {
         let RpcURI = "http://34.80.22.255:26657"
 
 
+        //        self.host = "34.80.22.255"
+        //        self.port = 9090
+        IRIS.host = "34.80.22.255"
+        IRIS.port = 9090
+        MerchantSession.nodeUrl = "http://52.81.146.252:8091"
         
-        
-                IRIS.transfer(from: from,
-                      to: to,
-                      value: "100",
-                      denom: "ubif",
-                      privateKey: privateKey,
-                      chainId: "bifrost-1",
-                      broadcastUrl: RpcURI) { res in
-
-
-            print("res=====\(res)")
-        } errorCallBack:{_ in
-
+        MerchantSession.getAllAsset { value in
+            print(value)
         }
+        
+        
+//                IRIS.transfer(from: from,
+//                      to: to,
+//                      value: "100",
+//                      denom: "ubif",
+//                      privateKey: privateKey,
+//                      chainId: "bifrost-1",
+//                      broadcastUrl: RpcURI) { res in
+//
+//
+//            print("res=====\(res)")
+//        } errorCallBack:{_ in
+//
+//        }
         
         IRIS.queryBalance(address: from, denom: "ubif") { cion in
             print("cion:\(cion)")
@@ -53,6 +62,14 @@ class ViewController: UIViewController {
             print(error)
         }
         
+        IRIS.queryBalance(address: from, denom: "ubif") { cion in
+            print("cion:\(cion)")
+//            37809011
+//            43809011
+//            45809011
+        } errorCallback: { error in
+            print(error)
+        }
 //        MerchantSession.getTokensByAddress(address: address,
 //                                           denom: model.address ?? "") { datas in
 //         } errorCallback: { error in

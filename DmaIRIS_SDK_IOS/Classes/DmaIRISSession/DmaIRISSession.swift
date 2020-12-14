@@ -12,25 +12,26 @@ import NIO
 import Alamofire
 
 public let IRIS = DmaIRISSession.default
-
+//        self.host = "34.80.22.255"
+//        self.port = 9090
 //let host = "http://52.81.146.252:9090"
 open class DmaIRISSession {
 
     public static let `default` = DmaIRISSession()
     
-    let host: String? = nil
-    let port: Int? = nil
-    let channel: ClientConnection = {
-        let host = "34.80.22.255"
-        let port = 9090
+    open var host = ""
+    open var port = 0
+
+    //MARK:- init
+    init() { }
+    
+    lazy var channel: ClientConnection = {
         let group = PlatformSupport.makeEventLoopGroup(loopCount: 1)
         let channel = ClientConnection.insecure(group: group)
-            .connect(host: host, port: port)
+            .connect(host: self.host, port: self.port)
         return channel
     }()
 
-    //MARK:- init
-    init() {}
 
 }
 

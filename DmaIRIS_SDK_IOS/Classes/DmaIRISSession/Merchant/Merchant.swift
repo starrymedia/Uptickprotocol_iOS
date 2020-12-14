@@ -9,12 +9,6 @@ import Foundation
 import HandyJSON
 import Alamofire
 
-public let MerchantSession = Merchant.default
-
-//let nodeUrl = "http://52.81.146.252:8090"
-let nodeUrl = "http://52.81.146.252:8091"
-//"http://52.81.146.252:8091";
-
 let onsaleUrl = "/api/1/merchant/onsale"//上架
 let offsaleUrl = "/api/1/merchant/offsale"//下架
 let transferUrl = "/api/1/merchant/transfer"//购买
@@ -24,9 +18,13 @@ let getTokenUrl = "/api/1/query/getToken"//获取已上架NFT信息
 let allAssetByAddressUrl = "/api/1/query/allAssetByAddress"//根据钱包地址查询已上架的所有资产种类
 let getTokensByAddressUrl = "/api/1/query/getTokensByAddress"//根据钱包地址以及类型查询已上架的所有NFT
 
+public let MerchantSession = Merchant.default
+
 public class Merchant {
     
     public static let `default` = Merchant()
+    open var nodeUrl = ""
+
     init() {}
 
     //MARK:- 获取平台上架中的所有资产种类
@@ -195,7 +193,7 @@ public class Merchant {
                             
                             if let hashData = Data(base64Encoded: data)?.sha256() {
                                 
-                                params.signatures = TxService.signatureString(hashData: hashData, privateKey: privateKey)?.base64EncodedString()
+                                params.signatures = WalletManager.signatureString(hashData: hashData, privateKey: privateKey)?.base64EncodedString()
                                 
                                 AF.request(url, method: .post, parameters: params, encoder: JSONParameterEncoder.default).responseString { response in
                                     switch response.result {
@@ -302,7 +300,7 @@ public class Merchant {
                         if let data = responseModel.data {
                             
                             if let hashData = Data(base64Encoded: data)?.sha256() {
-                                param.signatures = TxService.signatureString(hashData: hashData, privateKey: privateKey)?.base64EncodedString()
+                                param.signatures = WalletManager.signatureString(hashData: hashData, privateKey: privateKey)?.base64EncodedString()
                                 AF.request(url, method: .post, parameters: param, encoder: JSONParameterEncoder.default).responseString { response in
                                     switch response.result {
                                     case .success(let jsonString):

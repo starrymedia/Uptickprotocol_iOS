@@ -38,10 +38,9 @@ extension DmaIRISSession {
         let fee = TxUtils.getFee(gasLimit: txGasLimit,
                                  amount: txAmount,
                                  denom: txDenom)
-        
         TxService.signTx(txBody: txBody, chainId: chainId, privateKey: privateKey) { tx in
             
-            TxService.broadcast(url: broadcastUrl, tx: tx) { res in
+            BroadcastSession.broadcast(tx: tx) { res in
                 print(res)
             } errorCallBack: { error in
                 
@@ -76,11 +75,12 @@ extension DmaIRISSession {
         
         TxService.signTx(txBody: txBody, chainId: chainId, privateKey: privateKey) { tx in
             
-            TxService.broadcast(url: broadcastUrl, tx: tx) { res in
-                print(res)
-            }errorCallBack: { error in
-                
-            }
+            
+//            BroadcastSession.broadcast(tx: tx) { res in
+//                print(res)
+//            }errorCallBack: { error in
+//
+//            }
             
         }
     }
@@ -110,7 +110,7 @@ extension DmaIRISSession {
         
         TxService.signTx(txBody: txBody, chainId: chainId, privateKey: privateKey) { tx in
             
-            TxService.broadcast(url: broadcastUrl, tx: tx) { res in
+            BroadcastSession.broadcast(tx: tx) { res in
                 print(res)
             }errorCallBack: { error in
                 

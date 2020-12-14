@@ -152,7 +152,7 @@ open class TxService {
         //签名算法
         if let hashData = try? signdoc.serializedData().sha256() {
 
-            if let sigBytes = TxService.signatureString(hashData: hashData, privateKey: privateKey) {
+            if let sigBytes = WalletManager.signatureString(hashData: hashData, privateKey: privateKey) {
                 if let bytesValue = try? BytesValue(sigBytes) {
                     txSign.signatures.append(bytesValue.value)
                 }
@@ -163,68 +163,13 @@ open class TxService {
         return txSign
     }
     
-    class func broadcast(url: String,
-                   tx: Tx,
-                   successCallback: @escaping (_ res: String) -> (),
-                   errorCallBack: @escaping FPErrorCallback) {
-               
-        guard let txString = try? tx.serializedData().base64EncodedString() else {
-            print("broadcast tx error")
-            return
-        }
-        let broadcast = BroadcastRequest(id: "service_client",
-                                     jsonrpc: "2.0",
-                                     method: "broadcast_tx_commit",
-                                     params: BroadcastRequestParams(tx: txString))
-
-        AF.request(url,
-                   method: .post,
-                   parameters: broadcast,
-                   encoder: JSONParameterEncoder.default).responseString { response in
-                    switch response.result {
-                    case .success(let jsonString):
-                        print(jsonString)
-                        if let model = BroadcastModel.deserialize(from: jsonString) {
-                            if let hash = model.result?.hash {
-                                successCallback(hash)
-                            }
-                        }
-                    case .failure(let error):
-                        print(error)
-                        errorCallBack(error.errorDescription ?? "broadcast error")
-                    }
-        }
-    }
-    
-    open class func signatureString(hashData: Data, privateKey: String) -> Data? {
-        
-        guard let privateKeyData = Data.fromHex(privateKey) else {
-            print("privateKeyData error")
-            return nil
-        }
-        let sign = SECP256K1.signForRecovery(hash: hashData, privateKey: privateKeyData, useExtraEntropy: false)
-        
-        guard let serializedSignature = sign.serializedSignature else {
-            print("sign serializedSignature error")
-            return nil
-        }
-        guard let signature = SECP256K1.unmarshalSignature(signatureData: serializedSignature) else {
-            print("signature error")
-            return nil
-        }
-//        print("r:\(signature.r.base64EncodedString() )")
-//        print("s:\(signature.s.base64EncodedString() )")
-        let data = signature.r + signature.s
-        return data
-    }
-    
     
     class func simulateRequest(signTx: Tx,
                                successCallback: @escaping (_ gasUsed: UInt64) -> (),
                                errorCallBack: @escaping FPErrorCallback) {
 
-        let client = Cosmos_Base_Simulate_V1beta1_SimulateServiceClient(channel: IRIS.channel)
-        var req = Cosmos_Base_Simulate_V1beta1_SimulateRequest()
+        let client = SimulateServiceClient(channel: IRIS.channel)
+        var req = SimulateRequest()
         req.tx = signTx
 
         let res = client.simulate(req)
@@ -243,26 +188,3 @@ open class TxService {
 
 }
 
-struct BroadcastModel: HandyJSON {
-    var jsonrpc: String?
-    var id: String?
-    var result: BroadcastResult?
-}
-
-struct BroadcastResult: HandyJSON {
-    var hash: String?
-    var height: String?
-    var check_tx: BroadcastTx?
-    var deliver_tx: BroadcastTx?
-}
-
-struct BroadcastTx: HandyJSON {
-    var code: Int?
-    var data: Any?
-    var log: String?
-    var info: String?
-    var gas_wanted: String?
-    var gas_used: String?
-    var codespace: String?
-    var events: [Any]?
-}
