@@ -137,7 +137,7 @@ class IRISSessionTests: XCTestCase {
     
     func testQueryAllNfts() {
         let expectation = self.expectation(description: "testQueryAllNfts")
-        NFTService.queryAllNfts { denoms in
+        NFTService.allNfts { denoms in
             print(denoms)
             expectation.fulfill()
         } errorCallback: { error in
@@ -149,7 +149,7 @@ class IRISSessionTests: XCTestCase {
     
     func testQuerySupply() {
         let expectation = self.expectation(description: "testQuerySupply")
-        NFTService.querySupply(owner: "iaa1fu5xru6umtfqthe588z6zk37gdknulr55ee5qf", nftId: "ubif") { amount in
+        NFTService.supply(owner: "iaa1fu5xru6umtfqthe588z6zk37gdknulr55ee5qf", nftId: "ubif") { amount in
             print("amount:\(amount)")
             expectation.fulfill()
         } errorCallback: { error in

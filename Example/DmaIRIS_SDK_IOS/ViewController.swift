@@ -14,6 +14,11 @@ import web3swift
 import secp256k1_swift
 import Alamofire
 
+public struct PublicKey {
+    var type:String = ""
+    var value: String = ""
+
+}
 
 class ViewController: UIViewController {
 

@@ -17,7 +17,6 @@ open class TxService {
 
     class func signTx(txBody: TxBody,
                 privateKey: String,
-                number: Int = 1,
                 _ callback: @escaping (_ tx: Tx) -> Void) {
 
         //获取公钥

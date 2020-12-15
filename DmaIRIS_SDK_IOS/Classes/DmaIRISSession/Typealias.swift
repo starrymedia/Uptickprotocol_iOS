@@ -30,6 +30,10 @@ typealias BankMsgSend = Cosmos_Bank_V1beta1_MsgSend
 typealias NftMsgIssueDenom = Irismod_Nft_MsgIssueDenom
 typealias NftMsgMintNFT = Irismod_Nft_MsgMintNFT
 typealias NftMsgBurnNFT = Irismod_Nft_MsgBurnNFT
+typealias NftMsgEditNFT = Irismod_Nft_MsgEditNFT
+typealias NftIDCollection = Irismod_Nft_IDCollection
+
+
 typealias NftMsgTransferNFT = Irismod_Nft_MsgTransferNFT
 typealias NftQueryDenomRequest = Irismod_Nft_QueryDenomRequest
 typealias NftQueryDenomsRequest = Irismod_Nft_QueryDenomsRequest
