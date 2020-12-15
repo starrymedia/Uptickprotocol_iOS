@@ -6,13 +6,19 @@
 //
 
 import Foundation
+import HandyJSON
 
-public class DataStandard<T>  {
+public class DataStandard<T:HandyJSON>: HandyJSON {
     
-    var protoc: String = ""
-    var body: T? = nil
-    var signature: Signature? = nil
+    public var protoc: String = ""
+    public var body: T? = nil
+    public var signature: Signature? = nil
 
+    required public init() {
+        
+        
+    }
+    
     public func sign(signPriKey: String, pubKeyEnum: PublicKeyEnum) {
 
         let body = self.body
@@ -40,7 +46,12 @@ public class DataStandard<T>  {
         }
     }
     
-    public func verify(verifyKey: String) -> Bool {
+    public func verify() -> Bool {
+        return verify(verifyKey: nil);
+    }
+
+    
+    public func verify(verifyKey: String? = nil) -> Bool {
         if (self.body != nil && self.signature != nil) {
             
             let pubKey = self.signature?.pubKey
@@ -50,7 +61,7 @@ public class DataStandard<T>  {
                 return false
             }
             
-            if (!verifyKey.isEmpty) {
+            if (!verifyKey!.isEmpty) {
                 if (!pubKey!.value.isEmpty && verifyKey == pubKey!.value) {
                     
                 } else {
@@ -90,18 +101,11 @@ public class DataStandard<T>  {
         if (self.body == nil) {
             return "";
         }
-        #warning("需要修改")
-        let bodyStr = "JSONObject.toJSONString(body);"
-        let bodySort = "ObjectUtils.sortJson(bodyStr);"
-        return bodySort;
+        #warning("有疑问")
+        let bodyStr = self.body?.toJSONString()
+        let bodySort = String((bodyStr?.sorted())!)
+        return bodySort
     }
-
-    public func toString() -> String {
-        #warning("需要修改")
-        return "JSONObject.toJSONString(this);"
-    }
-    
-  
 
 }
 

@@ -4463,13 +4463,13 @@
 			path = secp256k1;
 			sourceTree = "<group>";
 		};
-		16DA11734C224EB4AC0593F404510C26 /* Wallet */ = {
+		16DA11734C224EB4AC0593F404510C26 /* WalletService */ = {
 			isa = PBXGroup;
 			children = (
 				7902F1E8EEBDDA31A663D2877C1A51C0 /* IRISWallet.swift */,
 				4F5795934D1FF1267881E7F3BF2C2D01 /* Bech32Address */,
 			);
-			path = Wallet;
+			path = WalletService;
 			sourceTree = "<group>";
 		};
 		189D730072B38F04F5122A706F8B42C0 /* Support Files */ = {
@@ -4747,12 +4747,12 @@
 			path = CNIOHTTPParser;
 			sourceTree = "<group>";
 		};
-		2A478DB24713903F788DF520C077BA99 /* Auth */ = {
+		2A478DB24713903F788DF520C077BA99 /* AuthService */ = {
 			isa = PBXGroup;
 			children = (
 				EA6B160DD5D21922D613C640068FEA60 /* AuthService.swift */,
 			);
-			path = Auth;
+			path = AuthService;
 			sourceTree = "<group>";
 		};
 		2AAE53EE26CFE730029011C50092D766 /* v1beta1 */ = {
@@ -5501,12 +5501,12 @@
 			path = CGRPCZlib;
 			sourceTree = "<group>";
 		};
-		88125EC5997AC1D84507939F2D07AA8C /* NFT */ = {
+		88125EC5997AC1D84507939F2D07AA8C /* NFTService */ = {
 			isa = PBXGroup;
 			children = (
 				D909340AA899130E6D2E2278923B5A08 /* NFTService.swift */,
 			);
-			path = NFT;
+			path = NFTService;
 			sourceTree = "<group>";
 		};
 		8863CF7639EFDE6B3FC2960F04240FD8 /* Support Files */ = {
@@ -5585,15 +5585,15 @@
 				F86CACB625885BF00066C76C /* Util */,
 				F828F0112588A6740049E82F /* entity */,
 				F828EFEA2588A2260049E82F /* TokenService */,
-				F86CABD1258845390066C76C /* Ticket */,
-				2A478DB24713903F788DF520C077BA99 /* Auth */,
+				F86CABD1258845390066C76C /* TicketService */,
+				2A478DB24713903F788DF520C077BA99 /* AuthService */,
 				F949D9EDB540BABFA427499202406ED2 /* Bank */,
 				937B517CD2CD38D3488203688705F537 /* Broadcast */,
 				7206C1653E7D054E1675506AFF856574 /* ERC20Token */,
-				BC1E786114F5772D5C975F7C67642980 /* Merchant */,
+				BC1E786114F5772D5C975F7C67642980 /* MerchantService */,
 				6E7B54742A6F4B0753093F707F19A555 /* NetWork */,
-				88125EC5997AC1D84507939F2D07AA8C /* NFT */,
-				16DA11734C224EB4AC0593F404510C26 /* Wallet */,
+				88125EC5997AC1D84507939F2D07AA8C /* NFTService */,
+				16DA11734C224EB4AC0593F404510C26 /* WalletService */,
 			);
 			name = DmaIRISSession;
 			path = DmaIRIS_SDK_IOS/Classes/DmaIRISSession;
@@ -5862,13 +5862,13 @@
 			path = HandyJSON;
 			sourceTree = "<group>";
 		};
-		BC1E786114F5772D5C975F7C67642980 /* Merchant */ = {
+		BC1E786114F5772D5C975F7C67642980 /* MerchantService */ = {
 			isa = PBXGroup;
 			children = (
 				9276F1A916FF87FAA90A1EB809FC6CAF /* MerchantService.swift */,
 				F86CABAB2587845D0066C76C /* MerchantModel.swift */,
 			);
-			path = Merchant;
+			path = MerchantService;
 			sourceTree = "<group>";
 		};
 		BE13D33D22E799AFF5B32407EE5F40E2 /* Support Files */ = {
@@ -6879,7 +6879,7 @@
 			path = proto;
 			sourceTree = "<group>";
 		};
-		F86CABD1258845390066C76C /* Ticket */ = {
+		F86CABD1258845390066C76C /* TicketService */ = {
 			isa = PBXGroup;
 			children = (
 				F86CABD2258845520066C76C /* TicketService.swift */,
@@ -6890,7 +6890,7 @@
 				F86CAC4425884EBE0066C76C /* Schema.swift */,
 				F86CAD0125887C460066C76C /* ProtocEnum.swift */,
 			);
-			path = Ticket;
+			path = TicketService;
 			sourceTree = "<group>";
 		};
 		F86CACB625885BF00066C76C /* Util */ = {

@@ -16,53 +16,100 @@ public class SignUtils {
     public static func doSign(data: String, privateKey: String) -> SignDataEntity {
         
         let dataByte = dataToByte(data: data)
-        var signature = Data()
-//        signature = doSign(data: dataByte, privateKey: privateKey)
+        let privateKeyData = Data.fromHex(privateKey)
+        var signature = doSign(data: dataByte, privateKey: privateKeyData!)
+        let sig = signature.toHexString()
         
-        return  SignDataEntity(msg: "data", pubKey: "pubKey", sig: "sig");
-
+        let encoded = SECP256K1.privateToPublic(privateKey: privateKeyData!, compressed: true)
+        let pubKey = encoded?.base64EncodedString()
+        return  SignDataEntity(msg: data, pubKey: pubKey!, sig: sig);
+        
+        
     }
     
-    private static func doSign(data: Data, privateKey: Data) {
+    private static func doSign(data: Data, privateKey: Data) -> Data {
+        
 //        BigInteger privateKeyForSigning = new BigInteger(1, privateKey);
-//        let privateKeyForSigning = BigInt
-//        ECDSASigner signer = new ECDSASigner(new HMacDSAKCalculator(new SHA256Digest()));
+//              ECDSASigner signer = new ECDSASigner(new HMacDSAKCalculator(new SHA256Digest()));
+//              ECPrivateKeyParameters privKey = new ECPrivateKeyParameters(privateKeyForSigning, ECKey.CURVE);
+//              signer.init(true, privKey);
 //
-//        SHA256Digest
-//        
-//        HMAC(key: <#T##SymmetricKey#>)
-    }
-
-
-    
-    public static func verify(data: String ,sig: String, base64PubKey: String) -> Bool {
+//              byte[] r;
+//              byte[] s;
+//              do {
+//                  do {
+//                      BigInteger[] components = signer.generateSignature(Sha256Hash.hash(data));
+//                      r = Utils.bigIntegerToBytes(components[0], 32);
+//                      s = Utils.bigIntegerToBytes(components[1], 32);
+//                  } while (r.length > 32);
+//              } while (s.length > 32);
+//
+//              byte[] signature = new byte[r.length + s.length];
+//              System.arraycopy(r, 0, signature, 0, r.length);
+//              System.arraycopy(s, 0, signature, r.length, s.length);
+//              return signature;
+        #warning("有疑问")
+        BigUInt()
+        var sign = SECP256K1.signForRecovery(hash: data, privateKey: privateKey)
+        let signer = SECP256K1.unmarshalSignature(signatureData: sign.serializedSignature!)
         
-        return true
+        return Data()
+
     }
+
 
     public static func verify(signDataEntity: SignDataEntity) -> Bool {
-//        byte[] msg = dataToByte(signDataEntity.getMsg());
-//        byte[] sig = new byte[0];
-//        try {
-//            sig = org.apache.commons.codec.binary.Hex.decodeHex(signDataEntity.getSig().toCharArray());
-//        } catch (DecoderException e) {
-//            e.printStackTrace();
-//        }
-//        byte[] pub = Base64.getDecoder().decode(signDataEntity.getPubKey());
-//        return verify(msg, sig, pub);
-        return true
+        let msg = dataToByte(data: signDataEntity.msg)
+        let sig = Data.fromHex(signDataEntity.sig)
+        let pub = Data(base64Encoded: signDataEntity.pubKey)
+        return verify(msg: msg, sig: sig!, pub: pub!)
+    }
+    
+    public static func verify(data: String ,sig: String, base64PubKey: String) -> Bool {
+        #warning("有疑问")
+        let msg = dataToByte(data: data)
+        let signature = Data.fromHex(sig)!
+        let pub = Data(base64Encoded: base64PubKey)
+        return verify(msg: msg, sig: signature, pub: pub!)
+    }
+
+
+    public static func dataToByte(data: String) -> Data {
+        
+        return data.data(using: .utf8) ?? Data()
     }
     
     public static func verify(msg: Data, sig: Data, pub: Data) -> Bool {
         
+        #warning("有疑问")
+//        if (sig.length != 64) {
+//                return false;
+//            } else {
+//                byte[] rb = new byte[sig.length / 2];
+//                byte[] sb = new byte[sig.length / 2];
+//                System.arraycopy(sig, 0, rb, 0, rb.length);
+//                System.arraycopy(sig, sb.length, sb, 0, sb.length);
+//                BigInteger r = parseBigIntegerPositive(new BigInteger(rb), rb.length * 8);
+//                BigInteger s = parseBigIntegerPositive(new BigInteger(sb), rb.length * 8);
+//
+//                msg = Sha256Hash.hash(msg);
+//                X9ECParameters curve = SECNamedCurves.getByName("secp256k1");
+//                ECDSASigner signer = new ECDSASigner(new HMacDSAKCalculator(new SHA256Digest()));
+//                ECPublicKeyParameters publicKey = new ECPublicKeyParameters(curve.getCurve().decodePoint(pub), ECKey.CURVE);
+//                signer.init(false, publicKey);
+//                return signer.verifySignature(msg, r, s);
+//            }
         return true
     }
     
-    public static func dataToByte(data: String) -> Data {
-        
-        #warning("需要修改")
-        return data.data(using: .utf8) ?? Data()
-    }
+//    private static BigInteger parseBigIntegerPositive(BigInteger b, int bitlen) {
+//           if (b.compareTo(BigInteger.ZERO) < 0) {
+//               b = b.add(BigInteger.ONE.shiftLeft(bitlen));
+//           }
+//
+//           return b;
+//       }
+//
 
  
 }
