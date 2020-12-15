@@ -16,7 +16,7 @@ open class TxUtils {
    
     class func getFee(gasLimit: UInt64, amount: String, denom: String) -> TxFee {
         //设置交易费
-        var feeCoin = Coin()
+        var feeCoin = BaseCoin()
         feeCoin.amount = amount
         feeCoin.denom = denom
         
@@ -103,7 +103,7 @@ open class TxUtils {
     }
     
     public class func fromBech32(_ address: String) -> Data? {
-        if let data = try? WalletManager.fromBech32(address: address) {
+        if let data = try? Bech32Utils.fromBech32(address: address) {
             if let bytesValue = try? BytesValue(data) {
                 return bytesValue.value
             }

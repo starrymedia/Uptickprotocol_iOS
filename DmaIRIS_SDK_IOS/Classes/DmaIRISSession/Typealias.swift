@@ -51,13 +51,13 @@ typealias TokenQueryTokensRequest = Irismod_Token_QueryTokensRequest
 typealias TokenQueryFeesRequest = Irismod_Token_QueryFeesRequest
 typealias TokenQueryClient = Irismod_Token_QueryClient
 
-public typealias Token = Irismod_Token_Token
+public typealias TokenToken = Irismod_Token_Token
 public typealias NftCollection = Irismod_Nft_Collection
 public typealias NftDenom = Irismod_Nft_Denom
 public typealias NftBaseNFT = Irismod_Nft_BaseNFT
 public typealias NftOwner = Irismod_Nft_Owner
 
-public typealias Coin = Cosmos_Base_V1beta1_Coin
+public typealias BaseCoin = Cosmos_Base_V1beta1_Coin
 typealias PubKey = Cosmos_Crypto_Secp256k1_PubKey
 
 typealias ProtobufAny = Google_Protobuf_Any

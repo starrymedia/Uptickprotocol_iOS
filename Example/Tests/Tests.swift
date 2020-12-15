@@ -65,9 +65,8 @@ class Tests: XCTestCase {
         
         var amount = Decimal()
         NSDecimalMultiply(&amount, &gasLimint, &gasPriceUp, .plain)
-        print(amount)
-        var amountString = NSDecimalString(&amount, nil)
-        print(amountString)
+        let amountString = NSDecimalString(&amount, nil)
+        print(UInt64(amountString))
         print("============")
 
     }

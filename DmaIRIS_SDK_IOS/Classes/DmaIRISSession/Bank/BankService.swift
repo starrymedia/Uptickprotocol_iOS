@@ -59,7 +59,7 @@ open class BankSession {
                                  successCallback: @escaping (_ res: BroadcastModel) -> (),
                                  errorCallBack: @escaping FPErrorCallback) {
         
-        var coin = Coin()
+        var coin = BaseCoin()
         coin.amount = value
         coin.denom = denom
         
@@ -124,7 +124,7 @@ open class BankSession {
     ///   - successCallback: 所有余额
     ///   - errorCallback: 错误信息
     public func queryAllBalance(address: String,
-                                successCallback: @escaping (_ balances: [Coin]) -> (),
+                                successCallback: @escaping (_ balances: [BaseCoin]) -> (),
                                 errorCallback: @escaping FPErrorCallback) {
                 
         let client = BankQueryClient(channel: IRISServive.channel)
@@ -147,7 +147,7 @@ open class BankSession {
     /// - Parameters:
     ///   - successCallback: successCallback description
     ///   - errorCallback: errorCallback description
-    public func queryTotalSupply(successCallback: @escaping (_ coins: [Coin]) -> (),
+    public func queryTotalSupply(successCallback: @escaping (_ coins: [BaseCoin]) -> (),
                                  errorCallback: @escaping FPErrorCallback) {
                 
         let client = BankQueryClient(channel: IRISServive.channel)
@@ -171,7 +171,7 @@ open class BankSession {
     ///   - successCallback: successCallback description
     ///   - errorCallback: errorCallback description
     public func querySupplyOf(denom: String,
-                              successCallback: @escaping (_ coin: Coin) -> (),
+                              successCallback: @escaping (_ coin: BaseCoin) -> (),
                               errorCallback: @escaping FPErrorCallback) {
                 
         let client = BankQueryClient(channel: IRISServive.channel)

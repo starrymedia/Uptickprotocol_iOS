@@ -157,7 +157,7 @@ open class ERC20TokenSession {
         response.whenComplete { result in
             switch result {
             case .success(let value):
-                if let token = try? Token(serializedData: value.token.value) {
+                if let token = try? TokenToken(serializedData: value.token.value) {
                     successCallback(token.scale)
                 } else {
                     errorCallBack("token error")
@@ -170,7 +170,7 @@ open class ERC20TokenSession {
     
     //MARK:- 根据地址查询拥有的token种类
     public func tokens(address: String,
-                       successCallback: @escaping (_ tokens: [Token]) -> (),
+                       successCallback: @escaping (_ tokens: [TokenToken]) -> (),
                        errorCallBack: @escaping FPErrorCallback) {
         
         var request = TokenQueryTokensRequest()
@@ -184,9 +184,9 @@ open class ERC20TokenSession {
             switch result {
             case .success(let value):
                 let dataList = value.tokens
-                var tokens = [Token]()
+                var tokens = [TokenToken]()
                 for data in dataList {
-                    if let token = try? Token(serializedData: data.value) {
+                    if let token = try? TokenToken(serializedData: data.value) {
                         tokens.append(token)
                     }
                 }
@@ -199,7 +199,7 @@ open class ERC20TokenSession {
     
     //MARK:- 创建token，估算交易费
     public func fees(denom: String,
-                     successCallback: @escaping (_ issueFee: Coin) -> (),
+                     successCallback: @escaping (_ issueFee: BaseCoin) -> (),
                      errorCallBack: @escaping FPErrorCallback) {
         var request = TokenQueryFeesRequest()
         request.symbol = denom

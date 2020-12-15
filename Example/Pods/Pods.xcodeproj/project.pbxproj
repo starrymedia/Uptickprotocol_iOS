@@ -1492,6 +1492,9 @@
 		F828EF3025888C980049E82F /* NFTToken.swift in Sources */ = {isa = PBXBuildFile; fileRef = F828EF2F25888C980049E82F /* NFTToken.swift */; };
 		F828EF7A25888E180049E82F /* AddressUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = F828EF7925888E180049E82F /* AddressUtils.swift */; };
 		F828EFA125888E480049E82F /* Bech32Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = F828EFA025888E480049E82F /* Bech32Utils.swift */; };
+		F828EFEC2588A24A0049E82F /* TokenService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F828EFEB2588A24A0049E82F /* TokenService.swift */; };
+		F828F0382588A6B40049E82F /* Token.swift in Sources */ = {isa = PBXBuildFile; fileRef = F828F0372588A6B40049E82F /* Token.swift */; };
+		F828F0822588B32F0049E82F /* Coin.swift in Sources */ = {isa = PBXBuildFile; fileRef = F828F0812588B32F0049E82F /* Coin.swift */; };
 		F86CAB86258775C20066C76C /* BroadcastDataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F86CAB85258775C20066C76C /* BroadcastDataModel.swift */; };
 		F86CABAC2587845D0066C76C /* MerchantModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F86CABAB2587845D0066C76C /* MerchantModel.swift */; };
 		F86CABD3258845530066C76C /* TicketService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F86CABD2258845520066C76C /* TicketService.swift */; };
@@ -3799,6 +3802,9 @@
 		F828EF2F25888C980049E82F /* NFTToken.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NFTToken.swift; sourceTree = "<group>"; };
 		F828EF7925888E180049E82F /* AddressUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressUtils.swift; sourceTree = "<group>"; };
 		F828EFA025888E480049E82F /* Bech32Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Bech32Utils.swift; sourceTree = "<group>"; };
+		F828EFEB2588A24A0049E82F /* TokenService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenService.swift; sourceTree = "<group>"; };
+		F828F0372588A6B40049E82F /* Token.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Token.swift; sourceTree = "<group>"; };
+		F828F0812588B32F0049E82F /* Coin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Coin.swift; sourceTree = "<group>"; };
 		F86CAB85258775C20066C76C /* BroadcastDataModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BroadcastDataModel.swift; sourceTree = "<group>"; };
 		F86CABAB2587845D0066C76C /* MerchantModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MerchantModel.swift; sourceTree = "<group>"; };
 		F86CABD2258845520066C76C /* TicketService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TicketService.swift; sourceTree = "<group>"; };
@@ -5499,8 +5505,6 @@
 			isa = PBXGroup;
 			children = (
 				D909340AA899130E6D2E2278923B5A08 /* NFTService.swift */,
-				F828EF0925888BBF0049E82F /* NFT.swift */,
-				F828EF2F25888C980049E82F /* NFTToken.swift */,
 			);
 			path = NFT;
 			sourceTree = "<group>";
@@ -5579,6 +5583,8 @@
 				776D6F59CAE45E44E24A2C255ABF579E /* TxUtils.swift */,
 				8E3A76310353731603657CE8DF754203 /* Typealias.swift */,
 				F86CACB625885BF00066C76C /* Util */,
+				F828F0112588A6740049E82F /* entity */,
+				F828EFEA2588A2260049E82F /* TokenService */,
 				F86CABD1258845390066C76C /* Ticket */,
 				2A478DB24713903F788DF520C077BA99 /* Auth */,
 				F949D9EDB540BABFA427499202406ED2 /* Bank */,
@@ -6844,6 +6850,33 @@
 				12FD16BFB500807631DCDF4FA9AF5A81 /* UptickProtocolIRISnet */,
 			);
 			name = "Development Pods";
+			sourceTree = "<group>";
+		};
+		F828EFEA2588A2260049E82F /* TokenService */ = {
+			isa = PBXGroup;
+			children = (
+				F828EFEB2588A24A0049E82F /* TokenService.swift */,
+			);
+			path = TokenService;
+			sourceTree = "<group>";
+		};
+		F828F0112588A6740049E82F /* entity */ = {
+			isa = PBXGroup;
+			children = (
+				F828F0362588A6920049E82F /* proto */,
+			);
+			path = entity;
+			sourceTree = "<group>";
+		};
+		F828F0362588A6920049E82F /* proto */ = {
+			isa = PBXGroup;
+			children = (
+				F828EF0925888BBF0049E82F /* NFT.swift */,
+				F828F0812588B32F0049E82F /* Coin.swift */,
+				F828EF2F25888C980049E82F /* NFTToken.swift */,
+				F828F0372588A6B40049E82F /* Token.swift */,
+			);
+			path = proto;
 			sourceTree = "<group>";
 		};
 		F86CABD1258845390066C76C /* Ticket */ = {
@@ -9206,6 +9239,7 @@
 				6A4FF782F207E6EA0D66AB2A7AA3093C /* CosmosAuthQuery.grpc.swift in Sources */,
 				4ED5F422868DC1A00EB8EBC471A62AA4 /* CosmosAuthQuery.pb.swift in Sources */,
 				6FB43599550AF4F453144AE9C8AEB71A /* CosmosBank.pb.swift in Sources */,
+				F828F0382588A6B40049E82F /* Token.swift in Sources */,
 				EBFD5A9C227F01CDD3BA4C526265CE91 /* CosmosBankGenesis.pb.swift in Sources */,
 				05B69ECCD63470404E3C299769724C80 /* CosmosBankQuery.grpc.swift in Sources */,
 				F828EF3025888C980049E82F /* NFTToken.swift in Sources */,
@@ -9236,6 +9270,7 @@
 				F86CAC6B258852090066C76C /* DataStandard.swift in Sources */,
 				3C466B5FB36372FEF8C94417F9E8FDC2 /* NftQuery.pb.swift in Sources */,
 				F86CAC91258855EA0066C76C /* SignDataEntity.swift in Sources */,
+				F828F0822588B32F0049E82F /* Coin.swift in Sources */,
 				0B191840CC3804E42D276800595CAD7B /* NFTService.swift in Sources */,
 				4C89370383FD15FA2FBA80546F887D94 /* SegwitAddrCoder.swift in Sources */,
 				EF9A9CCC303B5DD6A2DA157458E45AB5 /* TendermintAbciTypes.grpc.swift in Sources */,
@@ -9258,6 +9293,7 @@
 				F86CABF925884E850066C76C /* Ticket.swift in Sources */,
 				3CC64A0D3D76438D3E772FF02FDBAB11 /* Typealias.swift in Sources */,
 				FA60C66144EC464ADD8615FC66E03256 /* UptickProtocolIRISnet-dummy.m in Sources */,
+				F828EFEC2588A24A0049E82F /* TokenService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
