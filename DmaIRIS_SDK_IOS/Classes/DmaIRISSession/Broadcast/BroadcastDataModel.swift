@@ -33,14 +33,25 @@ struct BroadcastTx: HandyJSON {
     var events: [Any]?
 }
 
-struct BroadcastRequest: Encodable {
+public struct BroadcastRequest<T:Encodable>: Encodable {
     let id: String
     let jsonrpc: String
     let method: String
-    let params: BroadcastRequestParams
+    let params: T
+    
+    public init(id: String, jsonrpc: String, method: String, params: T) {
+        self.id = id
+        self.jsonrpc = jsonrpc
+        self.method = method
+        self.params = params
+    }
 
 }
 
-struct BroadcastRequestParams: Encodable {
-    let tx: String
+public struct BroadcastRequestParams: Encodable {
+    public let tx: String
+    
+    public init(tx: String) {
+        self.tx = tx
+    }
 }

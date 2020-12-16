@@ -76,7 +76,7 @@ open class BankSession {
         //调用签名方法
         TxService.signTx(txBody: txBody,
                          privateKey: privateKey) { tx in
-            BroadcastService.broadcast(tx: tx) { result in
+            RpcService.broadcast(tx: tx) { result in
                 successCallback(result)
             } errorCallBack: { error in
                 errorCallBack(error)

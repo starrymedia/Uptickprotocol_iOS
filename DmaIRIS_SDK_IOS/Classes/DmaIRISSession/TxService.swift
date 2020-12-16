@@ -17,7 +17,7 @@ open class TxService {
 
     class func signTx(txBody: TxBody,
                 privateKey: String,
-                _ callback: @escaping (_ tx: Tx) -> Void) {
+                _ callback: @escaping (_ tx: TxTx) -> Void) {
 
         //获取公钥
         guard let publicKeyData = WalletManager.exportPublicKey(privateKey: privateKey) else {
@@ -79,7 +79,7 @@ open class TxService {
                                accountNumber: UInt64,
                                privateKey: String,
                                gasLimit: UInt64,
-                               successCallback: @escaping (_ txSign: Tx) -> (),
+                               successCallback: @escaping (_ txSign: TxTx) -> (),
                                errorCallBack: @escaping FPErrorCallback) {
         var myGasLimit = gasLimit
         let txSign = setSignTx(signerInfo: signerInfo,
@@ -110,7 +110,7 @@ open class TxService {
                          txBody:TxBody,
                          accountNumber: UInt64,
                          privateKey: String,
-                         gasLimit: UInt64) -> Tx {
+                         gasLimit: UInt64) -> TxTx {
         
         var gasLimint = Decimal(gasLimit)
         var gasPrice = Decimal(0.025)
@@ -143,7 +143,7 @@ open class TxService {
         //链ID
         signdoc.chainID = chainId
         
-        var txSign = Tx()
+        var txSign = TxTx()
         txSign.body = txBody
         txSign.authInfo = authInfo
         
@@ -162,7 +162,7 @@ open class TxService {
     }
     
     
-    class func simulateRequest(signTx: Tx,
+    class func simulateRequest(signTx: TxTx,
                                successCallback: @escaping (_ gasUsed: UInt64) -> (),
                                errorCallBack: @escaping FPErrorCallback) {
 

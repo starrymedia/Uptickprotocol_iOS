@@ -17,7 +17,7 @@ class IRISSessionTests: XCTestCase {
         IRISServive.port = 9090
         IRISServive.chainId = "bifrost-1"
         MerchantService.nodeUrl = "http://52.81.146.252:8091"
-        BroadcastService.rpcUrl = "http://34.80.22.255:26657"
+        RpcService.rpcUrl = "http://34.80.22.255:26657"
 
     }
 

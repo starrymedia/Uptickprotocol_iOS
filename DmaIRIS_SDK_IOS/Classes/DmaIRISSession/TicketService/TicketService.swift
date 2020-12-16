@@ -96,7 +96,7 @@ class TicketService  {
         TxService.signTx(txBody: builder,
                          privateKey: privateKey) { tx in
             
-            BroadcastService.broadcast(tx: tx) { res in
+            RpcService.broadcast(tx: tx) { res in
                 print(res)
                 successCallback(res)
             } errorCallBack: { error in

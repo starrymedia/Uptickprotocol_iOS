@@ -34,9 +34,7 @@ public class DataStandard<T:HandyJSON>: HandyJSON {
                 break
             }
             
-            let pubKey = PublicKey()
-            pubKey.value = signDataEntity.pubKey
-            pubKey.type = pubKeyEnum.rawValue
+            let pubKey = PublicKey(type: pubKeyEnum.rawValue, value: signDataEntity.pubKey)
             
             let signature = Signature()
             signature.pubKey = pubKey
@@ -62,7 +60,7 @@ public class DataStandard<T:HandyJSON>: HandyJSON {
             }
             
             if (!verifyKey!.isEmpty) {
-                if (!pubKey!.value.isEmpty && verifyKey == pubKey!.value) {
+                if (!pubKey!.value!.isEmpty && verifyKey == pubKey!.value) {
                     
                 } else {
                     return false
@@ -71,12 +69,12 @@ public class DataStandard<T:HandyJSON>: HandyJSON {
             }
             
             let signType = pubKey!.type
-            let pubKeyEnum = PublicKeyEnum(rawValue: signType)
+            let pubKeyEnum = PublicKeyEnum(rawValue: signType!)
 
             var falg = false
             switch (pubKeyEnum) {
             case .base64:
-                falg = base64Verify(sig: self.signature!.sigData, base64PubKey: pubKey!.value);
+                falg = base64Verify(sig: self.signature!.sigData, base64PubKey: pubKey!.value!);
             default:
                 print("Public key type not supported")
             }
@@ -121,8 +119,13 @@ public class Signature  {
 }
 
 public class PublicKey {
-    public var type:String = ""
-    public var value: String = ""
+    
+    init(type:String, value: String) {
+        self.type = type
+        self.value = value
+    }
+    public var type:String?
+    public var value: String?
 }
 
 

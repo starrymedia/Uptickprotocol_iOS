@@ -8,7 +8,7 @@
 import Foundation
 import SwiftProtobuf
 
-public typealias Tx = Cosmos_Tx_V1beta1_Tx
+public typealias TxTx = Cosmos_Tx_V1beta1_Tx
 typealias TxFee = Cosmos_Tx_V1beta1_Fee
 typealias TxBody = Cosmos_Tx_V1beta1_TxBody
 typealias TxModeInfo = Cosmos_Tx_V1beta1_ModeInfo

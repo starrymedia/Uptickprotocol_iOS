@@ -51,7 +51,7 @@ open class NFTSession {
         TxService.signTx(txBody: txBody,
                          privateKey: privateKey) { tx in
             //广播交易
-            BroadcastService.broadcast(tx: tx) { res in
+            RpcService.broadcast(tx: tx) { res in
                 print(res)
                 successCallback(res)
             } errorCallBack: { error in
@@ -114,7 +114,7 @@ open class NFTSession {
         TxService.signTx(txBody: txBody,
                          privateKey: privateKey) { tx in
             
-            BroadcastService.broadcast(tx: tx) { res in
+            RpcService.broadcast(tx: tx) { res in
                 print(res)
                 successCallback(res)
             } errorCallBack: { error in
@@ -154,7 +154,7 @@ open class NFTSession {
                 
         TxService.signTx(txBody: txBody, privateKey: privateKey) { tx in
             
-            BroadcastService.broadcast(tx: tx) { res in
+            RpcService.broadcast(tx: tx) { res in
                 successCallback(res)
             }errorCallBack: { error in
                 errorCallback(error)
@@ -215,7 +215,7 @@ open class NFTSession {
         TxService.signTx(txBody: txBody,
                          privateKey: privateKey) { tx in
             
-            BroadcastService.broadcast(tx: tx) { res in
+            RpcService.broadcast(tx: tx) { res in
                 successCallback(res)
             } errorCallBack: { error in
                 errorCallback(error)
@@ -287,7 +287,7 @@ open class NFTSession {
         TxService.signTx(txBody: txBody,
                          privateKey: privateKey) { tx in
             
-            BroadcastService.broadcast(tx: tx) { res in
+            RpcService.broadcast(tx: tx) { res in
                 successCallback(res)
             } errorCallBack: { error in
                 errorCallback(error)

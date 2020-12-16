@@ -52,7 +52,8 @@ open class ERC20TokenSession {
         }
         
         TxService.signTx(txBody: txBody, privateKey: privateKey) { tx in
-            BroadcastService.broadcast(tx: tx) { res in
+            
+            RpcService.broadcast(tx: tx) { res in
                 print(res)
                 successCallback(res)
             } errorCallBack: { error in
@@ -96,7 +97,7 @@ open class ERC20TokenSession {
         let fee = TxUtils.getFee(gasLimit: txGasLimit, amount: txAmount, denom: txDenom)
         
         TxService.signTx(txBody: txBody, privateKey: privateKey) { tx in
-            BroadcastService.broadcast(tx: tx) { res in
+            RpcService.broadcast(tx: tx) { res in
                 successCallback(res)
             } errorCallBack: { error in
                 errorCallBack(error)
@@ -130,7 +131,7 @@ open class ERC20TokenSession {
         let fee = TxUtils.getFee(gasLimit: txGasLimit, amount: txAmount, denom: txDenom)
         
         TxService.signTx(txBody: txBody, privateKey: privateKey) { tx in
-            BroadcastService.broadcast(tx: tx) { res in
+            RpcService.broadcast(tx: tx) { res in
                 successCallback(res)
             } errorCallBack: { error in
                 errorCallBack(error)

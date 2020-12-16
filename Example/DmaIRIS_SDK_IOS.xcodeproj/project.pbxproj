@@ -15,6 +15,7 @@
 		607FACE01AFB9204008FA782 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDE1AFB9204008FA782 /* LaunchScreen.xib */; };
 		607FACEC1AFB9204008FA782 /* Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACEB1AFB9204008FA782 /* Tests.swift */; };
 		B85B347B879D611D662763A4 /* Pods_DmaIRIS_SDK_IOS_Tests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8C093D867D2893CFD1039C32 /* Pods_DmaIRIS_SDK_IOS_Tests.framework */; };
+		F8288C352589B4BB00EAEAE4 /* QueryServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8288C342589B4BB00EAEAE4 /* QueryServiceTests.swift */; };
 		F89A2C3C258748E600285A89 /* IRISSessionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F89A2C3B258748E600285A89 /* IRISSessionTests.swift */; };
 /* End PBXBuildFile section */
 
@@ -47,6 +48,7 @@
 		981C96CECD081BFAF90AFA6B /* Pods-DmaIRIS_SDK_IOS_Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DmaIRIS_SDK_IOS_Example.release.xcconfig"; path = "Target Support Files/Pods-DmaIRIS_SDK_IOS_Example/Pods-DmaIRIS_SDK_IOS_Example.release.xcconfig"; sourceTree = "<group>"; };
 		BA259A7AE285C13E7E27FCB3 /* Pods-DmaIRIS_SDK_IOS_Example.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DmaIRIS_SDK_IOS_Example.debug.xcconfig"; path = "Target Support Files/Pods-DmaIRIS_SDK_IOS_Example/Pods-DmaIRIS_SDK_IOS_Example.debug.xcconfig"; sourceTree = "<group>"; };
 		D2E744664C8CBBADAAF83FAA /* Pods-DmaIRIS_SDK_IOS_Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DmaIRIS_SDK_IOS_Tests.debug.xcconfig"; path = "Target Support Files/Pods-DmaIRIS_SDK_IOS_Tests/Pods-DmaIRIS_SDK_IOS_Tests.debug.xcconfig"; sourceTree = "<group>"; };
+		F8288C342589B4BB00EAEAE4 /* QueryServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueryServiceTests.swift; sourceTree = "<group>"; };
 		F89A2C3B258748E600285A89 /* IRISSessionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IRISSessionTests.swift; sourceTree = "<group>"; };
 		FFCF7B90644FE6861635B8CF /* Pods-DmaIRIS_SDK_IOS_Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DmaIRIS_SDK_IOS_Tests.release.xcconfig"; path = "Target Support Files/Pods-DmaIRIS_SDK_IOS_Tests/Pods-DmaIRIS_SDK_IOS_Tests.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -119,6 +121,7 @@
 			children = (
 				607FACEB1AFB9204008FA782 /* Tests.swift */,
 				F89A2C3B258748E600285A89 /* IRISSessionTests.swift */,
+				F8288C342589B4BB00EAEAE4 /* QueryServiceTests.swift */,
 				607FACE91AFB9204008FA782 /* Supporting Files */,
 			);
 			path = Tests;
@@ -428,6 +431,7 @@
 			files = (
 				607FACEC1AFB9204008FA782 /* Tests.swift in Sources */,
 				F89A2C3C258748E600285A89 /* IRISSessionTests.swift in Sources */,
+				F8288C352589B4BB00EAEAE4 /* QueryServiceTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

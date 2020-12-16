@@ -19,6 +19,8 @@ open class IRISAFNetwork {
                                              parameters: Parameters,
                                              successCallback: @escaping (_ jsonString: String) -> (),
                                              errorCallBack: @escaping FPErrorCallback) {
+        
+        assert(url != "","url is empty")
         AF.request(url,
                    method: .post,
                    parameters: parameters,
@@ -35,6 +37,7 @@ open class IRISAFNetwork {
     open func getRequest(url: String,
                          successCallback: @escaping (_ jsonString: String) -> (),
                          errorCallBack: @escaping FPErrorCallback) {
+        assert(url != "","url is empty")
         AF.request(url).responseString { response in
             switch response.result {
             case .success(let jsonString):

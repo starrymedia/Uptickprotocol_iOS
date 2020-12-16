@@ -9,16 +9,16 @@ import Foundation
 
 public class Coin {
 
-    var symbol: String = ""
-    var amount: Decimal = 0
+    var denom: String = ""
+    var amount: String = ""
 
     init() {
         
     }
     
-    convenience init(symbol: String, amount: Decimal) {
+    convenience init(symbol: String, amount: String) {
         self.init()
-        self.symbol = symbol
+        self.denom = symbol
         self.amount = amount
     }
     

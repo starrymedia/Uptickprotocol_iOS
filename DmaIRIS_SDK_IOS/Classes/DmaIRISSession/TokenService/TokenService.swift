@@ -53,7 +53,7 @@ open class TokenServiceSession {
         }
         
         TxService.signTx(txBody: txBody, privateKey: privateKey) { tx in
-            BroadcastService.broadcast(tx: tx) { broadcast in
+            RpcService.broadcast(tx: tx) { broadcast in
                 successCallback(broadcast)
             } errorCallBack: { error in
                 errorCallBack(error)
@@ -96,7 +96,7 @@ open class TokenServiceSession {
         let fee = TxUtils.getFee(gasLimit: txGasLimit, amount: txAmount, denom: txDenom)
         
         TxService.signTx(txBody: txBody, privateKey: privateKey) { tx in
-            BroadcastService.broadcast(tx: tx) { broadcast in
+            RpcService.broadcast(tx: tx) { broadcast in
                 successCallback(broadcast)
             } errorCallBack: { error in
                 errorCallBack(error)
@@ -137,7 +137,7 @@ open class TokenServiceSession {
         let fee = TxUtils.getFee(gasLimit: txGasLimit, amount: txAmount, denom: txDenom)
         
         TxService.signTx(txBody: txBody, privateKey: privateKey) { tx in
-            BroadcastService.broadcast(tx: tx) { res in
+            RpcService.broadcast(tx: tx) { res in
                 successCallback(res)
             } errorCallBack: { error in
                 errorCallBack(error)
@@ -232,7 +232,7 @@ open class TokenServiceSession {
         //调用签名方法
         TxService.signTx(txBody: txBody,
                          privateKey: privateKey) { tx in
-            BroadcastService.broadcast(tx: tx) { result in
+            RpcService.broadcast(tx: tx) { result in
                 successCallback(result)
             } errorCallBack: { error in
                 errorCallBack(error)
@@ -511,8 +511,8 @@ open class TokenServiceSession {
         self.toWei(tokenSymblol: coinOuter.denom,
                    amount: Decimal(string: coinOuter.amount)!) { amount in
             var coin = Coin()
-            coin.symbol = coinOuter.denom
-            coin.amount = Decimal(string: amount)!
+            coin.denom = coinOuter.denom
+            coin.amount = amount
             successCallback(coin)
         } errorCallBack: { error in
             errorCallBack(error)
@@ -529,8 +529,8 @@ open class TokenServiceSession {
                        amount: Decimal(string: item.amount)!) { amount in
                 var coins = [Coin]()
                 var coin = Coin()
-                coin.symbol = item.denom
-                coin.amount = Decimal(string: amount)!
+                coin.denom = item.denom
+                coin.amount = amount
                 coins.append(coin)
                 successCallback(coins)
             } errorCallBack: { error in

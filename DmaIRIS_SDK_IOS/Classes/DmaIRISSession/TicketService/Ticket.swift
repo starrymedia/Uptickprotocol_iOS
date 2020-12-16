@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import HandyJSON
 
 public class Ticket {
     var name: String = ""
