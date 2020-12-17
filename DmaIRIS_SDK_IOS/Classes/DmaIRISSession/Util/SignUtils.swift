@@ -10,14 +10,17 @@ import BigInt
 import web3swift
 import secp256k1_swift
 import CryptoKit
+import NIOSSL
+import Security
 
 public class SignUtils {
     
-    public static func doSign(data: String, privateKey: String) -> SignDataEntity {
+    public static func doSignDataEntity(data: String, privateKey: String) -> SignDataEntity {
         
         let dataByte = dataToByte(data: data)
         let privateKeyData = Data.fromHex(privateKey)
         var signature = doSign(data: dataByte, privateKey: privateKeyData!)
+        
         let sig = signature.toHexString()
         
         let encoded = SECP256K1.privateToPublic(privateKey: privateKeyData!, compressed: true)
@@ -29,8 +32,20 @@ public class SignUtils {
     
     private static func doSign(data: Data, privateKey: Data) -> Data {
         
-//        BigInteger privateKeyForSigning = new BigInteger(1, privateKey);
+        print(data)
+        print(privateKey)
+        let privateKeyData = privateKey
+        let sign = SECP256K1.signForRecovery(hash: data, privateKey: privateKeyData, useExtraEntropy: false)
+//        let serializedSignature = sign.serializedSignature
+//        let signature = SECP256K1.unmarshalSignature(signatureData: serializedSignature!)
+//        let data = signature!.r + signature!.s
+        
+
+//        BigInt(1).power(privateKey, modulus: privateKey)
+        //        BigInteger privateKeyForSigning = new BigInteger(1, privateKey);
 //              ECDSASigner signer = new ECDSASigner(new HMacDSAKCalculator(new SHA256Digest()));
+
+        
 //              ECPrivateKeyParameters privKey = new ECPrivateKeyParameters(privateKeyForSigning, ECKey.CURVE);
 //              signer.init(true, privKey);
 //
@@ -49,9 +64,6 @@ public class SignUtils {
 //              System.arraycopy(s, 0, signature, r.length, s.length);
 //              return signature;
         #warning("有疑问")
-        BigUInt()
-        var sign = SECP256K1.signForRecovery(hash: data, privateKey: privateKey)
-        let signer = SECP256K1.unmarshalSignature(signatureData: sign.serializedSignature!)
         
         return Data()
 
@@ -113,3 +125,5 @@ public class SignUtils {
 
  
 }
+
+ 

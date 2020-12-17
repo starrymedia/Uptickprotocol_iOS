@@ -6,14 +6,15 @@
 //
 
 import Foundation
+import HandyJSON
 
-public class SignDataEntity {
+public class SignDataEntity: HandyJSON {
     
     var msg: String = ""
     var pubKey: String = ""
     var sig: String = ""
     
-    init() {
+    required public init() {
     }
     
     convenience init(msg: String, pubKey: String, sig: String) {
@@ -24,7 +25,6 @@ public class SignDataEntity {
     }
     
     public func toString() -> String {
-        #warning("需要修改")
-        return "JSONObject.toJSONString(self);"
+        return self.toJSONString() ?? "\(self) json error"
     }
 }

@@ -27,7 +27,7 @@ public class DataStandard<T:HandyJSON>: HandyJSON {
             var signDataEntity: SignDataEntity!
             switch pubKeyEnum {
             case .base64:
-                signDataEntity = SignUtils.doSign(data: bodySort, privateKey: signPriKey)
+                signDataEntity = SignUtils.doSignDataEntity(data: bodySort, privateKey: signPriKey)
                 break
             default:
                 print("Public key type not supported")
