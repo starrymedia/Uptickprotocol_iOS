@@ -6,8 +6,13 @@
 //
 
 import Foundation
+import HandyJSON
 
-public class Single  {
+public class Single: HandyJSON  {
+    public required init() {
+        
+    }
+    
     
     public var mode: Int?
     public init(mode: Int) {

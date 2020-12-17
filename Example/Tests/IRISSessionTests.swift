@@ -76,14 +76,18 @@ class IRISSessionTests: XCTestCase {
     
     func testRequestQueryBalance() {
         let expectation = self.expectation(description: "testRequestQueryBalance")
-        BankService.queryBalance(address: "iaa1fu5xru6umtfqthe588z6zk37gdknulr55ee5qf",
-                                 denom: "ubif") { amount in
-            print("amount:\(amount)")
+
+        NFTService.balance(owner: "iaa1fu5xru6umtfqthe588z6zk37gdknulr55ee5qf",
+                           nftId: "") { list in
+            print("amount:\(list)")
             expectation.fulfill()
+
         } errorCallback: { error in
             print("error:\(error)")
             expectation.fulfill()
+
         }
+
         waitForExpectations(timeout: 15, handler: nil)
     }
     
@@ -138,7 +142,10 @@ class IRISSessionTests: XCTestCase {
     func testQueryAllNfts() {
         let expectation = self.expectation(description: "testQueryAllNfts")
         NFTService.allNfts { denoms in
-            print(denoms)
+//            print(denoms)
+            for de in denoms {
+                print(de.name)
+            }
             expectation.fulfill()
         } errorCallback: { error in
             print(error)

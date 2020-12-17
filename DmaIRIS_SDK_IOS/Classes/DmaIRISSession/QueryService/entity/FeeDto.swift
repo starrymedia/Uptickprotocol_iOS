@@ -6,9 +6,12 @@
 //
 
 import Foundation
+import HandyJSON
 
-public class FeeDto {
-
+public class FeeDto: HandyJSON {
+    required public init() {
+        
+    }
     public var amountList: [Coin]?
     public var payer: String?
     public var granter: String?

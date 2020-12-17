@@ -508,8 +508,12 @@ open class TokenServiceSession {
                     successCallback: @escaping (_ coin: Coin) -> (),
                     errorCallBack: @escaping FPErrorCallback) {
         
-        self.toWei(tokenSymblol: coinOuter.denom,
-                   amount: Decimal(string: coinOuter.amount)!) { amount in
+        guard let amount = Decimal(string: coinOuter.amount) else {
+            print("amount error")
+            return
+        }
+        self.forWei(tokenSymblol: coinOuter.denom,
+                   amount: amount) { amount in
             var coin = Coin()
             coin.denom = coinOuter.denom
             coin.amount = amount

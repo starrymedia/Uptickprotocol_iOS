@@ -20,5 +20,7 @@ public class QueryTxResult: HandyJSON {
     public var tx_result: QueryTxInnerResult = QueryTxInnerResult()
     public var stdTx: Tx = Tx()
     public var tx: String = ""
+    public var timestamp: UInt64 = 0
+
 }
 

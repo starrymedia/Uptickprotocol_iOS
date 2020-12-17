@@ -8,7 +8,12 @@
 import Foundation
 
 
-class TicketService  {
+public let TicketService = TicketServiceSession.default
+
+open class TicketServiceSession  {
+    
+    public static let `default` = TicketServiceSession()
+
     /**
      * 创建票实体
      *
@@ -17,10 +22,10 @@ class TicketService  {
      * @return
      * @throws ServiceException
      */
-    func issueTicket(ticket: Ticket ,
-                     privateKey: String,
-                     successCallback: @escaping (_ res: BroadcastModel) -> (),
-                     errorCallback: @escaping FPErrorCallback) {
+    public func issueTicket( ticket: Ticket ,
+                             privateKey: String,
+                             successCallback: @escaping (_ res: BroadcastModel) -> (),
+                             errorCallback: @escaping FPErrorCallback) {
         
         NFTService.issueNft(sender: ticket.create,
                             nftName: ticket.name,
@@ -31,7 +36,6 @@ class TicketService  {
         } errorCallback: { error in
             errorCallback(error)
         }
-
     }
     
     /**
@@ -45,13 +49,13 @@ class TicketService  {
      * @return
      * @throws ServiceException
      */
-    func mintTicket(ticketEntities: [TicketInfo],
-                    sender: String,
-                    recipient: String,
-                    privateKey: String,
-                    isSign: Bool,
-                    successCallback: @escaping (_ res: BroadcastModel) -> (),
-                    errorCallback: @escaping FPErrorCallback) {
+    public func mintTicket( ticketEntities: [TicketInfo],
+                            sender: String,
+                            recipient: String,
+                            privateKey: String,
+                            isSign: Bool,
+                            successCallback: @escaping (_ res: BroadcastModel) -> (),
+                            errorCallback: @escaping FPErrorCallback) {
         
         var builder = TxBody()
         
@@ -66,6 +70,7 @@ class TicketService  {
             dataStandard.body = ticketEntity
             dataStandard.protoc = ProtocEnum.ticket.rawValue
             if (isSign) {
+                #warning("需要签名")
                 dataStandard.sign(signPriKey: privateKey, pubKeyEnum: .base64)
             }
             
@@ -185,6 +190,7 @@ class TicketService  {
                              tokenId: tokenId) { nftToken in
             
             let dataStandard = DataStandard<TicketInfo>.deserialize(from: nftToken.data)
+            #warning("需要签名")
             let verify = dataStandard!.verify(verifyKey: base64PubKey)
             successCallback(verify)
         } errorCallback: { error in
@@ -221,7 +227,11 @@ class TicketService  {
                                   tokenId: tokenId) { nftToken in
                         
             let dataStandard = DataStandard<TicketInfo>.deserialize(from: nftToken.data)
-            successCallback((dataStandard?.body)!)
+            if let ticketInfo = dataStandard?.body {
+                successCallback(ticketInfo)
+            } else {
+                errorCallback("ticketInfo is empty")
+            }
         } errorCallback: { error in
             errorCallback(error)
         }
@@ -236,7 +246,7 @@ class TicketService  {
      * @throws ServiceException
      */
 //    Ticket ticket(String nftId) throws ServiceException;
-    func ticket(nftId: String,
+    public func ticket(nftId: String,
                 successCallback: @escaping (_ ticket: Ticket) -> (),
                 errorCallback: @escaping FPErrorCallback) {
         
@@ -260,7 +270,7 @@ class TicketService  {
      * @return
      * @throws ServiceException
      */
-    func balanceAll(owner: String,
+    public func balanceAll(owner: String,
                     nftId: String,
                     successCallback: @escaping (_ ticketList: [Ticket]) -> (),
                     errorCallback: @escaping FPErrorCallback) {
@@ -284,7 +294,7 @@ class TicketService  {
      * @return
      * @throws ServiceException
      */
-    func balanceByValid(owner: String, nftId: String,
+    public func balanceByValid(owner: String, nftId: String,
                         successCallback: @escaping (_ ticketList: [Ticket]) -> (),
                         errorCallback: @escaping FPErrorCallback) {
         
@@ -306,7 +316,7 @@ class TicketService  {
      * @return
      * @throws ServiceException
      */
-    func balanceByInvalid(owner: String, nftId: String,
+    public func balanceByInvalid(owner: String, nftId: String,
                           successCallback: @escaping (_ ticketList: [Ticket]) -> (),
                           errorCallback: @escaping FPErrorCallback) {
         self.getTickey(owner: owner,
@@ -326,7 +336,7 @@ class TicketService  {
      * @return
      * @throws ServiceException
      */
-    func balanceByExpire(owner: String, nftId: String,
+    public func balanceByExpire(owner: String, nftId: String,
                          successCallback: @escaping (_ ticketList: [Ticket]) -> (),
                          errorCallback: @escaping FPErrorCallback) {
        self.getTickey(owner: owner,
@@ -347,7 +357,7 @@ class TicketService  {
      * @return
      * @throws ServiceException
      */
-    func balanceByDisabled(owner: String, nftId: String,
+    public func balanceByDisabled(owner: String, nftId: String,
                            successCallback: @escaping (_ ticketList: [Ticket]) -> (),
                            errorCallback: @escaping FPErrorCallback) {
          self.getTickey(owner: owner,
@@ -368,7 +378,7 @@ class TicketService  {
      * @param privateKey
      * @return
      */
-    func signTicket(ticketEntity: TicketInfo, privateKey:String) -> DataStandard<TicketInfo> {
+    public func signTicket(ticketEntity: TicketInfo, privateKey:String) -> DataStandard<TicketInfo> {
         let dataStandard = DataStandard<TicketInfo>()
         dataStandard.body = ticketEntity
         dataStandard.protoc = ProtocEnum.ticket.rawValue

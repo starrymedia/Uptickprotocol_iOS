@@ -9,10 +9,10 @@ import Foundation
 
 public class NFT {
     
-    var creator: String = ""
-    var id: String = ""
-    var name: String = ""
-    var schema: String = ""
-    var tokens: [NFTToken] = []
+    public var creator: String = ""
+    public var id: String = ""
+    public var name: String = ""
+    public var schema: String = ""
+    public var tokens: [NFTToken] = []
 
 }

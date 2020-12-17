@@ -6,8 +6,13 @@
 //
 
 import Foundation
+import HandyJSON
 
-public class SignerInfo  {
+public class SignerInfo: HandyJSON  {
+
+    required public init() {
+        
+    }
 
     public var publicKey: PublicKey?
     public var modeInfo: ModeInfo?

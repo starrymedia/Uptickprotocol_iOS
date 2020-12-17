@@ -9,13 +9,13 @@ import Foundation
 
 public class Token {
 
-    var symbol: String = ""
-    var name: String = ""
-    var scale: UInt32 = 0
-    var minUnit: String = ""
-    var initialSupply: UInt64 = 0
-    var maxSupply: UInt64 = 0
-    var mintAble: Bool = false
-    var owner: String = ""
+    public var symbol: String = ""
+    public var name: String = ""
+    public var scale: UInt32 = 0
+    public var minUnit: String = ""
+    public var initialSupply: UInt64 = 0
+    public var maxSupply: UInt64 = 0
+    public var mintAble: Bool = false
+    public var owner: String = ""
  
 }

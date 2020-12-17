@@ -13,7 +13,7 @@ public class AddressUtils {
     public static let HRP = "iaa"
     
     public static func convertBits(hash: Data, instart: Int, from: Int, to: Int, pad: Bool) -> Data {
-        let data = try? SegwitAddrCoder().convertBits(instart: instart, from: 8, to: 5, pad: true, idata: hash)
+        let data = try? SegwitAddrCoder().convertBits(instart: instart, from: from, to: to, pad: true, idata: hash)
         return data ?? Data()
     }
     

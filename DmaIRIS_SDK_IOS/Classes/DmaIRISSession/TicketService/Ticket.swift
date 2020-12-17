@@ -9,8 +9,12 @@ import Foundation
 import HandyJSON
 
 public class Ticket {
-    var name: String = ""
-    var id: String = ""
-    var create: String = "" //发送者
-    var ticketInfos: [TicketInfo]?
+    public var name: String = ""
+    public var id: String = ""
+    public var create: String = "" //发送者
+    public var ticketInfos =  [TicketInfo]()
+    
+    required public init() {
+        
+    }
 }

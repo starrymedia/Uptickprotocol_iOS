@@ -24,26 +24,53 @@ class ViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        IRISServive.host = "34.80.22.255"
+        IRISServive.port = 9090
+        IRISServive.chainId = "bifrost-1"
+        MerchantService.nodeUrl = "http://52.81.146.252:8091"
         RpcService.rpcUrl = "http://34.80.22.255:26657"
-//        let sender = "iaa1fu5xru6umtfqthe588z6zk37gdknulr55ee5qf"
-//        QueryService.searchTxs(sender: sender,
-//                               page: 1,
-//                               size: 10) { result in
-//            print(result.toJSON())
-//        } errorCallBack: { error in
+        
+  
+        let address = "iaa1fu5xru6umtfqthe588z6zk37gdknulr55ee5qf"
+        let privateKey = "0f6f503144fd27a530f0ed5867fc19aae3a86bd41a021ddffd065519bbf11fed"
+        let ticker = Ticket()
+        ticker.create = address
+        ticker.name = "wodeceshi12345678"
+        ticker.id = "wodeceshi12345678"
+        
+        let ticketInfo = TicketInfo()
+//         TickerService.mintTicket(ticketEntities: [ticketInfo],
+//                                 sender: address,
+//                                 recipient: address,
+//                                 privateKey: privateKey,
+//                                 isSign: false) { result in
+//            print(result)
+//        } errorCallback: { error in
 //            print(error)
-//
+//        }
+
+        //创建分类
+//        TickerService.issueTicket(ticket: ticker, privateKey: privateKey) { result in
+//            print(result)
+//        } errorCallback: { error in
+//            print(error)
+//        }
+
+        //查询详情
+//        TickerService.ticketInfo(nftId: "ceshi09876",
+//                                 tokenId: "starry0f4d7ca1794e409b946a9569f6721668") { result in
+//            print(result)
+//        } errorCallback: { error in
+//            print(error)
 //        }
         
-        let hash = "02E7499ACB7A968D286127F57180CEA7E718ACC181FF199DE9F878CAE3F92BCA"
-        QueryService.queryTxByHash(hash: hash) { result in
-            print(result.toJSON())
-        } errorCallBack: { error in
-            print(error)
+        //获取所有票
+//        TickerService.ticket(nftId: "ceshi09876") { ticket in
+//            print(ticket)
+//        } errorCallback: { error in
+//            print(error)
+//        }
 
-        }
-
-        
      }
  
  

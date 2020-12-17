@@ -49,15 +49,15 @@ class QueryServiceTests: XCTestCase {
         let expectation = self.expectation(description: "testSearchTxs")
 //        let actionType =  ActionType(rawValue: "message.sender")!
         let sender = "iaa1fu5xru6umtfqthe588z6zk37gdknulr55ee5qf"
-        QueryService.searchTxs(sender: sender,
-                               page: 1,
-                               size: 10) { jsonString in
-            print(jsonString.toJSON()!)
-            expectation.fulfill()
-        } errorCallBack: { error in
-            print(error)
-            expectation.fulfill()
-        }
+//        QueryService.searchTxs(sender: sender,
+//                               page: 1,
+//                               size: 10) { jsonString in
+//            print(jsonString.toJSON()!)
+//            expectation.fulfill()
+//        } errorCallBack: { error in
+//            print(error)
+//            expectation.fulfill()
+//        }
 
         waitForExpectations(timeout: 60, handler: nil)
     }

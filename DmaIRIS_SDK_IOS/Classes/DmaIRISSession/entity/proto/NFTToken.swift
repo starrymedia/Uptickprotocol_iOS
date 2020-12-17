@@ -8,9 +8,9 @@
 import Foundation
 public class NFTToken {
 
-    var id: String = ""
-    var name: String = ""
-    var uri: String = ""
-    var data: String = ""
-    var owner: String = ""
+    public var id: String = ""
+    public var name: String = ""
+    public var uri: String = ""
+    public var data: String = ""
+    public var owner: String = ""
 }

@@ -6,12 +6,24 @@
 //
 
 import Foundation
+import HandyJSON
 
-public class ModeInfo {
-
-    public var single: Single?
- 
-    public init(single: Single) {
-        self.single = single
+public class ModeInfo: HandyJSON {
+    public required init() {
+        
     }
+    
+    
+    public var single: Single = Single()
+
+    public required init(single: Single) {
+        self.single = single
+
+    }
+    
+
+ 
+//    public init(single: Single) {
+//        self.single = single
+//    }
 }

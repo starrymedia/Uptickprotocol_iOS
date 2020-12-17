@@ -6,17 +6,18 @@
 //
 
 import Foundation
+import HandyJSON
 
-public class Coin {
+public class Coin: HandyJSON {
 
-    var denom: String = ""
-    var amount: String = ""
+    public var denom: String = ""
+    public var amount: String = ""
 
-    init() {
+    required public init() {
         
     }
     
-    convenience init(symbol: String, amount: String) {
+    public convenience init(symbol: String, amount: String) {
         self.init()
         self.denom = symbol
         self.amount = amount

@@ -356,7 +356,7 @@ open class NFTSession {
         response.whenComplete { result in
             switch result {
             case .success(let value):
-                
+                print(value)
                 let denom = value.collection.denom
                 let nft = self.formatNft(denom)
                 
@@ -491,6 +491,10 @@ open class NFTSession {
     
     func formatNft(_ denom: NftDenom) -> NFT {
         let nft = NFT()
+        print(denom.creator)
+        print(denom.id)
+        print(denom.name)
+
         nft.creator = Bech32Utils.toBech32(hrp: AddressUtils.HRP, pubkeyHexData: denom.creator)
         nft.id = denom.id
         nft.name = denom.name
@@ -524,27 +528,7 @@ open class NFTSession {
         }
         return list
     }
-//    private List<NFT> formatNftInfo(List<Nft.IDCollection> idCollectionList) throws ServiceException {
-//        List<NFT> nftList = new ArrayList<>();
-//        for (Nft.IDCollection idCollection : idCollectionList) {
-//            String denom = idCollection.getDenom();
-//            NFT nft = nftInfoById(denom);
-//
-//            List<String> tokenids = idCollection.getIdsList();
-//            List<NFTToken> nftTokens = nft.getTokens();
-//            List<NFTToken> nftTokenList = new ArrayList<>();
-//            for (NFTToken nftToken : nftTokens) {
-//                if (tokenids.contains(nftToken.getId())) {
-//                    nftTokenList.add(nftToken);
-//                }
-//            }
-//            nft.setTokens(nftTokenList);
-//            nftList.add(nft);
-//        }
-//
-//        return nftList;
-//    }
-    
+
     func formatNftInfo(_ idCollectionList:[NftIDCollection],
                        successCallback: @escaping (_ nftList: [NFT]) -> (),
                        errorCallback: @escaping FPErrorCallback) {

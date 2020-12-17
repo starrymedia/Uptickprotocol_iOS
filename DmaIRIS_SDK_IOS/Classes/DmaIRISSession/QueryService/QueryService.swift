@@ -23,23 +23,15 @@ public class QueryServiceSession {
      * @return
      * @throws ServiceException
     */
-    public func searchTxs(sender: String = "",
-                          actionType: ActionType? = nil,
-                          page: Int,
+    public func searchTxs(page: Int,
                           size: Int,
+                          orderBy: String  = "desc",
+                          conditions: [Condition],
                           successCallback: @escaping (_ result: SearchTxsResult) -> (),
                           errorCallBack: @escaping FPErrorCallback) {
         
         let eventQueryBuilder = EventQueryBuilder()
-        if !sender.isEmpty {
-            let condition = Condition(key: EventKey.sender.rawValue)
-            condition.eq(sender)
-            eventQueryBuilder.addCondition(condition: condition)
-        }
-        
-        if actionType != nil {
-            let condition = Condition(key: EventKey.action.rawValue)
-            condition.eq(actionType!.rawValue)
+        conditions.forEach { condition in
             eventQueryBuilder.addCondition(condition: condition)
         }
         
@@ -47,6 +39,7 @@ public class QueryServiceSession {
         
         var parameters = SearchTxsParameters()
         parameters.query = query
+        parameters.order_by = orderBy
         parameters.page = "\(page)"
         parameters.per_page = "\(size)"
         
@@ -66,6 +59,77 @@ public class QueryServiceSession {
             errorCallBack(error)
         }
     }
+    
+    /**
+     * 根据条件查询记录
+     *
+     * @param page       页码
+     * @param size       每页条数
+     * @param orderBy    分页   desc|ace
+     * @param conditions 条件
+     * @param blockTime  是否查询区块时间
+     * @return
+     */
+    public func searchTxs(page: Int,
+                          size: Int,
+                          orderBy: String,
+                          conditions: [Condition],
+                          blockTime: Bool,
+                          successCallback: @escaping (_ result: SearchTxsResult) -> (),
+                          errorCallBack: @escaping FPErrorCallback) {
+        
+        self.searchTxs(page: page,
+                       size: size,
+                       orderBy: orderBy,
+                       conditions: conditions) { searchTxsResult in
+            if blockTime {
+                                
+                searchTxsResult.txs.forEach { queryTxResult in
+                    let height = queryTxResult.height
+                    self.queryBlock(height: height) { blockResult in
+                        var time = blockResult.block.header.time
+                        time = time.replacingOccurrences(of: "T", with: " T ")
+                        queryTxResult.timestamp = time.getTimestamp()/1000
+                        #warning("注意修改")
+                        successCallback(searchTxsResult)
+                    } errorCallBack: { error in
+                    
+                    }
+                }
+            }
+        } errorCallBack: { error in
+            errorCallBack(error)
+        }
+        
+    }
+    
+    /**
+        * 根据块号查询
+        *
+        * @param height
+        * @return
+        * @throws ServiceException
+        */
+    public func queryBlock(height: String,
+                           successCallback: @escaping (_ result: BlockResult) -> (),
+                           errorCallBack: @escaping FPErrorCallback) {
+        
+        let params = QueryBlockParamterd(height: height)
+        RpcService.request(method: .block,
+                           params: params) { jsonString in
+            
+            if let blockResult = BlockResult.deserialize(from: jsonString, designatedPath: "result") {
+                successCallback(blockResult)
+            } else {
+                errorCallBack("queryBlock data error")
+            }
+        } errorCallBack: { error in
+            errorCallBack(error)
+        }
+
+        
+    }
+
     
     /**
      * 根据hash查询交易记录详情
@@ -95,8 +159,132 @@ public class QueryServiceSession {
         }
         
     }
-
     
+    /**
+     * 查询 sender 签名的交易记录
+     *
+     * @param sender
+     * @param page
+     * @param size
+     * @param orderBy
+     * @param blockTime
+     * @return
+     */
+    public func searchTxsBySender(sender: String,
+                                  page: Int,
+                                  size: Int,
+                                  orderBy: String,
+                                  blockTime: Bool,
+                                  successCallback: @escaping (_ result: SearchTxsResult) -> (),
+                                  errorCallBack: @escaping FPErrorCallback) {
+        let condition = Condition(key: EventKey.MessageSender.rawValue)
+        condition.eq(sender)
+        var conditions = [Condition]()
+        conditions.append(condition)
+        if blockTime {
+            self.searchTxs(page: page, size: size, orderBy: orderBy, conditions: conditions, blockTime: true, successCallback: successCallback, errorCallBack: errorCallBack)
+        } else {
+            self.searchTxs(page: page, size: size, orderBy: orderBy, conditions: conditions, successCallback: successCallback, errorCallBack: errorCallBack)
+        }
+
+    }
+    
+    /**
+     * 查询 sender 签名的token交易记录
+     *
+     * @param sender
+     * @param page
+     * @param size
+     * @param orderBy
+     * @param blockTime
+     * @return
+     */
+    public func searchTokenTxsBySender(sender: String,
+                                       page: Int,
+                                       size: Int,
+                                       orderBy: String,
+                                       blockTime: Bool,
+                                       successCallback: @escaping (_ result: SearchTxsResult) -> (),
+                                       errorCallBack: @escaping FPErrorCallback) {
+        let condition = Condition(key: EventKey.MessageSender.rawValue)
+        condition.eq(sender)
+        let condition2 = Condition(key: EventKey.MessageModule.rawValue)
+        condition2.eq(ModuleType.Token.rawValue)
+
+        var conditions = [Condition]()
+        conditions.append(condition)
+        conditions.append(condition2)
+
+        if blockTime {
+            self.searchTxs(page: page, size: size, orderBy: orderBy, conditions: conditions, blockTime: true, successCallback: successCallback, errorCallBack: errorCallBack)
+        } else {
+            self.searchTxs(page: page, size: size, orderBy: orderBy, conditions: conditions, successCallback: successCallback, errorCallBack: errorCallBack)
+        }
+
+    }
+    
+    /**
+     * 查询 Token 发送者为sender 的交易记录
+     *
+     * @param sender
+     * @param page
+     * @param size
+     * @param orderBy
+     * @param blockTime
+     * @return
+     */
+    public func searchTokenTxsByTransferSender(sender: String,
+                                               page: Int,
+                                               size: Int,
+                                               orderBy: String,
+                                               blockTime: Bool,
+                                               successCallback: @escaping (_ result: SearchTxsResult) -> (),
+                                               errorCallBack: @escaping FPErrorCallback) {
+        let condition = Condition(key: EventKey.TransferSender.rawValue)
+        condition.eq(sender)
+        
+        var conditions = [Condition]()
+        conditions.append(condition)
+
+        if blockTime {
+            self.searchTxs(page: page, size: size, orderBy: orderBy, conditions: conditions, blockTime: true, successCallback: successCallback, errorCallBack: errorCallBack)
+        } else {
+            self.searchTxs(page: page, size: size, orderBy: orderBy, conditions: conditions, successCallback: successCallback, errorCallBack: errorCallBack)
+        }
+
+    }
+    
+    /**
+     * 查询 Token recipient 的交易记录
+     *
+     * @param recipient
+     * @param page
+     * @param size
+     * @param orderBy
+     * @param blockTime
+     * @return
+     */
+    public func searchTokenTxsByTransferRecipient(sender: String,
+                                                  page: Int,
+                                                  size: Int,
+                                                  orderBy: String,
+                                                  blockTime: Bool,
+                                                  successCallback: @escaping (_ result: SearchTxsResult) -> (),
+                                                  errorCallBack: @escaping FPErrorCallback) {
+        let condition = Condition(key: EventKey.TransferRecipient.rawValue)
+        condition.eq(sender)
+
+        var conditions = [Condition]()
+        conditions.append(condition)
+
+        if blockTime {
+            self.searchTxs(page: page, size: size, orderBy: orderBy, conditions: conditions, blockTime: true, successCallback: successCallback, errorCallBack: errorCallBack)
+        } else {
+            self.searchTxs(page: page, size: size, orderBy: orderBy, conditions: conditions, successCallback: successCallback, errorCallBack: errorCallBack)
+        }
+
+    }
+        
     func parseTxResult(queryTxResult: QueryTxResult) -> QueryTxResult {
         let code = queryTxResult.tx
         let stdTx = ProtobufUtils.deserializeTx(code: code)
@@ -107,6 +295,7 @@ public class QueryServiceSession {
 
 struct SearchTxsParameters: Encodable {
     var query: String?
+    var order_by: String?
     var page: String?
     var per_page: String?
 
@@ -114,4 +303,19 @@ struct SearchTxsParameters: Encodable {
 
 struct QueryTxByHashParamterd: Encodable {
     var hash: String?
+}
+
+struct QueryBlockParamterd: Encodable {
+    var height: String?
+}
+
+
+extension String {
+    //字符串 -> 日期
+    func getTimestamp(dateFormat:String = "yyyy-MM-dd HH:mm") -> UInt64 {
+        let formatter = DateFormatter()
+        formatter.dateFormat = dateFormat
+        let date = formatter.date(from: self)
+        return UInt64(date?.timeIntervalSince1970 ?? 0)
+    }
 }

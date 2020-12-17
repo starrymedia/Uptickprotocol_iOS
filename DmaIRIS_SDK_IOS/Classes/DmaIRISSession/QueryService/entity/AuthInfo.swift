@@ -6,8 +6,12 @@
 //
 
 import Foundation
-public class AuthInfo  {
+import HandyJSON
+public class AuthInfo: HandyJSON  {
 
+    required public init() {
+        
+    }
     public var feeDto =  FeeDto()
     public var signerInfosList = [SignerInfo]()
 
