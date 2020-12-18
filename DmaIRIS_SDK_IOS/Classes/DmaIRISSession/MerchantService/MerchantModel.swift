@@ -73,14 +73,15 @@ struct MerchantTransfer: Encodable {
     let recipien: String
     var signatures: String?
     let ids: [String]
+    var memo: String
 }
 
 public struct MerchantResponseModel: HandyJSON {
     public init() {}
-    var code: Int?
-    var success: Bool?
-    var msg: String?
-    var data: String?
+    public var code: Int?
+    public var success: Bool?
+    public var msg: String?
+    public var data: Any?
 }
  
 

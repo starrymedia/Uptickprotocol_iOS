@@ -20,10 +20,5 @@ public class ModeInfo: HandyJSON {
         self.single = single
 
     }
-    
-
  
-//    public init(single: Single) {
-//        self.single = single
-//    }
 }

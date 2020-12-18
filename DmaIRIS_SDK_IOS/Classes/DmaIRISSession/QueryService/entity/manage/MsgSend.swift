@@ -9,6 +9,8 @@ import Foundation
 public class MsgSend: IrisMessage {
 
     public var fromAddress: String = ""
-    public var toAddress: String = ""
+    public var toAddress: String = "-"
     public var amount: [Coin] = []
 }
+
+

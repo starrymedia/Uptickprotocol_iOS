@@ -26,7 +26,7 @@ public class SearchTxsResult: HandyJSON {
         
     }
 
-    public var txs: [QueryTxResult] = []
+    public var txs = [QueryTxResult]()
     public var total_count: String = ""
 
 }

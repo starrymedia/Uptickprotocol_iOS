@@ -177,9 +177,9 @@ open class NFTSession {
     public func editToken(owner: String,
                           nftId: String,
                           tokenId: String,
-                          data: String,
-                          name: String,
-                          uri: String,
+                          data: String = "[do-not-modify]",
+                          name: String = "[do-not-modify]",
+                          uri: String = "[do-not-modify]",
                           privateKey: String,
                           successCallback: @escaping (_ res: BroadcastModel) -> (),
                           errorCallback: @escaping FPErrorCallback) {
@@ -265,10 +265,10 @@ open class NFTSession {
         var txBody = TxUtils.getBody(meno: memo, timeoutHeight: 0)
         for tokenId in tokenIds {
             var transferNFT = NftMsgTransferNFT()
-            transferNFT.data = ""
             transferNFT.denom = nftId
-            transferNFT.uri = ""
-            transferNFT.name = ""
+            transferNFT.uri = "[do-not-modify]"
+            transferNFT.name = "[do-not-modify]"
+            transferNFT.data = "[do-not-modify]"
             transferNFT.id = tokenId
 
             if let value = TxUtils.fromBech32(sender) {

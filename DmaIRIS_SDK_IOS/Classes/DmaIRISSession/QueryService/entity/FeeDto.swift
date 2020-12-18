@@ -12,9 +12,9 @@ public class FeeDto: HandyJSON {
     required public init() {
         
     }
-    public var amountList: [Coin]?
-    public var payer: String?
-    public var granter: String?
-    public var gasLimit: UInt64?
+    public var amountList: [Coin] = []
+    public var payer: String = ""
+    public var granter: String = ""
+    public var gasLimit: UInt64 = 0
    
 }

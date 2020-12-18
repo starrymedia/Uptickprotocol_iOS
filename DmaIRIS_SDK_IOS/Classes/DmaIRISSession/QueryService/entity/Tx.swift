@@ -14,7 +14,7 @@ public class Tx: HandyJSON {
         
     }
 
-    public var body: Body? 
-    public var authInfo: AuthInfo?
+    public var body: Body = Body()
+    public var authInfo: AuthInfo = AuthInfo()
     public var signaturesList: [String] = []
 }

@@ -201,14 +201,14 @@ public class Merchant {
         IRISAF.postRequest(url: url, parameters: params) { jsonString in
             if let responseModel = MerchantResponseModel.deserialize(from: jsonString) {
                 if responseModel.success == true {
-                    if let data = responseModel.data {
+                    if let data = responseModel.data as? String {
                         if let hashData = Data(base64Encoded: data)?.sha256() {
                             params.signatures = WalletManager.signatureString(hashData: hashData, privateKey: privateKey)?.base64EncodedString()
                             
                             IRISAF.postRequest(url: url, parameters: params) { jsonString in
                                 if let responseModel = MerchantResponseModel.deserialize(from: jsonString) {
                                     if responseModel.success == true {
-                                        successCallback(jsonString)
+                                        successCallback(responseModel.data as? String ?? "")
                                     } else {
                                         errorCallback(responseModel.msg ?? "")
                                     }
@@ -266,7 +266,8 @@ public class Merchant {
     public func transfer(denom: String,
                         tokenIds: [String],
                         privateKey: String,
-                        successCallback: @escaping (_ value: String) -> (),
+                        memo: String,
+                        successCallback: @escaping (_ data: String) -> (),
                         errorCallback: @escaping FPErrorCallback) {
         
         guard let publicKeyData = try? WalletManager.exportPublicKey(privateKey: privateKey) else {
@@ -280,22 +281,19 @@ public class Merchant {
                                      nftTd: denom,
                                      payer: address,
                                      recipien: address,
-                                     ids: tokenIds)
+                                     ids: tokenIds,
+                                     memo: memo)
         
         let url = nodeUrl + transferUrl
 
-        self.transferRequest(url: url, parameters: param, privateKey: privateKey) { jsonString in
-            successCallback(jsonString)
-        } errorCallback: { error in
-            errorCallback(error)
-        }
+        self.transferRequest(url: url, parameters: param, privateKey: privateKey, successCallback: successCallback, errorCallback: errorCallback)
 
     }
     
     func transferRequest(url: String,
                          parameters: MerchantTransfer,
                          privateKey: String,
-                         successCallback: @escaping (_ jsonString: String) -> (),
+                         successCallback: @escaping (_ data: String) -> (),
                          errorCallback: @escaping FPErrorCallback) {
         
         var param = parameters
@@ -304,7 +302,7 @@ public class Merchant {
             if let responseModel = MerchantResponseModel.deserialize(from: jsonString) {
                 if responseModel.success == true {
                     
-                    if let data = responseModel.data {
+                    if let data = responseModel.data as? String {
                         
                         if let hashData = Data(base64Encoded: data)?.sha256() {
                             param.signatures = WalletManager.signatureString(hashData: hashData, privateKey: privateKey)?.base64EncodedString()
@@ -313,7 +311,7 @@ public class Merchant {
                                 if let responseModel = MerchantResponseModel.deserialize(from: jsonString) {
                                     
                                     if responseModel.success == true {
-                                        successCallback(jsonString)
+                                        successCallback(responseModel.data as? String ?? "")
                                     } else {
                                         errorCallback(responseModel.msg ?? "")
                                     }

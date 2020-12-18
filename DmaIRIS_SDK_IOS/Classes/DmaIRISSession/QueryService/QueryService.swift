@@ -61,49 +61,6 @@ public class QueryServiceSession {
     }
     
     /**
-     * 根据条件查询记录
-     *
-     * @param page       页码
-     * @param size       每页条数
-     * @param orderBy    分页   desc|ace
-     * @param conditions 条件
-     * @param blockTime  是否查询区块时间
-     * @return
-     */
-    public func searchTxs(page: Int,
-                          size: Int,
-                          orderBy: String,
-                          conditions: [Condition],
-                          blockTime: Bool,
-                          successCallback: @escaping (_ result: SearchTxsResult) -> (),
-                          errorCallBack: @escaping FPErrorCallback) {
-        
-        self.searchTxs(page: page,
-                       size: size,
-                       orderBy: orderBy,
-                       conditions: conditions) { searchTxsResult in
-            if blockTime {
-                                
-                searchTxsResult.txs.forEach { queryTxResult in
-                    let height = queryTxResult.height
-                    self.queryBlock(height: height) { blockResult in
-                        var time = blockResult.block.header.time
-                        time = time.replacingOccurrences(of: "T", with: " T ")
-                        queryTxResult.timestamp = time.getTimestamp()/1000
-                        #warning("注意修改")
-                        successCallback(searchTxsResult)
-                    } errorCallBack: { error in
-                    
-                    }
-                }
-            }
-        } errorCallBack: { error in
-            errorCallBack(error)
-        }
-        
-    }
-    
-    /**
         * 根据块号查询
         *
         * @param height
@@ -174,19 +131,13 @@ public class QueryServiceSession {
                                   page: Int,
                                   size: Int,
                                   orderBy: String,
-                                  blockTime: Bool,
                                   successCallback: @escaping (_ result: SearchTxsResult) -> (),
                                   errorCallBack: @escaping FPErrorCallback) {
         let condition = Condition(key: EventKey.MessageSender.rawValue)
         condition.eq(sender)
         var conditions = [Condition]()
         conditions.append(condition)
-        if blockTime {
-            self.searchTxs(page: page, size: size, orderBy: orderBy, conditions: conditions, blockTime: true, successCallback: successCallback, errorCallBack: errorCallBack)
-        } else {
-            self.searchTxs(page: page, size: size, orderBy: orderBy, conditions: conditions, successCallback: successCallback, errorCallBack: errorCallBack)
-        }
-
+        self.searchTxs(page: page, size: size, orderBy: orderBy, conditions: conditions, successCallback: successCallback, errorCallBack: errorCallBack)
     }
     
     /**
@@ -203,7 +154,6 @@ public class QueryServiceSession {
                                        page: Int,
                                        size: Int,
                                        orderBy: String,
-                                       blockTime: Bool,
                                        successCallback: @escaping (_ result: SearchTxsResult) -> (),
                                        errorCallBack: @escaping FPErrorCallback) {
         let condition = Condition(key: EventKey.MessageSender.rawValue)
@@ -215,11 +165,8 @@ public class QueryServiceSession {
         conditions.append(condition)
         conditions.append(condition2)
 
-        if blockTime {
-            self.searchTxs(page: page, size: size, orderBy: orderBy, conditions: conditions, blockTime: true, successCallback: successCallback, errorCallBack: errorCallBack)
-        } else {
-            self.searchTxs(page: page, size: size, orderBy: orderBy, conditions: conditions, successCallback: successCallback, errorCallBack: errorCallBack)
-        }
+        self.searchTxs(page: page, size: size, orderBy: orderBy, conditions: conditions, successCallback: successCallback, errorCallBack: errorCallBack)
+
 
     }
     
@@ -237,7 +184,6 @@ public class QueryServiceSession {
                                                page: Int,
                                                size: Int,
                                                orderBy: String,
-                                               blockTime: Bool,
                                                successCallback: @escaping (_ result: SearchTxsResult) -> (),
                                                errorCallBack: @escaping FPErrorCallback) {
         let condition = Condition(key: EventKey.TransferSender.rawValue)
@@ -246,11 +192,7 @@ public class QueryServiceSession {
         var conditions = [Condition]()
         conditions.append(condition)
 
-        if blockTime {
-            self.searchTxs(page: page, size: size, orderBy: orderBy, conditions: conditions, blockTime: true, successCallback: successCallback, errorCallBack: errorCallBack)
-        } else {
-            self.searchTxs(page: page, size: size, orderBy: orderBy, conditions: conditions, successCallback: successCallback, errorCallBack: errorCallBack)
-        }
+        self.searchTxs(page: page, size: size, orderBy: orderBy, conditions: conditions, successCallback: successCallback, errorCallBack: errorCallBack)
 
     }
     
@@ -268,7 +210,6 @@ public class QueryServiceSession {
                                                   page: Int,
                                                   size: Int,
                                                   orderBy: String,
-                                                  blockTime: Bool,
                                                   successCallback: @escaping (_ result: SearchTxsResult) -> (),
                                                   errorCallBack: @escaping FPErrorCallback) {
         let condition = Condition(key: EventKey.TransferRecipient.rawValue)
@@ -277,11 +218,8 @@ public class QueryServiceSession {
         var conditions = [Condition]()
         conditions.append(condition)
 
-        if blockTime {
-            self.searchTxs(page: page, size: size, orderBy: orderBy, conditions: conditions, blockTime: true, successCallback: successCallback, errorCallBack: errorCallBack)
-        } else {
-            self.searchTxs(page: page, size: size, orderBy: orderBy, conditions: conditions, successCallback: successCallback, errorCallBack: errorCallBack)
-        }
+        self.searchTxs(page: page, size: size, orderBy: orderBy, conditions: conditions, successCallback: successCallback, errorCallBack: errorCallBack)
+
 
     }
         
@@ -312,7 +250,7 @@ struct QueryBlockParamterd: Encodable {
 
 extension String {
     //字符串 -> 日期
-    func getTimestamp(dateFormat:String = "yyyy-MM-dd HH:mm") -> UInt64 {
+    func getTimestamp(dateFormat:String = "yyyy-MM-dd 'T' HH:mm:ss") -> UInt64 {
         let formatter = DateFormatter()
         formatter.dateFormat = dateFormat
         let date = formatter.date(from: self)

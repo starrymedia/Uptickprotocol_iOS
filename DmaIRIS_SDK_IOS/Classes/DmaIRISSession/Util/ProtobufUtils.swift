@@ -9,8 +9,6 @@ import Foundation
 
 public class ProtobufUtils {
     
-//    public static org.uptickprotocol.irisnet.entity.Tx deserializeTx(String code) throws ServiceException {
-
     public static func deserializeTx(code: String) -> Tx {
 
         let txResult = Tx()
@@ -50,9 +48,9 @@ public class ProtobufUtils {
             let amount = parseCoins(coinList: fee?.amount ?? [])
             let feeDto = FeeDto()
             feeDto.amountList = amount
-            feeDto.gasLimit = fee?.gasLimit
-            feeDto.granter = fee?.granter
-            feeDto.payer = fee?.payer
+            feeDto.gasLimit = fee?.gasLimit ?? 0
+            feeDto.granter = fee?.granter ?? ""
+            feeDto.payer = fee?.payer ?? ""
             ai.feeDto = feeDto
             
             var signerInfosList = [SignerInfo]()
@@ -98,14 +96,12 @@ public class ProtobufUtils {
         
         var txTypeString = typeUrl.replacingOccurrences(of: "/", with: "")
         let txType = TxType(rawValue: txTypeString)
-        
-        print(txType)
-        
+                
         switch txType {
         case .msgSend:
             if let message = try? BankMsgSend(serializedData: value) {
                 let msg = MsgSend()
-                msg.type = typeUrl
+                msg.type = txTypeString
                 msg.fromAddress = message.fromAddress
                 msg.toAddress = message.toAddress
                 

@@ -16,3 +16,5 @@ public class IrisMessage: HandyJSON {
 
     public var type: String = ""    
 }
+
+
