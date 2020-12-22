@@ -11,6 +11,8 @@ import GRPC
 import NIO
 import Alamofire
 
+public typealias FPErrorCallback = (_ error: String) -> ()
+
 public let IRISServive = DmaIRISSession.default
 
 open class DmaIRISSession {

@@ -37,27 +37,7 @@ class IRISSessionTests: XCTestCase {
         }
     }
     
-    func testBankTransfer() {
-        
-        let expectation = self.expectation(description: "testBankTransfer")
 
-        let from="iaa1fu5xru6umtfqthe588z6zk37gdknulr55ee5qf"
-        let to = "iaa1nhu8qvj232mwxllwwxs4m9zz5pqcxazpmxtm8z"
-        let privateKey="0f6f503144fd27a530f0ed5867fc19aae3a86bd41a021ddffd065519bbf11fed"
-        
-        BankService.transfer(from: from,
-                             to: to,
-                             value: "10",
-                             denom: "ubif",
-                             privateKey: privateKey) { res in
-            print("res=====\(res.toJSONString(prettyPrint: true)!)")
-            expectation.fulfill()
-        } errorCallBack:{ error in
-            print(error)
-            expectation.fulfill()
-        }
-        waitForExpectations(timeout: 30, handler: nil)
-    }
     
     func testRequestQueryAccount() {
         let expectation = self.expectation(description: "testRequestQueryAccount")
@@ -91,53 +71,9 @@ class IRISSessionTests: XCTestCase {
         waitForExpectations(timeout: 15, handler: nil)
     }
     
-    func testRequestQueryAllBalance() {
-        let expectation = self.expectation(description: "testRequestQueryAllBalance")
-        BankService.queryAllBalance(address: "iaa1fu5xru6umtfqthe588z6zk37gdknulr55ee5qf") { balances in
-            print("balances:\(balances)")
-            expectation.fulfill()
-        } errorCallback: { error in
-            print("error:\(error)")
-            expectation.fulfill()
-        }
-        waitForExpectations(timeout: 15, handler: nil)
-    }
-    
-    func testRequestQueryTotalSupply() {
-        let expectation = self.expectation(description: "testRequestQueryAllBalance")
-        BankService.queryTotalSupply { coins in
-            print("\(coins)")
-            expectation.fulfill()
-        } errorCallback: { error in
-            print("error:\(error)")
-            expectation.fulfill()
-        }
-        waitForExpectations(timeout: 15, handler: nil)
-    }
-    
-    func testRequestQuerySupplyOf() {
-        let expectation = self.expectation(description: "testRequestQueryAllBalance")
-        BankService.querySupplyOf(denom: "ubif") { coin in
-            print("\(coin)")
-            expectation.fulfill()
-        } errorCallback: { error in
-            print("error:\(error)")
-            expectation.fulfill()
-        }
-        waitForExpectations(timeout: 15, handler: nil)
-    }
 
-    func testERC20TokenServiceToken() {
-        let expectation = self.expectation(description: "testERC20TokenServiceToken")
-        ERC20TokenService.token(denom: "ubif") { scale in
-            print("scale:\(scale)")
-            expectation.fulfill()
-        } errorCallBack: { error in
-            print("error:\(error)")
-            expectation.fulfill()
-        }
-        waitForExpectations(timeout: 15, handler: nil)
-    }
+
+
     
     func testQueryAllNfts() {
         let expectation = self.expectation(description: "testQueryAllNfts")

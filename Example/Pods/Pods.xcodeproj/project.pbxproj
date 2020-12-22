@@ -808,7 +808,6 @@
 		7E4EA96E23D42EBEB9F20CBB1F056ACB /* md5.c in Sources */ = {isa = PBXBuildFile; fileRef = 7921870FB19B6D5A807C222D10E20DA6 /* md5.c */; settings = {COMPILER_FLAGS = "-w -Xanalyzer -analyzer-disable-all-checks"; }; };
 		7E619CEAAFB3EAFB438F55DA4D7DE5FD /* x509name.c in Sources */ = {isa = PBXBuildFile; fileRef = ADBCC9895285F08227F778BE02E4BC1D /* x509name.c */; settings = {COMPILER_FLAGS = "-w -Xanalyzer -analyzer-disable-all-checks"; }; };
 		7E6F4EFB85936E0B3EB9AD287F074C36 /* PKCS7.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6BBC862136FD2232E155B446FDFC9DA /* PKCS7.swift */; };
-		7EEA484EDFEAEF8C7B0E9AFDA9E5C4DC /* ERC20Token.swift in Sources */ = {isa = PBXBuildFile; fileRef = E579E93E222F0B543121785ACB40E1ED /* ERC20Token.swift */; };
 		7F0566765BD7333666C0424CE3D1E745 /* Bitwise Ops.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13B6BC419E4834EEB2844D58E40EBCAB /* Bitwise Ops.swift */; };
 		7F0A0D2C7F39BCBC2A9EE48037B384D5 /* SignDataEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = D15B0D4FCE4E2D35702830D5049503A0 /* SignDataEntity.swift */; };
 		7FB25DF6F2DE28197B504429F9A160A8 /* GRPCError.swift in Sources */ = {isa = PBXBuildFile; fileRef = F36926CD8DC4CA51083B46B886261F50 /* GRPCError.swift */; };
@@ -1193,7 +1192,6 @@
 		BBD3DA9C3535A0BB8792229A9EA013DE /* CBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 987FF9FD041160E1B20F2D8B3216F75E /* CBridge.swift */; };
 		BCD2D0E7B360895871FB37EFA7DDEE9F /* WriteCapturingHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F014A310E3A4D3E786966E5D1C354B8 /* WriteCapturingHandler.swift */; };
 		BD0951716F3D4BCEF3A18EC62F233AB7 /* SipHash.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8CE5907417DD0BC765CA54F0F9433A38 /* SipHash.framework */; };
-		BD171A64C57747967CA7E230917F6C78 /* BankService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B037B7D4F321C9B562C914F57E70D368 /* BankService.swift */; };
 		BD1E7B74CC5D5A380365FB16FFFD31AA /* internal.h in Headers */ = {isa = PBXBuildFile; fileRef = B166A5FB8331D8E2C81D2D5B80397046 /* internal.h */; settings = {ATTRIBUTES = (Project, ); }; };
 		BD4953074A12E769ED4E6C94F5E73694 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1F8F3C259E895E5C13F0D29E11789766 /* UIKit.framework */; };
 		BDD3E5888FF60B7B16B14DE41C23F313 /* NSURLSession+AnyPromise.m in Sources */ = {isa = PBXBuildFile; fileRef = 351E194FE9981558D9687B4FF8C329A7 /* NSURLSession+AnyPromise.m */; settings = {COMPILER_FLAGS = "-w -Xanalyzer -analyzer-disable-all-checks"; }; };
@@ -3384,7 +3382,6 @@
 		B00AD68717AB44AE3017DC1C49FE3375 /* Response.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Response.swift; path = Source/Response.swift; sourceTree = "<group>"; };
 		B030F38A9F00E7B3003EC223F0742CAF /* dispatch_promise.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = dispatch_promise.m; path = Sources/dispatch_promise.m; sourceTree = "<group>"; };
 		B032F603B3B557AFA8697250AA8A0F42 /* CNIOBoringSSL_err.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = CNIOBoringSSL_err.h; path = Sources/CNIOBoringSSL/include/CNIOBoringSSL_err.h; sourceTree = "<group>"; };
-		B037B7D4F321C9B562C914F57E70D368 /* BankService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BankService.swift; sourceTree = "<group>"; };
 		B0401836EF42B5EB4F73401F54FF139E /* UptickProtocolIRISnet.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = UptickProtocolIRISnet.release.xcconfig; sourceTree = "<group>"; };
 		B04B92B42EBB00C470EF32E425A7549D /* after.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = after.m; path = Sources/after.m; sourceTree = "<group>"; };
 		B05A80F45B5A0740C8EDDCA95E42E80C /* Google_Protobuf_Duration+Extensions.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = "Google_Protobuf_Duration+Extensions.swift"; path = "Sources/SwiftProtobuf/Google_Protobuf_Duration+Extensions.swift"; sourceTree = "<group>"; };
@@ -3742,7 +3739,6 @@
 		E4DE2C610B9DE4C80B05221AE7B1074D /* a_mbstr.c */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.c; name = a_mbstr.c; path = Sources/CNIOBoringSSL/crypto/asn1/a_mbstr.c; sourceTree = "<group>"; };
 		E4DF1FBC51D0AA96544E6EB127F7D269 /* e_des.c */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.c; name = e_des.c; path = Sources/CNIOBoringSSL/crypto/fipsmodule/cipher/e_des.c; sourceTree = "<group>"; };
 		E508E14A365EEC3B795F779E7B0A04C1 /* FileDescriptor.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = FileDescriptor.swift; path = Sources/NIO/FileDescriptor.swift; sourceTree = "<group>"; };
-		E579E93E222F0B543121785ACB40E1ED /* ERC20Token.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ERC20Token.swift; sourceTree = "<group>"; };
 		E583248F19BC669659A63F31F9780CB6 /* Web3.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Web3.swift; path = web3swift/Web3/Classes/Web3.swift; sourceTree = "<group>"; };
 		E5B4B045D36B6950CCE08E41B92620E5 /* SwiftProtobuf-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "SwiftProtobuf-prefix.pch"; sourceTree = "<group>"; };
 		E5D07D39BBCCDD2B252B76C479063ACE /* CustomStringConvertible.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CustomStringConvertible.swift; path = Sources/CustomStringConvertible.swift; sourceTree = "<group>"; };
@@ -5308,14 +5304,6 @@
 			path = SwiftNIOConcurrencyHelpers;
 			sourceTree = "<group>";
 		};
-		528887CDAD127297017F74E7253E7921 /* Bank */ = {
-			isa = PBXGroup;
-			children = (
-				B037B7D4F321C9B562C914F57E70D368 /* BankService.swift */,
-			);
-			path = Bank;
-			sourceTree = "<group>";
-		};
 		53AB0445B9326B324D0FB2A612669654 /* Support Files */ = {
 			isa = PBXGroup;
 			children = (
@@ -5562,14 +5550,6 @@
 				AE0454E6C7906F76766E84882D98BE9D /* Support Files */,
 			);
 			path = SwiftNIOHTTP2;
-			sourceTree = "<group>";
-		};
-		69BE824298013FAC4369678F74312E4C /* ERC20Token */ = {
-			isa = PBXGroup;
-			children = (
-				E579E93E222F0B543121785ACB40E1ED /* ERC20Token.swift */,
-			);
-			path = ERC20Token;
 			sourceTree = "<group>";
 		};
 		72EDDDBAF833118EED845C555B88F026 /* SwiftNIOHTTP1 */ = {
@@ -6440,10 +6420,8 @@
 				F8184640D50118529DFC94055A0E9E4A /* TxUtils.swift */,
 				4391F3CE5E47AD08340F94BACA7231C0 /* Typealias.swift */,
 				73BAEC205CC7E926CC375B6C3BCD7D43 /* AuthService */,
-				528887CDAD127297017F74E7253E7921 /* Bank */,
 				37304DDC036795047FF394B15F298782 /* Broadcast */,
 				19DEC4306A434F813A5B085198A48FDA /* entity */,
-				69BE824298013FAC4369678F74312E4C /* ERC20Token */,
 				A63945ED94133DFEF028CD207FB356FD /* MerchantService */,
 				48435D41CBE25EB99286EFB465DBC1F7 /* NetWork */,
 				30A01FB5887B0E39132E115B0ACD8266 /* NFTService */,
@@ -9909,7 +9887,6 @@
 				BB67D0D97E72D56DF06A76BCC5B15914 /* Attributes.swift in Sources */,
 				76303125620E5D52C8B1799C514478B5 /* AuthInfo.swift in Sources */,
 				A95CA5E12FE9907AE50A5B19D80C876B /* AuthService.swift in Sources */,
-				BD171A64C57747967CA7E230917F6C78 /* BankService.swift in Sources */,
 				08F8B58E9AA7D48869F310A8EF012818 /* Bech32.swift in Sources */,
 				25A20AE81DCE52305354E6755CA68325 /* Bech32Utils.swift in Sources */,
 				EFB98CD0F6E6754190B79E61F66A07F0 /* Block.swift in Sources */,
@@ -9944,7 +9921,6 @@
 				FABE4B43168C0BFFECE2700841B6A632 /* CosmosTxSigningSigning.pb.swift in Sources */,
 				38B87EEE88A1ED08CDAB1939063958AE /* DataStandard.swift in Sources */,
 				962AEC7F44D3EF1A5899188DD3387B9C /* DmaIRISSession.swift in Sources */,
-				7EEA484EDFEAEF8C7B0E9AFDA9E5C4DC /* ERC20Token.swift in Sources */,
 				5C82EED8C40D51BB8E9ECA82465DDEAB /* EventKey.swift in Sources */,
 				89A046A70396C7CFADC7E33ECFDB866B /* EventQueryBuilder.swift in Sources */,
 				9C26A840F54FCB611274A69FD888CB29 /* Events.swift in Sources */,

@@ -54,53 +54,7 @@ open class TxUtils {
         return string.lowercased()
     }
     
-    /// 精度转换
-    public class func toWei(tokenSymblol: String,
-                            amount: Double,
-                            successCallback: @escaping (_ amount: String) -> (),
-                            errorCallBack: @escaping FPErrorCallback) {
-     
-        ERC20TokenService.token(denom: tokenSymblol) { scale in
-            var amount = Decimal(amount)
-            var result = Decimal()
-            NSDecimalMultiplyByPowerOf10(&result, &amount, Int16(scale), .plain)
 
-            var rounded = Decimal()
-            NSDecimalRound(&rounded, &result, 0, .down)
-            let resultstring = NSDecimalString(&rounded, nil)
-           
-            successCallback(resultstring)
-
-        } errorCallBack: { error in
-            print(error)
-            errorCallBack(error)
-        }
-    }
-    
-    
-    /// 精度转换
-    /// - Parameters:
-    ///   - tokenSymblol:分类ID
-    ///   - amount: 金额
-    ///   - successCallback: 金额字符串
-    ///   - errorCallBack: 错误信息
-    public class func forWei(tokenSymblol: String,
-                            amount: UInt64,
-                            successCallback: @escaping (_ amount: String) -> (),
-                            errorCallBack: @escaping FPErrorCallback) {
-     
-        ERC20TokenService.token(denom: tokenSymblol) { scale in
-            print(scale)
-            var amount = Decimal(amount)
-            var result = Decimal()
-            NSDecimalMultiplyByPowerOf10(&result, &amount, -Int16(scale), .plain)
-            let resultstring = NSDecimalString(&result, nil)
-            successCallback(resultstring)
-        } errorCallBack: { error in
-            print(error)
-            errorCallBack(error)
-        }
-    }
     
     public class func fromBech32(_ address: String) -> Data? {
         if let data = try? Bech32Utils.fromBech32(address: address) {

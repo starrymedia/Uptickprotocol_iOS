@@ -133,7 +133,8 @@ public class Merchant {
                        errorCallback: @escaping FPErrorCallback) {
         
 
-        TxUtils.toWei(tokenSymblol: coin, amount: Double(price) ?? 0.00) { amount in
+        TokenService.toWei(tokenSymblol: coin,
+                           amount: Decimal(Double(price) ?? 0.00)) { amount in
             
             self.onsaleRequset(denom: denom,
                                tokenids: tokenids,

@@ -11,13 +11,24 @@ To run the example project, clone the repo, and run `pod install` from the Examp
 
 ## Requirements
 
+## Start
+```
+AppDelegate 中配置基本信息
+IRISServive.host = "34.80.22.255"
+IRISServive.port = 9090
+IRISServive.chainId = "bifrost-1"
+MerchantService.nodeUrl = "http://52.81.146.252:8091"
+RpcService.rpcUrl = "http://34.80.22.255:26657"
+
+```
+
 ## Installation
 
 DmaIRIS_SDK_IOS is available through [CocoaPods](https://cocoapods.org). To install
 it, simply add the following line to your Podfile:
 
 ```ruby
-pod 'UptickProtocolIRISnet'
+    pod 'UptickProtocolIRISnet',:git =>"https://github.com/starrymedia/DmaIRIS_SDK_IOS.git"
 ```
 
 ## Author
