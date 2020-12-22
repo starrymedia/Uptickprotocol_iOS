@@ -64,13 +64,13 @@ class ViewController: UIViewController {
 //            print(error)
 //        }
         
-        //获取所有票
-//        TickerService.ticket(nftId: "ceshi09876") { ticket in
-//            print(ticket)
-//        } errorCallback: { error in
-//            print(error)
-//        }
-
+//        获取所有票
+        TicketService.ticket(nftId: "ceshi09876") { ticket in
+            print(ticket)
+        } errorCallback: { error in
+            print(error)
+        }
+        
      }
  
  
