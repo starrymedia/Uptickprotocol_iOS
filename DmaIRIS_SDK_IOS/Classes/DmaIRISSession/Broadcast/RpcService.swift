@@ -15,6 +15,7 @@ open class RpcServiceSession {
     open var rpcUrl = ""
 
     public func broadcast(tx: TxTx,
+                          method: RpcMethods,
                           successCallback: @escaping (_ broadcast: BroadcastModel) -> (),
                           errorCallBack: @escaping FPErrorCallback) {
                
@@ -25,7 +26,7 @@ open class RpcServiceSession {
         
         let params = BroadcastRequestParams(tx: txString)
 
-        self.request(method: .broadcastTxCommit, params: params) { jsonString in
+        self.request(method: method, params: params) { jsonString in
             if let model = BroadcastModel.deserialize(from: jsonString) {
                 successCallback(model)
             } else {

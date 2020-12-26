@@ -30,6 +30,7 @@ open class TokenServiceSession {
                            mintAble: Bool,
                            owner: String,
                            privateKey: String,
+                           method: RpcMethods = .broadcastTxAsync,
                            successCallback: @escaping (_ res: BroadcastModel) -> (),
                            errorCallBack: @escaping FPErrorCallback) {
     
@@ -53,7 +54,7 @@ open class TokenServiceSession {
         }
         
         TxService.signTx(txBody: txBody, privateKey: privateKey) { tx in
-            RpcService.broadcast(tx: tx) { broadcast in
+            RpcService.broadcast(tx: tx, method: method) { broadcast in
                 successCallback(broadcast)
             } errorCallBack: { error in
                 errorCallBack(error)
@@ -74,6 +75,7 @@ open class TokenServiceSession {
                           tokenOwner: String,
                           recipient: String,
                           privateKey: String,
+                          method: RpcMethods = .broadcastTxAsync,
                           successCallback: @escaping (_ res: BroadcastModel) -> (),
                           errorCallBack: @escaping FPErrorCallback) {
         
@@ -96,7 +98,7 @@ open class TokenServiceSession {
         let fee = TxUtils.getFee(gasLimit: txGasLimit, amount: txAmount, denom: txDenom)
         
         TxService.signTx(txBody: txBody, privateKey: privateKey) { tx in
-            RpcService.broadcast(tx: tx) { broadcast in
+            RpcService.broadcast(tx: tx, method: method) { broadcast in
                 successCallback(broadcast)
             } errorCallBack: { error in
                 errorCallBack(error)
@@ -117,6 +119,7 @@ open class TokenServiceSession {
                                   tokenOwner: String,
                                   recipient: String,
                                   privateKey: String,
+                                  method: RpcMethods = .broadcastTxAsync,
                                   successCallback: @escaping (_ res: BroadcastModel) -> (),
                                   errorCallBack: @escaping FPErrorCallback) {
 
@@ -137,7 +140,7 @@ open class TokenServiceSession {
         let fee = TxUtils.getFee(gasLimit: txGasLimit, amount: txAmount, denom: txDenom)
         
         TxService.signTx(txBody: txBody, privateKey: privateKey) { tx in
-            RpcService.broadcast(tx: tx) { res in
+            RpcService.broadcast(tx: tx, method: method) { res in
                 successCallback(res)
             } errorCallBack: { error in
                 errorCallBack(error)
@@ -212,6 +215,7 @@ open class TokenServiceSession {
                       amount: String,
                       memo: String,
                       privateKey: String,
+                      method: RpcMethods = .broadcastTxAsync,
                       successCallback: @escaping (_ res: BroadcastModel) -> (),
                       errorCallBack: @escaping FPErrorCallback) {
         
@@ -232,7 +236,7 @@ open class TokenServiceSession {
         //调用签名方法
         TxService.signTx(txBody: txBody,
                          privateKey: privateKey) { tx in
-            RpcService.broadcast(tx: tx) { result in
+            RpcService.broadcast(tx: tx, method: method) { result in
                 successCallback(result)
             } errorCallBack: { error in
                 errorCallBack(error)

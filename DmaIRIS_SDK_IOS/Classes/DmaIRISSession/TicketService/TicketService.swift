@@ -54,6 +54,7 @@ open class TicketServiceSession  {
                             recipient: String,
                             privateKey: String,
                             isSign: Bool,
+                            method: RpcMethods = .broadcastTxAsync,
                             successCallback: @escaping (_ res: BroadcastModel) -> (),
                             errorCallback: @escaping FPErrorCallback) {
         
@@ -101,7 +102,7 @@ open class TicketServiceSession  {
         TxService.signTx(txBody: builder,
                          privateKey: privateKey) { tx in
             
-            RpcService.broadcast(tx: tx) { res in
+            RpcService.broadcast(tx: tx, method: method) { res in
                 print(res)
                 successCallback(res)
             } errorCallBack: { error in

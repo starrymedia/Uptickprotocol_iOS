@@ -16,8 +16,8 @@ open class TxService {
     
 
     class func signTx(txBody: TxBody,
-                privateKey: String,
-                _ callback: @escaping (_ tx: TxTx) -> Void) {
+                      privateKey: String,
+                      _ callback: @escaping (_ tx: TxTx) -> Void) {
 
         //获取公钥
         guard let publicKeyData = WalletManager.exportPublicKey(privateKey: privateKey) else {

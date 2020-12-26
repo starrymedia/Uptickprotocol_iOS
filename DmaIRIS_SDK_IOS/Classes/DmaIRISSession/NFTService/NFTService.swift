@@ -27,6 +27,7 @@ open class NFTSession {
                          nftSchema: String,
                          nftId: String,
                          privateKey: String,
+                         method: RpcMethods = .broadcastTxAsync,
                          successCallback: @escaping (_ res: BroadcastModel) -> (),
                          errorCallback: @escaping FPErrorCallback) {
         
@@ -51,7 +52,7 @@ open class NFTSession {
         TxService.signTx(txBody: txBody,
                          privateKey: privateKey) { tx in
             //广播交易
-            RpcService.broadcast(tx: tx) { res in
+            RpcService.broadcast(tx: tx, method: method) { res in
                 print(res)
                 successCallback(res)
             } errorCallBack: { error in
@@ -82,6 +83,7 @@ open class NFTSession {
                           data: String,
                           uri: String,
                           privateKey: String,
+                          method: RpcMethods = .broadcastTxAsync,
                           successCallback: @escaping (_ res: BroadcastModel) -> (),
                           errorCallback: @escaping FPErrorCallback) {
 
@@ -114,7 +116,7 @@ open class NFTSession {
         TxService.signTx(txBody: txBody,
                          privateKey: privateKey) { tx in
             
-            RpcService.broadcast(tx: tx) { res in
+            RpcService.broadcast(tx: tx, method: method) { res in
                 print(res)
                 successCallback(res)
             } errorCallBack: { error in
@@ -136,6 +138,7 @@ open class NFTSession {
                    nftId: String,
                    tokenId: String,
                    privateKey: String,
+                   method: RpcMethods = .broadcastTxAsync,
                    successCallback: @escaping (_ string: BroadcastModel) -> (),
                    errorCallback: @escaping FPErrorCallback) {
         
@@ -154,7 +157,7 @@ open class NFTSession {
                 
         TxService.signTx(txBody: txBody, privateKey: privateKey) { tx in
             
-            RpcService.broadcast(tx: tx) { res in
+            RpcService.broadcast(tx: tx, method: method) { res in
                 successCallback(res)
             }errorCallBack: { error in
                 errorCallback(error)
@@ -181,6 +184,7 @@ open class NFTSession {
                           name: String = "[do-not-modify]",
                           uri: String = "[do-not-modify]",
                           privateKey: String,
+                          method: RpcMethods = .broadcastTxAsync,
                           successCallback: @escaping (_ res: BroadcastModel) -> (),
                           errorCallback: @escaping FPErrorCallback) {
 
@@ -215,7 +219,7 @@ open class NFTSession {
         TxService.signTx(txBody: txBody,
                          privateKey: privateKey) { tx in
             
-            RpcService.broadcast(tx: tx) { res in
+            RpcService.broadcast(tx: tx, method: method) { res in
                 successCallback(res)
             } errorCallBack: { error in
                 errorCallback(error)
@@ -259,6 +263,7 @@ open class NFTSession {
                               tokenIds: [String],
                               memo: String,
                               privateKey: String,
+                              method: RpcMethods = .broadcastTxAsync,
                               successCallback: @escaping (_ res: BroadcastModel) -> (),
                               errorCallback: @escaping FPErrorCallback) {
         
@@ -287,7 +292,7 @@ open class NFTSession {
         TxService.signTx(txBody: txBody,
                          privateKey: privateKey) { tx in
             
-            RpcService.broadcast(tx: tx) { res in
+            RpcService.broadcast(tx: tx, method: method) { res in
                 successCallback(res)
             } errorCallBack: { error in
                 errorCallback(error)
