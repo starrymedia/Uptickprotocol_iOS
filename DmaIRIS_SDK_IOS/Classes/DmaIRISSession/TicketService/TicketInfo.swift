@@ -14,7 +14,9 @@ public class TicketInfo: HandyJSON {
         
     }
 
-    public var nftId: String = ""
+    
+    public var price: String = ""
+    public var denom: String = ""
     public var nftTokeId: String = ""
     public var name: String = ""//名称
     public var imgUrl: String = ""//封面图片

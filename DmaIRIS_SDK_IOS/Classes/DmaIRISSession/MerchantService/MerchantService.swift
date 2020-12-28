@@ -129,6 +129,7 @@ public class Merchant {
                        price: String,
                        coin: String,
                        privateKey: String,
+                       callback: String,
                        successCallback: @escaping (_ value: String) -> (),
                        errorCallback: @escaping FPErrorCallback) {
         
@@ -140,7 +141,8 @@ public class Merchant {
                                tokenids: tokenids,
                                price: amount,
                                coin: coin,
-                               privateKey: privateKey) { value in
+                               privateKey: privateKey,
+                               callback: callback) { value in
                 successCallback(value)
             } errorCallback: { error in
                 errorCallback(error)
@@ -160,6 +162,7 @@ public class Merchant {
                        price: String,
                        coin: String,
                        privateKey: String,
+                       callback: String,
                        successCallback: @escaping (_ value: String) -> (),
                        errorCallback: @escaping FPErrorCallback) {
         
@@ -169,8 +172,9 @@ public class Merchant {
         }
         let publicKeyString = publicKeyData.base64EncodedString() ?? ""
         let address = WalletManager.exportBech32Address(privateKey: privateKey)
-        var params = MerchantOnSale(pubKey: publicKeyString,
-                                    nftId: denom,
+        var params = MerchantOnSale(callback: callback,
+                                    pubKey: publicKeyString,
+                                    denom: denom,
                                     owner: address)
         
         var labels = [MerchantOnSaleLabels]()
@@ -234,6 +238,7 @@ public class Merchant {
     public func offsale(denom: String,
                         tokenIds: [String],
                         privateKey: String,
+                        callback: String,
                         successCallback: @escaping () -> (),
                         errorCallback: @escaping FPErrorCallback) {
         
@@ -244,8 +249,9 @@ public class Merchant {
         let publicKeyString = publicKeyData.base64EncodedString() ?? ""
         let address = WalletManager.exportBech32Address(privateKey: privateKey)
 
-        let param = MerchantOffSale(pubKey: publicKeyString,
-                                    nftId: denom,
+        let param = MerchantOffSale(callback: callback,
+                                    pubKey: publicKeyString,
+                                    denom: denom,
                                     owner: address,
                                     tokenIds: tokenIds)
         
@@ -268,6 +274,7 @@ public class Merchant {
                         tokenIds: [String],
                         privateKey: String,
                         memo: String,
+                        callback: String,
                         successCallback: @escaping (_ data: String) -> (),
                         errorCallback: @escaping FPErrorCallback) {
         
@@ -278,8 +285,9 @@ public class Merchant {
         let publicKeyString = publicKeyData.base64EncodedString()
         let address = WalletManager.exportBech32Address(privateKey: privateKey)
 
-        var param = MerchantTransfer(payerPubKey: publicKeyString,
-                                     nftTd: denom,
+        var param = MerchantTransfer(callBack: callback,
+                                     payerPubKey: publicKeyString,
+                                     denom: denom,
                                      payer: address,
                                      recipien: address,
                                      ids: tokenIds,
@@ -309,6 +317,7 @@ public class Merchant {
                             param.signatures = WalletManager.signatureString(hashData: hashData, privateKey: privateKey)?.base64EncodedString()
                       
                             IRISAF.postRequest(url: url, parameters: param) { jsonString in
+                                print(jsonString)
                                 if let responseModel = MerchantResponseModel.deserialize(from: jsonString) {
                                     
                                     if responseModel.success == true {

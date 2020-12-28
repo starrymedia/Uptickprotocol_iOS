@@ -65,13 +65,27 @@ class ViewController: UIViewController {
 //        }
         
 //        获取所有票
-        TicketService.ticket(nftId: "ceshi09876") { ticket in
-            print(ticket)
-        } errorCallback: { error in
-            print(error)
-        }
+//        TicketService.ticket(nftId: "ceshi09876") { ticket in
+//            print(ticket)
+//        } errorCallback: { error in
+//            print(error)
+//        }
+      
         
+        
+        let date = self.getDateInTimer(timer: Date().timeIntervalSince1970)
+        let lateDate = self.getDateInTimer(timer: Date().timeIntervalSince1970 + 24*60*60)
+        print(date)
+        print(lateDate)
+
      }
+    
+    func getDateInTimer(timer : Double) -> String{
+        let date = Date(timeIntervalSince1970: TimeInterval(timer))
+        let format = DateFormatter()
+        format.dateFormat = "yyyy-MM-dd"
+        return format.string(from: date)
+    }
  
  
     override func didReceiveMemoryWarning() {

@@ -18,16 +18,16 @@ open class NFTSession {
     ///   - sender: 创建人地址
     ///   - nftName: 分类名称
     ///   - nftSchema: 简介
-    ///   - nftId: 唯一标识 3-64位字母/数组
+    ///   - denom: 唯一标识 3-64位字母/数组
     ///   - privateKey: 私钥
     ///   - successCallback: successCallback description
     ///   - errorCallback: errorCallback description
     public func issueNft(sender: String,
                          nftName: String,
                          nftSchema: String,
-                         nftId: String,
+                         denom: String,
                          privateKey: String,
-                         method: RpcMethods = .broadcastTxAsync,
+                         method: RpcMethods,
                          successCallback: @escaping (_ res: BroadcastModel) -> (),
                          errorCallback: @escaping FPErrorCallback) {
         
@@ -37,7 +37,7 @@ open class NFTSession {
         var msgIssueDenom = NftMsgIssueDenom()
         msgIssueDenom.name = nftName
         msgIssueDenom.schema = nftSchema
-        msgIssueDenom.id = nftId
+        msgIssueDenom.id = denom
         if let senderValue = TxUtils.fromBech32(sender) {
             msgIssueDenom.sender = senderValue
         }
@@ -69,7 +69,7 @@ open class NFTSession {
     ///   - recipient: 接收人地址
     ///   - name: 分类名称
     ///   - data: 简介
-    ///   - nftId: 分类ID
+    ///   - denom: 分类ID
     ///   - uri: 详细描述
     ///   - tokenIds: 同类型中多个ID不能重复 3-64位字母/数组，以字母开头
     ///   - privateKey: 私钥
@@ -77,13 +77,13 @@ open class NFTSession {
     ///   - errorCallback: errorCallback description
     public func mintToken(sender: String,
                           recipient: String,
-                          nftId: String,
+                          denom: String,
                           tokenIds: [String],
                           name: String,
                           data: String,
                           uri: String,
                           privateKey: String,
-                          method: RpcMethods = .broadcastTxAsync,
+                          method: RpcMethods,
                           successCallback: @escaping (_ res: BroadcastModel) -> (),
                           errorCallback: @escaping FPErrorCallback) {
 
@@ -95,7 +95,7 @@ open class NFTSession {
         for tokenId in tokenIds {
             var mintNft = NftMsgMintNFT()
             mintNft.data = data
-            mintNft.denom = nftId
+            mintNft.denom = denom
             mintNft.uri = uri
             mintNft.name = name
             mintNft.id = tokenId
@@ -129,16 +129,16 @@ open class NFTSession {
     /// 销毁NFT资产
     /// - Parameters:
     ///   - owner: 创建人地址
-    ///   - nftId: 分类ID
+    ///   - denom: 分类ID
     ///   - tokenId: 资产ID
     ///   - privateKey: 私钥
     ///   - successCallback: successCallback description
     ///   - errorCallback: errorCallback description
     func burnToken(owner: String,
-                   nftId: String,
+                   denom: String,
                    tokenId: String,
                    privateKey: String,
-                   method: RpcMethods = .broadcastTxAsync,
+                   method: RpcMethods,
                    successCallback: @escaping (_ string: BroadcastModel) -> (),
                    errorCallback: @escaping FPErrorCallback) {
         
@@ -146,7 +146,7 @@ open class NFTSession {
         if let value = TxUtils.fromBech32(owner) {
             msgBurnNFT.sender = value
         }
-        msgBurnNFT.denom = nftId
+        msgBurnNFT.denom = denom
         msgBurnNFT.id = tokenId
 
         
@@ -170,7 +170,7 @@ open class NFTSession {
       * 修改资产
       *
       * @param owner
-      * @param nftId
+      * @param denom
       * @param tokenId
       * @param data
       * @param name
@@ -178,13 +178,13 @@ open class NFTSession {
       * @param privateKey
       */
     public func editToken(owner: String,
-                          nftId: String,
+                          denom: String,
                           tokenId: String,
                           data: String = "[do-not-modify]",
                           name: String = "[do-not-modify]",
                           uri: String = "[do-not-modify]",
                           privateKey: String,
-                          method: RpcMethods = .broadcastTxAsync,
+                          method: RpcMethods,
                           successCallback: @escaping (_ res: BroadcastModel) -> (),
                           errorCallback: @escaping FPErrorCallback) {
 
@@ -195,7 +195,7 @@ open class NFTSession {
         if let value = TxUtils.fromBech32(owner) {
             nft.sender = value
         }
-        nft.denom = nftId
+        nft.denom = denom
         nft.id = tokenId
 
         if !uri.isEmpty {
@@ -231,18 +231,20 @@ open class NFTSession {
     ///转送NFT
     public func transferToken(sender: String,
                               recipient: String,
-                              nftId: String,
+                              denom: String,
                               tokenIds: [String],
                               privateKey: String,
+                              method: RpcMethods,
                               successCallback: @escaping (_ res: BroadcastModel) -> (),
                               errorCallback: @escaping FPErrorCallback) {
         self.transferToken(sender: sender,
                            recipient:
                             recipient,
-                           nftId: nftId,
+                           denom: denom,
                            tokenIds: tokenIds,
                            memo: "",
                            privateKey: privateKey,
+                           method: method,
                            successCallback: successCallback,
                            errorCallback: errorCallback)
     }
@@ -259,18 +261,18 @@ open class NFTSession {
     ///   - privateKey: 私钥
     public func transferToken(sender: String,
                               recipient: String,
-                              nftId: String,
+                              denom: String,
                               tokenIds: [String],
                               memo: String,
                               privateKey: String,
-                              method: RpcMethods = .broadcastTxAsync,
+                              method: RpcMethods,
                               successCallback: @escaping (_ res: BroadcastModel) -> (),
                               errorCallback: @escaping FPErrorCallback) {
         
         var txBody = TxUtils.getBody(meno: memo, timeoutHeight: 0)
         for tokenId in tokenIds {
             var transferNFT = NftMsgTransferNFT()
-            transferNFT.denom = nftId
+            transferNFT.denom = denom
             transferNFT.uri = "[do-not-modify]"
             transferNFT.name = "[do-not-modify]"
             transferNFT.data = "[do-not-modify]"
@@ -305,15 +307,15 @@ open class NFTSession {
     
     /// 根据nft id 查询nftx信息
     /// - Parameters:
-    ///   - nftId: 分类ID
+    ///   - denom: 分类ID
     ///   - successCallback: successCallback description
     ///   - errorCallback: errorCallback description
-    public func nftById(nftId: String,
+    public func nftInfo(denom: String,
                         successCallback: @escaping (_ nft: NFT) -> (),
                         errorCallback: @escaping FPErrorCallback) {
         
         var request = NftQueryDenomRequest()
-        request.denom = nftId
+        request.denom = denom
         
         let client = NftQueryClient(channel: IRISServive.channel)
         let response = client.denom(request).response
@@ -348,14 +350,14 @@ open class NFTSession {
     
     /// 根据nft id查询nft token 详情
     /// - Parameters:
-    ///   - nftId: 分类ID
+    ///   - denom: 分类ID
     ///   - successCallback: successCallback description
     ///   - errorCallback: errorCallback description
-    public func nftInfoById(nftId: String,
-                            successCallback: @escaping (_ nft: NFT) -> (),
-                            errorCallback: @escaping FPErrorCallback) {
+    public func nftTokens(denom: String,
+                          successCallback: @escaping (_ nft: NFT) -> (),
+                          errorCallback: @escaping FPErrorCallback) {
         var request = NftQueryCollectionRequest()
-        request.denom = nftId
+        request.denom = denom
         let client = NftQueryClient(channel: IRISServive.channel)
         let response = client.collection(request).response
         response.whenComplete { result in
@@ -379,17 +381,17 @@ open class NFTSession {
     
     /// 查询资产基础信息
     /// - Parameters:
-    ///   - nftId: 分类ID
+    ///   - denom: 分类ID
     ///   - tokenId: 资产ID
     ///   - successCallback: successCallback description
     ///   - errorCallback: errorCallback description
-    public func tokenById(nftId: String,
+    public func tokenById(denom: String,
                           tokenId: String,
                           successCallback: @escaping (_ value: NFTToken) -> (),
                           errorCallback: @escaping FPErrorCallback) {
         
         var request = NftQueryNFTRequest()
-        request.denom = nftId
+        request.denom = denom
         request.id = tokenId
         let client = NftQueryClient(channel: IRISServive.channel)
         let response = client.nFT(request).response
@@ -407,16 +409,16 @@ open class NFTSession {
     /// 根据地址和分类查询拥有的NFT 资产
     /// - Parameters:
     ///   - owner: 钱包地址
-    ///   - nftId: 分类ID
+    ///   - denom: 分类ID
     ///   - successCallback: successCallback description
     ///   - errorCallback: errorCallback description
     public func balance(owner: String,
-                        nftId: String,
+                        denom: String,
                         successCallback: @escaping (_ list: [NFT]) -> (),
                         errorCallback: @escaping FPErrorCallback) {
 
         var request = NftQueryOwnerRequest()
-        request.denom = nftId
+        request.denom = denom
         if let value = TxUtils.fromBech32(owner) {
             request.owner = value
         }
@@ -436,16 +438,16 @@ open class NFTSession {
     /// 根据地址和分类查询拥有的NFT 资产
     /// - Parameters:
     ///   - owner: 钱包地址
-    ///   - nftId: 分类ID
+    ///   - denom: 分类ID
     ///   - successCallback: successCallback description
     ///   - errorCallback: errorCallback description
     public func balanceInfo(owner: String,
-                            nftId: String,
+                            denom: String,
                             successCallback: @escaping (_ nftList: [NFT]) -> (),
                             errorCallback: @escaping FPErrorCallback) {
 
         var request = NftQueryOwnerRequest()
-        request.denom = nftId
+        request.denom = denom
         if let value = TxUtils.fromBech32(owner) {
             request.owner = value
         }
@@ -469,11 +471,11 @@ open class NFTSession {
     /// 根据地址和分类查询拥有资产总数
     /// - Parameters:
     ///   - owner: 钱包地址
-    ///   - nftId: 分类ID
+    ///   - denom: 分类ID
     ///   - successCallback: successCallback description
     ///   - errorCallback: errorCallback description
     public func supply(owner: String,
-                       nftId: String,
+                       denom: String,
                        successCallback: @escaping (_ amount: UInt64) -> (),
                        errorCallback: @escaping FPErrorCallback) {
 
@@ -481,7 +483,7 @@ open class NFTSession {
         if let value = TxUtils.fromBech32(owner) {
             request.owner = value
         }
-        request.denom = nftId
+        request.denom = denom
         
         let response = NftQueryClient(channel: IRISServive.channel).supply(request).response
         response.whenComplete { result in
@@ -540,7 +542,7 @@ open class NFTSession {
         var nftList = [NFT]()
         for idCollection in idCollectionList {
             let denom = idCollection.denom
-            self.nftById(nftId: denom) { nft in
+            self.nftInfo(denom: denom) { nft in
                 let tokenids = idCollection.ids
                 let nftTokens = nft.tokens
                 var nftTokenList = [NFTToken]()

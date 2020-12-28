@@ -67,8 +67,9 @@ public struct TokensModel: HandyJSON {
 
 struct MerchantTransfer: Encodable {
     
+    let callBack: String
     let payerPubKey: String
-    let nftTd: String
+    let denom: String
     let payer: String
     let recipien: String
     var signatures: String?
@@ -87,14 +88,16 @@ public struct MerchantResponseModel: HandyJSON {
 
 struct MerchantOnSale: Encodable {
     
+    let callback: String
     let pubKey: String
-    let nftId: String
+    let denom: String
     let owner: String
     var signatures: String?
     var labels: [MerchantOnSaleLabels]?
 }
  
 struct MerchantOnSaleLabels: Encodable {
+    
     let coin: String
     let tokenId: String
     let price: String
@@ -102,8 +105,9 @@ struct MerchantOnSaleLabels: Encodable {
 
 struct MerchantOffSale: Encodable {
     
+    let callback: String
     let pubKey: String
-    let nftId: String
+    let denom: String
     let owner: String
     var tokenIds: [String]?
 }

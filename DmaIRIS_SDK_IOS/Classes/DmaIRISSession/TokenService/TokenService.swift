@@ -26,7 +26,7 @@ open class TokenServiceSession {
     public func issueToken(initialSupply: UInt64,
                            maxSupply: UInt64,
                            tokenName: String,
-                           tokenSymbol: String,
+                           denom: String,
                            mintAble: Bool,
                            owner: String,
                            privateKey: String,
@@ -35,13 +35,13 @@ open class TokenServiceSession {
                            errorCallBack: @escaping FPErrorCallback) {
     
         var token = TokenMsgIssueToken()
-        token.symbol = tokenSymbol
+        token.symbol = denom
         token.initialSupply = initialSupply
         token.maxSupply = maxSupply
         token.mintable = true
         token.scale = 6
         token.name = tokenName
-        token.minUnit = tokenSymbol
+        token.minUnit = denom
         token.mintable = mintAble
         
         if let ownerValue = TxUtils.fromBech32(owner) {
@@ -70,7 +70,7 @@ open class TokenServiceSession {
     ///   - owner: token所有者钱包地址
     ///   - amount: 价格
     ///   - privateKey: 私钥
-    public func mintToken(tokenSymbol: String,
+    public func mintToken(denom: String,
                           amount: UInt64,
                           tokenOwner: String,
                           recipient: String,
@@ -81,7 +81,7 @@ open class TokenServiceSession {
         
         
         var token = TokenMsgMintToken()
-        token.symbol = tokenSymbol
+        token.symbol = denom
         token.amount = amount
         if let ownerValue = TxUtils.fromBech32(tokenOwner) {
             token.owner = ownerValue
@@ -110,12 +110,12 @@ open class TokenServiceSession {
     /**
      * 更换同质化Token Owner
      *
-     * @param tokenSymbol
+     * @param denom
      * @param tokenOwner
      * @param recipient
      * @param privateKey
      */
-    public func transferOwnership(tokenSymbol: String,
+    public func transferOwnership(denom: String,
                                   tokenOwner: String,
                                   recipient: String,
                                   privateKey: String,
@@ -124,7 +124,7 @@ open class TokenServiceSession {
                                   errorCallBack: @escaping FPErrorCallback) {
 
         var token = TokenMsgTransferTokenOwner()
-        token.symbol = tokenSymbol
+        token.symbol = denom
         if let fromValue = TxUtils.fromBech32(tokenOwner) {
             token.srcOwner = fromValue
         }
@@ -155,20 +155,20 @@ open class TokenServiceSession {
      *
      * @param from
      * @param to
-     * @param tokenSymbol
+     * @param denom
      * @param amount
      * @param privateKey
      */
     public func transfer(from: String,
                          to: String,
-                         tokenSymbol: String,
+                         denom: String,
                          amount: Decimal,
                          privateKey: String,
                          successCallback: @escaping (_ res: BroadcastModel) -> (),
                          errorCallBack: @escaping FPErrorCallback) {
         self.transfer(from: from,
                       to: to,
-                      tokenSymbol: tokenSymbol,
+                      denom: denom,
                       amount: amount,
                       memo: "",
                       privateKey: privateKey,
@@ -179,24 +179,24 @@ open class TokenServiceSession {
        * 转送同质化token
        * @param from
        * @param to
-       * @param tokenSymbol
+       * @param denom
        * @param amount
        * @param privateKey
     */
     public func transfer(from: String,
                          to: String,
-                         tokenSymbol: String,
+                         denom: String,
                          amount: Decimal,
                          memo: String,
                          privateKey: String,
                          successCallback: @escaping (_ res: BroadcastModel) -> (),
                          errorCallBack: @escaping FPErrorCallback) {
         
-        self.toWei(tokenSymblol: tokenSymbol,
+        self.toWei(tokenSymblol: denom,
                    amount: amount) { amount in
             self.sendTransfer(from: from,
                               to: to,
-                              tokenSymbol: tokenSymbol,
+                              denom: denom,
                               amount: amount,
                               memo: memo,
                               privateKey: privateKey,
@@ -211,7 +211,7 @@ open class TokenServiceSession {
     
     func sendTransfer(from: String,
                       to: String,
-                      tokenSymbol: String,
+                      denom: String,
                       amount: String,
                       memo: String,
                       privateKey: String,
@@ -221,7 +221,7 @@ open class TokenServiceSession {
         
         var coin = BaseCoin()
         coin.amount = amount
-        coin.denom = tokenSymbol
+        coin.denom = denom
         
         var msgSend = BankMsgSend()
         msgSend.fromAddress = from
@@ -251,12 +251,12 @@ open class TokenServiceSession {
     ///   - denom: 分类ID
     ///   - callback: token信息
     /// - Returns:
-    public func tokenInfo(tokenSymbol: String,
+    public func tokenInfo(denom: String,
                           successCallback: @escaping (_ token: Token) -> (),
                           errorCallBack: @escaping FPErrorCallback)  {
        
         var request = TokenQueryTokenRequest()
-        request.denom = tokenSymbol
+        request.denom = denom
         
         let client = TokenQueryClient(channel: IRISServive.channel)
         let response = client.token(request).response
@@ -313,16 +313,16 @@ open class TokenServiceSession {
     /**
      * mint资产，估算交易费
      *
-     * @param tokenSymbol
+     * @param denom
      * @return
      * @throws ServiceException
      */
-    public func issueFees(tokenSymbol: String,
+    public func issueFees(denom: String,
                           successCallback: @escaping (_ coin: Coin) -> (),
                           errorCallBack: @escaping FPErrorCallback) {
         
         var request = TokenQueryFeesRequest()
-        request.symbol = tokenSymbol
+        request.symbol = denom
         
         let response = TokenQueryClient(channel: IRISServive.channel).fees(request).response
         response.whenComplete { result in
@@ -342,19 +342,19 @@ open class TokenServiceSession {
     /**
        * 查询拥有的token
        * @param address
-       * @param tokenSymbol
+       * @param denom
        * @return
        * @throws ServiceException
     */
     public func balance(address: String,
-                        tokenSymbol: String,
+                        denom: String,
                         successCallback: @escaping (_ coin: Coin) -> (),
                         errorCallback: @escaping FPErrorCallback) {
                 
         let client = BankQueryClient(channel: IRISServive.channel)
         var req = BankQueryBalanceRequest()
         req.address = address
-        req.denom = tokenSymbol
+        req.denom = denom
         let res = client.balance(req)
         res.response.whenComplete { result in
             switch result {
@@ -429,17 +429,17 @@ open class TokenServiceSession {
     /**
      * token总量
      *
-     * @param tokenSymbol
+     * @param denom
      * @return
      * @throws ServiceException
      */
-    public func supplyOf(tokenSymbol: String,
+    public func supplyOf(denom: String,
                          successCallback: @escaping (_ coin: Coin) -> (),
                          errorCallback: @escaping FPErrorCallback) {
                 
         let client = BankQueryClient(channel: IRISServive.channel)
         var req = BankQuerySupplyOfRequest()
-        req.denom = tokenSymbol
+        req.denom = denom
         let res = client.supplyOf(req)
         res.response.whenComplete { result in
             switch result {
@@ -461,7 +461,7 @@ open class TokenServiceSession {
                       successCallback: @escaping (_ amount: String) -> (),
                       errorCallBack: @escaping FPErrorCallback) {
      
-        self.tokenInfo(tokenSymbol: tokenSymblol) { token in
+        self.tokenInfo(denom: tokenSymblol) { token in
             var amount = amount
             var result = Decimal()
             NSDecimalMultiplyByPowerOf10(&result, &amount, Int16(token.scale), .plain)
@@ -481,7 +481,7 @@ open class TokenServiceSession {
                             successCallback: @escaping (_ amount: String) -> (),
                             errorCallBack: @escaping FPErrorCallback) {
      
-        self.tokenInfo(tokenSymbol: tokenSymblol) { token in
+        self.tokenInfo(denom: tokenSymblol) { token in
             var amount = amount
             var result = Decimal()
             NSDecimalMultiplyByPowerOf10(&result, &amount, -Int16(token.scale), .plain)
