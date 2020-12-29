@@ -87,7 +87,7 @@ open class TicketServiceSession  {
                 nft.sender = value
             }
             
-            nft.denom = ticketEntity.nftId
+            nft.denom = ticketEntity.denom
             nft.name = ticketEntity.name
             nft.id = ticketEntity.nftTokeId
             nft.uri = ticketEntity.imgUrl

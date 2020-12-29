@@ -29,7 +29,7 @@ open class IRISAFNetwork {
                     case .success(let jsonString):
                         successCallback(jsonString)
                     case .failure(let error):
-                        errorCallBack("\(error)")
+                        errorCallBack(error.localizedDescription)
                     }
         }
     }
@@ -43,7 +43,7 @@ open class IRISAFNetwork {
             case .success(let jsonString):
                 successCallback(jsonString)
             case .failure(let error):
-                errorCallBack("\(error)")
+                errorCallBack(error.localizedDescription)
             }
         }
     }
