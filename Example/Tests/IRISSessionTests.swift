@@ -57,16 +57,16 @@ class IRISSessionTests: XCTestCase {
     func testRequestQueryBalance() {
         let expectation = self.expectation(description: "testRequestQueryBalance")
 
-        NFTService.balance(owner: "iaa1fu5xru6umtfqthe588z6zk37gdknulr55ee5qf",
-                           nftId: "") { list in
-            print("amount:\(list)")
-            expectation.fulfill()
-
-        } errorCallback: { error in
-            print("error:\(error)")
-            expectation.fulfill()
-
-        }
+//        NFTService.balance(owner: "iaa1fu5xru6umtfqthe588z6zk37gdknulr55ee5qf",
+//                           denom: "") successCallback: { list in
+//            print("amount:\(list)")
+//            expectation.fulfill()
+//
+//        } errorCallback: { error in
+//            print("error:\(error)")
+//            expectation.fulfill()
+//
+//        }
 
         waitForExpectations(timeout: 15, handler: nil)
     }
@@ -92,13 +92,13 @@ class IRISSessionTests: XCTestCase {
     
     func testQuerySupply() {
         let expectation = self.expectation(description: "testQuerySupply")
-        NFTService.supply(owner: "iaa1fu5xru6umtfqthe588z6zk37gdknulr55ee5qf", nftId: "ubif") { amount in
-            print("amount:\(amount)")
-            expectation.fulfill()
-        } errorCallback: { error in
-            print(error)
-            expectation.fulfill()
-        }
+//        NFTService.supply(owner: "iaa1fu5xru6umtfqthe588z6zk37gdknulr55ee5qf", denom: "ubif") successCallback: { amount in
+//            print("amount:\(amount)")
+//            expectation.fulfill()
+//        } errorCallback: { error in
+//            print(error)
+//            expectation.fulfill()
+//        }
         waitForExpectations(timeout: 15, handler: nil)
     }
     
