@@ -17,11 +17,8 @@ public class SignUtils {
     
     public static func doSignDataEntity(data: String, privateKey: String) -> SignDataEntity {
         
-        let privateKeyData = Data.fromHex(privateKey)
         let sig = ECDSASignTool.ecdsaSign(message: data, privateKey: privateKey)
-        let encoded = SECP256K1.privateToPublic(privateKey: privateKeyData!, compressed: true)
-        let pubKey = encoded?.base64EncodedString()
-        return  SignDataEntity(msg: data, pubKey: pubKey!, sig: sig);
+        return  SignDataEntity(msg: data, pubKey: sig.1, sig: sig.0);
     }
 
     public static func verify(signDataEntity: SignDataEntity) -> Bool {
@@ -44,12 +41,12 @@ public class SignUtils {
         return data.data(using: .utf8) ?? Data()
     }
     
-    public static func verify(msg: Data, sig: Data, pub: Data) -> Bool {
-        
+    static func verify(msg: Data, sig: Data, pub: Data) -> Bool {
+        print(String(data: msg, encoding: .utf8))
+        print(sig.toHexString())
+        print(pub.base64EncodedString())
         let verify = ECDSASignTool.ecdsaVerify(msg: msg, sig: sig, pub: pub)
-        return verify
-        #warning("有疑问")
- 
+        return verify 
     }
      
 }

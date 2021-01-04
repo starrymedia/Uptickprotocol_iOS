@@ -16,9 +16,23 @@ class Tests: XCTestCase {
     
     func testExample() {
         // This is an example of a functional test case.
-
+        let privateKey = "1779b474da9ef4aef67271f455dd58054d3181863b91f63910074f3cb9123591"
+        let signDataEntity = SignUtils.doSignDataEntity(data: "123456", privateKey: privateKey)
+        print("\(signDataEntity.msg)")
+        print("\(signDataEntity.sig)")
+        print("\(signDataEntity.pubKey)")
+    }
+    
+    func testVerify() {
+        let signDataEntity = SignDataEntity()
+        signDataEntity.msg = "123456"
+        signDataEntity.sig = "5a599c01d7c6fffba98a7ea4b8ee51ae519815fe62584346b4d0aaa2a7ceb0966e0a7da702d0949d3f49b635b0d9e8d1634d0d83843be636d19abec695afa29a"
+        signDataEntity.pubKey = "A4bUD0joUAsDQGvkFs44lzwDWvlA4+BKrCnI7er9HSi7"
+        let ver = SignUtils.verify(signDataEntity: signDataEntity)
+        print(ver)
 
     }
+    
     
 
     

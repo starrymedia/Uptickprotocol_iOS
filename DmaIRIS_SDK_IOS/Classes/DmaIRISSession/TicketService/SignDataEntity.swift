@@ -10,9 +10,9 @@ import HandyJSON
 
 public class SignDataEntity: HandyJSON {
     
-    var msg: String = ""
-    var pubKey: String = ""
-    var sig: String = ""
+    public var msg: String = ""
+    public var pubKey: String = ""
+    public var sig: String = ""
     
     required public init() {
     }

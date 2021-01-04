@@ -17,39 +17,41 @@ class ECDSASignTool: NSObject {
     ///   - message: 欲加密文本
     ///   - privateKey: 私钥(hex格式)
     /// - Returns: 签名结果
-    static func ecdsaSign(message: String, privateKey: String) -> String {
+    static func ecdsaSign(message: String, privateKey: String) -> (String,String) {
         // hash to sign
         guard let message = message.data(using: .utf8) else {
-            return "";
+            return ("","")
         }
         let hash = sha256(data: message)
 
         guard let privateKey = hexadecimal(hexString: privateKey) else {
             print("privateKey生成出错")
-            return "";
+            return ("","")
         }
-        guard let publicKey = SECP256K1.privateToPublic(privateKey: privateKey) else {
+        guard let publicKey = SECP256K1.privateToPublic(privateKey: privateKey,compressed: true) else {
             print("publicKey生成出错");
-            return "";
+            return ("","")
         }
 
         // ecdsa signing with private key
         guard case let (serializedSignature?, rawSignature?) = SECP256K1.ecdsaSign(hash: hash, privateKey: privateKey) else {
             print("ecdsaSign 签名出错");
-            return ""
-        };
+            return ("","")
+        }
         // serializedSignature : compressed format R+S
         // rawSignature : low form signature
         let serializedSignature_hex = hexString(data: serializedSignature)
-        return serializedSignature_hex
+        
+        return (serializedSignature_hex,publicKey.base64EncodedString())
     }
     
     static func ecdsaVerify(msg: Data, sig: Data, pub: Data) -> Bool {
         
+        let hash = sha256(data: msg)
 
-        let verify = SECP256K1.ecdsaVerify(hash: msg, signature: sig, publicKey: pub)
+        let verify = SECP256K1.ecdsaVerify(hash: hash, signature: sig, publicKey: pub)
         
-        return true
+        return verify
     }
 
     
