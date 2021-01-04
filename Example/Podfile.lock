@@ -83,7 +83,7 @@ PODS:
   - SwiftProtobuf (1.13.0)
   - SwiftRLP (1.0.1):
     - BigInt (~> 3.1)
-  - UptickProtocolIRISnet (0.1.0):
+  - UptickProtocolIRISnet (0.1.1):
     - Alamofire (~> 5.2)
     - gRPC-Swift (= 1.0.0-alpha.20)
     - HandyJSON (= 5.0.0-beta)
@@ -175,7 +175,7 @@ SPEC CHECKSUMS:
   SwiftNIOTransportServices: 801923921fbecdcde1e1c1ff38e812167d01ead1
   SwiftProtobuf: fd4693388a96c8c2df35d3b063272b0e7c499d00
   SwiftRLP: 9de2c9512a9a6bf0909cd84cc143a7ff1aff7820
-  UptickProtocolIRISnet: 0400b3b9f335c4db044065ed4875d6bf0cea4df8
+  UptickProtocolIRISnet: 7b0b2df0b636161f7ceba5ce57fc66af8c156548
   web3swift: 843dd5295d2ae755e6f80e9e0bdabe2868a5c7d8
 
 PODFILE CHECKSUM: bd544a6d81b968d27cafef84c33b79bf1a09ad74

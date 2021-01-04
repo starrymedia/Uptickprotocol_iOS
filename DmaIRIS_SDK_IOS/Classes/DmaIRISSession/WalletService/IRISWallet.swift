@@ -12,13 +12,13 @@ import BigInt
 import secp256k1_swift
 import SwiftProtobuf
 
-public let WalletManager = EthWallet.default
+public let WalletManager = IRISWallet.default
 
-open class EthWallet: NSObject {
+open class IRISWallet: NSObject {
     
 //    let url:String = "http://192.168.1.104:8545"
     
-    public static let `default` = EthWallet()
+    public static let `default` = IRISWallet()
 
     public override init() {
         
