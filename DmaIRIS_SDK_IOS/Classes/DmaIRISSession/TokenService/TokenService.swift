@@ -60,6 +60,8 @@ open class TokenServiceSession {
                 errorCallBack(error)
             }
             
+        }errorCallBack: { error in
+            errorCallBack(error)
         }
     }
     
@@ -104,6 +106,8 @@ open class TokenServiceSession {
                 errorCallBack(error)
             }
             
+        }errorCallBack: { error in
+            errorCallBack(error)
         }
     }
     
@@ -146,6 +150,8 @@ open class TokenServiceSession {
                 errorCallBack(error)
             }
             
+        }errorCallBack: { error in
+            errorCallBack(error)
         }
     }
     
@@ -242,6 +248,8 @@ open class TokenServiceSession {
                 errorCallBack(error)
             }
 
+        } errorCallBack: { error in
+            errorCallBack(error)
         }
         
     }

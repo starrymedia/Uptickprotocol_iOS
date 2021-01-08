@@ -73,7 +73,6 @@ open class TicketServiceSession  {
             dataStandard.body = ticketEntity
             dataStandard.protoc = ProtocEnum.ticket.rawValue
             if (isSign) {
-                #warning("需要签名")
                 dataStandard.sign(signPriKey: privateKey, pubKeyEnum: .base64)
             }
             
@@ -110,6 +109,8 @@ open class TicketServiceSession  {
             } errorCallBack: { error in
                 errorCallback(error)
             }
+        } errorCallBack: { error in
+            errorCallback(error)
         }
     }
     

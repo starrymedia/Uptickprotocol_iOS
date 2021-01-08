@@ -17,7 +17,8 @@ open class TxService {
 
     class func signTx(txBody: TxBody,
                       privateKey: String,
-                      _ callback: @escaping (_ tx: TxTx) -> Void) {
+                      _ callback: @escaping (_ tx: TxTx) -> Void,
+                      errorCallBack: @escaping FPErrorCallback) {
 
         //获取公钥
         guard let publicKeyData = WalletManager.exportPublicKey(privateKey: privateKey) else {
@@ -61,14 +62,16 @@ open class TxService {
                                          privateKey: privateKey,
                                          gasLimit: gasLimit) { tx in
                 callback(tx)
-            } errorCallBack: { eror in
-                print(eror)
+            } errorCallBack: { error in
+                print(error)
+                errorCallBack(error)
             }
 
 
 
         } errorCallback: { error in
             print(error)
+            errorCallBack(error)
         }
 
     }
@@ -100,8 +103,8 @@ open class TxService {
             myGasLimit = gasUsed
             self.forRequestSimulate(signerInfo: signerInfo, chainId: chainId, txBody: txBody, accountNumber: accountNumber, privateKey: privateKey, gasLimit: myGasLimit, successCallback: successCallback, errorCallBack: errorCallBack)
         }
-       } errorCallBack: { _ in
-
+       } errorCallBack: { error in
+            errorCallBack(error)
        }
     }
     
@@ -179,7 +182,7 @@ open class TxService {
                 successCallback(gasUsed)
             case .failure(let error):
                 print(error)
-                errorCallBack(error.localizedDescription)
+                errorCallBack("\(error)")
             }
         }
     }

@@ -58,6 +58,8 @@ open class NFTSession {
             } errorCallBack: { error in
                 errorCallback(error)
             }
+        } errorCallBack: { error in
+            errorCallback(error)
         }
     }
     
@@ -122,6 +124,8 @@ open class NFTSession {
             } errorCallBack: { error in
                 errorCallback(error)
             }
+        } errorCallBack: { error in
+            errorCallback(error)
         }
         
     }
@@ -162,6 +166,8 @@ open class NFTSession {
             }errorCallBack: { error in
                 errorCallback(error)
             }
+        }errorCallBack: { error in
+            errorCallback(error)
         }
         
     }
@@ -224,6 +230,8 @@ open class NFTSession {
             } errorCallBack: { error in
                 errorCallback(error)
             }
+        }errorCallBack: { error in
+            errorCallback(error)
         }
         
     }
@@ -299,6 +307,8 @@ open class NFTSession {
             } errorCallBack: { error in
                 errorCallback(error)
             }
+        }errorCallBack: { error in
+            errorCallback(error)
         }
         
     }
