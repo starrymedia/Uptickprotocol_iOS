@@ -16,10 +16,15 @@ To run the example project, clone the repo, and run `pod install` from the Examp
 ## Start
 ```
 AppDelegate 中配置基本信息
+//GRPC节点地址
 IRISServive.host = "44.90.23.285"
+//GRPC节点端口
 IRISServive.port = 9095
+//链id
 IRISServive.chainId = "test"
+//Merchant模块地址
 MerchantService.nodeUrl = "http://51.82.156.272:8092"
+//交易广播地址
 RpcService.rpcUrl = "http://51.82.156.272:8092"
 
 ```
