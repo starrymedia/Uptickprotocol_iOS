@@ -5,6 +5,8 @@
 [![License](https://img.shields.io/cocoapods/l/DmaIRIS_SDK_IOS.svg?style=flat)](https://cocoapods.org/pods/DmaIRIS_SDK_IOS)
 [![Platform](https://img.shields.io/cocoapods/p/DmaIRIS_SDK_IOS.svg?style=flat)](https://cocoapods.org/pods/DmaIRIS_SDK_IOS)
 
+IRISNet 公链版 SDK
+
 ## Example
 
 To run the example project, clone the repo, and run `pod install` from the Example directory first.
@@ -14,21 +16,21 @@ To run the example project, clone the repo, and run `pod install` from the Examp
 ## Start
 ```
 AppDelegate 中配置基本信息
-IRISServive.host = "34.80.22.255"
-IRISServive.port = 9090
-IRISServive.chainId = "bifrost-1"
-MerchantService.nodeUrl = "http://52.81.146.252:8091"
-RpcService.rpcUrl = "http://34.80.22.255:26657"
+IRISServive.host = "44.90.23.285"
+IRISServive.port = 9095
+IRISServive.chainId = "test"
+MerchantService.nodeUrl = "http://51.82.156.272:8092"
+RpcService.rpcUrl = "http://51.82.156.272:8092"
 
 ```
 
 ## Installation
 
-DmaIRIS_SDK_IOS is available through [CocoaPods](https://cocoapods.org). To install
+UptickProtocolIRISnet is available through [CocoaPods](https://cocoapods.org). To install
 it, simply add the following line to your Podfile:
 
 ```ruby
-    pod 'UptickProtocolIRISnet',:git =>"https://github.com/starrymedia/DmaIRIS_SDK_IOS.git"
+pod 'UptickProtocolIRISnet',:git =>"https://github.com/starrymedia/DmaIRIS_SDK_IOS.git"
 ```
 
 ## Author
@@ -38,4 +40,4 @@ it, simply add the following line to your Podfile:
 ## License
 
 DmaIRIS_SDK_IOS is available under the MIT license. See the LICENSE file for more info.
->>>>>>> master
+ 
