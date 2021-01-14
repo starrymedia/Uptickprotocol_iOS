@@ -30,7 +30,7 @@ open class TicketServiceSession  {
         
         NFTService.issueNft(sender: ticket.create,
                             nftName: ticket.name,
-                            nftSchema: Schema.ticket.rawValue,
+                            nftSchema: Schema.ticket.toJSONString(),
                             denom: ticket.id,
                             privateKey: privateKey,
                             method: method) { broadcastModel in
@@ -145,7 +145,7 @@ open class TicketServiceSession  {
     }
     
     /**
-     * 票核销
+     * 修改nftData
      *
      * @param nftId
      * @param tokenId
@@ -155,14 +155,14 @@ open class TicketServiceSession  {
      * @return
      * @throws ServiceException
      */
-    public func wiped(nftId: String,
-                      tokenId: String,
-                      owner: String,
-                      ownerPrivateKey: String,
-                      signData: String,
-                      method: RpcMethods,
-                      successCallback: @escaping (_ broadcastModel: BroadcastModel) -> (),
-                      errorCallback: @escaping FPErrorCallback) {
+    public func editDate(nftId: String,
+                         tokenId: String,
+                         owner: String,
+                         ownerPrivateKey: String,
+                         signData: String,
+                         method: RpcMethods,
+                         successCallback: @escaping (_ broadcastModel: BroadcastModel) -> (),
+                         errorCallback: @escaping FPErrorCallback) {
         
         NFTService.editToken(owner: owner,
                              denom: nftId,
@@ -226,10 +226,10 @@ open class TicketServiceSession  {
      * @return
      * @throws ServiceException
      */
-    public func ticketInfo(nftId: String,
-                           tokenId: String,
-                           successCallback: @escaping (_ ticketInfo: TicketInfo) -> (),
-                           errorCallback: @escaping FPErrorCallback) {
+    public func getTicketInfo(nftId: String,
+                              tokenId: String,
+                              successCallback: @escaping (_ ticketInfo: TicketInfo) -> (),
+                              errorCallback: @escaping FPErrorCallback) {
         
         NFTService.tokenById(denom: nftId,
                                   tokenId: tokenId) { nftToken in
@@ -253,10 +253,9 @@ open class TicketServiceSession  {
      * @return
      * @throws ServiceException
      */
-//    Ticket ticket(String nftId) throws ServiceException;
-    public func ticket(nftId: String,
-                successCallback: @escaping (_ ticket: Ticket) -> (),
-                errorCallback: @escaping FPErrorCallback) {
+    public func getTickets(nftId: String,
+                           successCallback: @escaping (_ ticket: Ticket) -> (),
+                           errorCallback: @escaping FPErrorCallback) {
         
         NFTService.nftTokens(denom: nftId) { nft in
             if let ticket = self.formatTicket(nft, type: 5) {
@@ -278,10 +277,10 @@ open class TicketServiceSession  {
      * @return
      * @throws ServiceException
      */
-    public func balanceAll(owner: String,
-                    nftId: String,
-                    successCallback: @escaping (_ ticketList: [Ticket]) -> (),
-                    errorCallback: @escaping FPErrorCallback) {
+    public func getTicketsById(owner: String,
+                               nftId: String,
+                               successCallback: @escaping (_ ticketList: [Ticket]) -> (),
+                               errorCallback: @escaping FPErrorCallback) {
         
         self.getTickey(owner: owner,
                        nftId: nftId,
@@ -302,9 +301,10 @@ open class TicketServiceSession  {
      * @return
      * @throws ServiceException
      */
-    public func balanceByValid(owner: String, nftId: String,
-                        successCallback: @escaping (_ ticketList: [Ticket]) -> (),
-                        errorCallback: @escaping FPErrorCallback) {
+    public func getValidTicketsById(owner: String,
+                                    nftId: String,
+                                    successCallback: @escaping (_ ticketList: [Ticket]) -> (),
+                                    errorCallback: @escaping FPErrorCallback) {
         
         self.getTickey(owner: owner,
                        nftId: nftId,
@@ -324,9 +324,10 @@ open class TicketServiceSession  {
      * @return
      * @throws ServiceException
      */
-    public func balanceByInvalid(owner: String, nftId: String,
-                          successCallback: @escaping (_ ticketList: [Ticket]) -> (),
-                          errorCallback: @escaping FPErrorCallback) {
+    public func getInvalidTicketsById(owner: String,
+                                      nftId: String,
+                                      successCallback: @escaping (_ ticketList: [Ticket]) -> (),
+                                      errorCallback: @escaping FPErrorCallback) {
         self.getTickey(owner: owner,
                        nftId: nftId,
                        type: 2) { ticketList in
@@ -344,9 +345,10 @@ open class TicketServiceSession  {
      * @return
      * @throws ServiceException
      */
-    public func balanceByExpire(owner: String, nftId: String,
-                         successCallback: @escaping (_ ticketList: [Ticket]) -> (),
-                         errorCallback: @escaping FPErrorCallback) {
+    public func getExpiredTicketsById(owner: String,
+                                      nftId: String,
+                                      successCallback: @escaping (_ ticketList: [Ticket]) -> (),
+                                      errorCallback: @escaping FPErrorCallback) {
        self.getTickey(owner: owner,
                       nftId: nftId,
                       type: 3) { ticketList in
@@ -365,9 +367,10 @@ open class TicketServiceSession  {
      * @return
      * @throws ServiceException
      */
-    public func balanceByDisabled(owner: String, nftId: String,
-                           successCallback: @escaping (_ ticketList: [Ticket]) -> (),
-                           errorCallback: @escaping FPErrorCallback) {
+    public func getTamperedTicketsById(owner: String,
+                                       nftId: String,
+                                       successCallback: @escaping (_ ticketList: [Ticket]) -> (),
+                                       errorCallback: @escaping FPErrorCallback) {
          self.getTickey(owner: owner,
                         nftId: nftId,
                         type: 4) { ticketList in
@@ -395,6 +398,7 @@ open class TicketServiceSession  {
     }
     
     public func formatTicket(_ nft: NFT, type: Int) -> Ticket? {
+        
         
         if nft.schema != Schema.ticket.rawValue {
             return nil

@@ -1,6 +1,7 @@
 import XCTest
 import UptickProtocolIRISnet
 import Pods_DmaIRIS_SDK_IOS_Tests
+import HandyJSON
 
 class Tests: XCTestCase {
     
@@ -85,6 +86,14 @@ class Tests: XCTestCase {
 
     }
 
+    func testType() {
+        
+        let string = "{\"type\":\"\\/uptick.ticket\",}"
+        print(string)
+        let isEq = Schema.ticket.isEqualTo(string)
+        print(isEq)
+        
+    }
     
     func testPerformanceExample() {
         // This is an example of a performance test case.
@@ -93,4 +102,8 @@ class Tests: XCTestCase {
         }
     }
     
+}
+
+struct TypeTest: HandyJSON {
+    var type: String = ""
 }
