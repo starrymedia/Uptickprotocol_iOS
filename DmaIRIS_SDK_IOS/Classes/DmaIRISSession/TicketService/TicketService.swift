@@ -155,7 +155,7 @@ open class TicketServiceSession  {
      * @return
      * @throws ServiceException
      */
-    public func editDate(nftId: String,
+    public func editData(nftId: String,
                          tokenId: String,
                          owner: String,
                          ownerPrivateKey: String,
@@ -400,7 +400,7 @@ open class TicketServiceSession  {
     public func formatTicket(_ nft: NFT, type: Int) -> Ticket? {
         
         
-        if nft.schema != Schema.ticket.rawValue {
+        if !Schema.ticket.isEqualTo(nft.schema) {
             return nil
         }
         
