@@ -88,10 +88,8 @@ class Tests: XCTestCase {
 
     func testType() {
         
-        let string = "{\"type\":\"\\/uptick.ticket\",}"
-        print(string)
-        let isEq = Schema.ticket.isEqualTo(string)
-        print(isEq)
+        let string = "QmQAzaDnvn6F1ryAVMJmPAvaU8fzZkV3vxDHpbXJdpRGsZ"
+        print(string.count)
         
     }
     

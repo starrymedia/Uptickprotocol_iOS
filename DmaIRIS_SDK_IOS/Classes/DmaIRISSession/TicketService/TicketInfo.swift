@@ -8,6 +8,7 @@
 import Foundation
 import HandyJSON
 
+
 public class TicketInfo: HandyJSON {
     
     required public init() {
@@ -42,4 +43,10 @@ public class TicketInfo: HandyJSON {
     public func getValid() -> Bool {
         return self.isValid
     }
+}
+
+
+public class CardInfo: TicketInfo {
+    
+    public var number: Int?
 }
