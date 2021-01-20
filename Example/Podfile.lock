@@ -175,7 +175,7 @@ SPEC CHECKSUMS:
   SwiftNIOTransportServices: 801923921fbecdcde1e1c1ff38e812167d01ead1
   SwiftProtobuf: fd4693388a96c8c2df35d3b063272b0e7c499d00
   SwiftRLP: 9de2c9512a9a6bf0909cd84cc143a7ff1aff7820
-  UptickProtocolIRISnet: 7b0b2df0b636161f7ceba5ce57fc66af8c156548
+  UptickProtocolIRISnet: fa0d3403bb2a3167652029b12c3a962e445c8580
   web3swift: 843dd5295d2ae755e6f80e9e0bdabe2868a5c7d8
 
 PODFILE CHECKSUM: bd544a6d81b968d27cafef84c33b79bf1a09ad74

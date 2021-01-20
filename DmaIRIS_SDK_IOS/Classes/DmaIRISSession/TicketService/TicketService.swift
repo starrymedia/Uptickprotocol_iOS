@@ -78,15 +78,10 @@ open class TicketServiceSession  {
             
             var nft = NftMsgMintNFT()
             nft.data = dataStandard.toJSONString() ?? ""
-            if let value = TxUtils.fromBech32(recipient) {
-                nft.recipient = value
-            }
-            
-            if let value = TxUtils.fromBech32(sender) {
-                nft.sender = value
-            }
-            
-            nft.denom = ticketEntity.denom
+            nft.recipient = recipient
+            nft.sender = sender
+        
+            nft.denomID = ticketEntity.denom
             nft.name = ticketEntity.name
             nft.id = ticketEntity.nftTokeId
             nft.uri = ticketEntity.imgUrl

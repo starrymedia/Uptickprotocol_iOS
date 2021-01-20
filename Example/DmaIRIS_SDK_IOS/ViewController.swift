@@ -26,7 +26,7 @@ class ViewController: UIViewController {
         super.viewDidLoad()
         IRISServive.host = "34.80.22.255"
         IRISServive.port = 9090
-        IRISServive.chainId = "bifrost-1"
+        IRISServive.chainId = "bifrost-2"
         MerchantService.nodeUrl = "http://52.81.146.252:8091"
         RpcService.rpcUrl = "http://34.80.22.255:26657"
         
@@ -47,7 +47,7 @@ class ViewController: UIViewController {
         } errorCallback: { error in
             print(error)
         }
-//
+
         TokenService.allBalances(owner: "iaa1fu5xru6umtfqthe588z6zk37gdknulr55ee5qf") { list in
             print(list)
             for l in list {
@@ -56,12 +56,7 @@ class ViewController: UIViewController {
             }
         } errorCallback: { error in
             print(error)
-        }
-
-
-        
-        
-    
+        }    
      }
 
  

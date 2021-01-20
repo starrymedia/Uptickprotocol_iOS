@@ -63,6 +63,6 @@ typealias PubKey = Cosmos_Crypto_Secp256k1_PubKey
 typealias ProtobufAny = Google_Protobuf_Any
 typealias BytesValue = Google_Protobuf_BytesValue
 
-typealias SimulateServiceClient = Cosmos_Base_Simulate_V1beta1_SimulateServiceClient
-typealias SimulateRequest = Cosmos_Base_Simulate_V1beta1_SimulateRequest
+typealias SimulateServiceClient = Cosmos_Tx_V1beta1_ServiceClient
+typealias SimulateRequest = Cosmos_Tx_V1beta1_SimulateRequest
 

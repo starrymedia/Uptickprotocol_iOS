@@ -43,10 +43,7 @@ open class TokenServiceSession {
         token.name = tokenName
         token.minUnit = denom
         token.mintable = mintAble
-        
-        if let ownerValue = TxUtils.fromBech32(owner) {
-            token.owner = ownerValue
-        }
+        token.owner = owner
         
         var txBody = TxUtils.getBody(meno: "", timeoutHeight: 0)
         if let any = TxUtils.getProtobufAny(message: token, typePrefix: "") {
@@ -85,12 +82,9 @@ open class TokenServiceSession {
         var token = TokenMsgMintToken()
         token.symbol = denom
         token.amount = amount
-        if let ownerValue = TxUtils.fromBech32(tokenOwner) {
-            token.owner = ownerValue
-        }
-        if let toValue = TxUtils.fromBech32(recipient) {
-            token.to = toValue
-        }
+
+        token.owner = tokenOwner
+        token.to = recipient
         
         var txBody = TxUtils.getBody(meno: "", timeoutHeight: 0)
         if let any = TxUtils.getProtobufAny(message: token, typePrefix: "") {
@@ -129,12 +123,9 @@ open class TokenServiceSession {
 
         var token = TokenMsgTransferTokenOwner()
         token.symbol = denom
-        if let fromValue = TxUtils.fromBech32(tokenOwner) {
-            token.srcOwner = fromValue
-        }
-        if let toValue = TxUtils.fromBech32(recipient) {
-            token.dstOwner = toValue
-        }
+  
+        token.srcOwner = tokenOwner
+        token.dstOwner = recipient
         
         var txBody = TxUtils.getBody(meno: "", timeoutHeight: 0)
         if let any = TxUtils.getProtobufAny(message: token, typePrefix: "") {
@@ -296,9 +287,7 @@ open class TokenServiceSession {
         
         var request = TokenQueryTokensRequest()
 
-        if let addressValue = TxUtils.fromBech32(owner) {
-            request.owner = addressValue
-        }
+        request.owner = owner
         let client = TokenQueryClient(channel: IRISServive.channel)
         let response = client.tokens(request).response
         response.whenComplete { result in
@@ -503,7 +492,6 @@ open class TokenServiceSession {
     
     func formatToken(_ token: TokenToken) -> Token {
         
-        let owner = Bech32Utils.toBech32(hrp: AddressUtils.HRP, pubkeyHexData: token.owner)
         let entity = Token()
         entity.initialSupply = token.initialSupply
         entity.maxSupply = token.maxSupply
@@ -512,7 +500,7 @@ open class TokenServiceSession {
         entity.name = token.name
         entity.scale = token.scale
         entity.symbol = token.symbol
-        entity.owner = owner
+        entity.owner = token.owner
         return entity
     }
     

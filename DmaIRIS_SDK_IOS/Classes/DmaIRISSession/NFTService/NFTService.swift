@@ -38,9 +38,7 @@ open class NFTSession {
         msgIssueDenom.name = nftName
         msgIssueDenom.schema = nftSchema
         msgIssueDenom.id = denom
-        if let senderValue = TxUtils.fromBech32(sender) {
-            msgIssueDenom.sender = senderValue
-        }
+        msgIssueDenom.sender = sender
 
         //创建TxBody
         var txBody = TxUtils.getBody(meno: "", timeoutHeight: 0)
@@ -97,18 +95,12 @@ open class NFTSession {
         for tokenId in tokenIds {
             var mintNft = NftMsgMintNFT()
             mintNft.data = data
-            mintNft.denom = denom
+            mintNft.denomID = denom
             mintNft.uri = uri
             mintNft.name = name
             mintNft.id = tokenId
-
-            if let value = TxUtils.fromBech32(sender) {
-                mintNft.sender = value
-            }
- 
-            if let value = TxUtils.fromBech32(recipient) {
-                mintNft.recipient = value
-            }
+            mintNft.sender = sender
+            mintNft.recipient = recipient
             
             if let any =  TxUtils.getProtobufAny(message: mintNft,typePrefix: "") {
                 txBody.messages.append(any)
@@ -147,10 +139,8 @@ open class NFTSession {
                    errorCallback: @escaping FPErrorCallback) {
         
         var msgBurnNFT = NftMsgBurnNFT()
-        if let value = TxUtils.fromBech32(owner) {
-            msgBurnNFT.sender = value
-        }
-        msgBurnNFT.denom = denom
+        msgBurnNFT.sender = owner
+        msgBurnNFT.denomID = denom
         msgBurnNFT.id = tokenId
 
         
@@ -198,10 +188,8 @@ open class NFTSession {
         nft.data = data
         nft.name = name
         nft.uri = uri
-        if let value = TxUtils.fromBech32(owner) {
-            nft.sender = value
-        }
-        nft.denom = denom
+        nft.sender = owner
+        nft.denomID = denom
         nft.id = tokenId
 
         if !uri.isEmpty {
@@ -280,19 +268,13 @@ open class NFTSession {
         var txBody = TxUtils.getBody(meno: memo, timeoutHeight: 0)
         for tokenId in tokenIds {
             var transferNFT = NftMsgTransferNFT()
-            transferNFT.denom = denom
+            transferNFT.denomID = denom
             transferNFT.uri = "[do-not-modify]"
             transferNFT.name = "[do-not-modify]"
             transferNFT.data = "[do-not-modify]"
             transferNFT.id = tokenId
-
-            if let value = TxUtils.fromBech32(sender) {
-                transferNFT.sender = value
-            }
-    
-            if let value = TxUtils.fromBech32(recipient) {
-                transferNFT.recipient = value
-            }
+            transferNFT.sender = sender
+            transferNFT.recipient = recipient
             
             if let any = TxUtils.getProtobufAny(message: transferNFT,typePrefix: "") {
                 txBody.messages.append(any)
@@ -325,7 +307,7 @@ open class NFTSession {
                         errorCallback: @escaping FPErrorCallback) {
         
         var request = NftQueryDenomRequest()
-        request.denom = denom
+        request.denomID = denom
         
         let client = NftQueryClient(channel: IRISServive.channel)
         let response = client.denom(request).response
@@ -367,7 +349,7 @@ open class NFTSession {
                           successCallback: @escaping (_ nft: NFT) -> (),
                           errorCallback: @escaping FPErrorCallback) {
         var request = NftQueryCollectionRequest()
-        request.denom = denom
+        request.denomID = denom
         let client = NftQueryClient(channel: IRISServive.channel)
         let response = client.collection(request).response
         response.whenComplete { result in
@@ -401,8 +383,8 @@ open class NFTSession {
                           errorCallback: @escaping FPErrorCallback) {
         
         var request = NftQueryNFTRequest()
-        request.denom = denom
-        request.id = tokenId
+        request.denomID = denom
+        request.tokenID = tokenId
         let client = NftQueryClient(channel: IRISServive.channel)
         let response = client.nFT(request).response
         response.whenComplete { result in
@@ -428,10 +410,8 @@ open class NFTSession {
                         errorCallback: @escaping FPErrorCallback) {
 
         var request = NftQueryOwnerRequest()
-        request.denom = denom
-        if let value = TxUtils.fromBech32(owner) {
-            request.owner = value
-        }
+        request.denomID = denom
+        request.owner = owner
     
         let client = NftQueryClient(channel: IRISServive.channel)
         let response = client.owner(request).response
@@ -457,10 +437,8 @@ open class NFTSession {
                             errorCallback: @escaping FPErrorCallback) {
 
         var request = NftQueryOwnerRequest()
-        request.denom = denom
-        if let value = TxUtils.fromBech32(owner) {
-            request.owner = value
-        }
+        request.denomID = denom
+        request.owner = owner
     
         let client = NftQueryClient(channel: IRISServive.channel)
         let response = client.owner(request).response
@@ -490,10 +468,8 @@ open class NFTSession {
                        errorCallback: @escaping FPErrorCallback) {
 
         var request = NftQuerySupplyRequest()
-        if let value = TxUtils.fromBech32(owner) {
-            request.owner = value
-        }
-        request.denom = denom
+        request.owner = owner
+        request.denomID = denom
         
         let response = NftQueryClient(channel: IRISServive.channel).supply(request).response
         response.whenComplete { result in
@@ -512,7 +488,7 @@ open class NFTSession {
         print(denom.id)
         print(denom.name)
 
-        nft.creator = Bech32Utils.toBech32(hrp: AddressUtils.HRP, pubkeyHexData: denom.creator)
+        nft.creator = denom.creator
         nft.id = denom.id
         nft.name = denom.name
         nft.schema = denom.schema
@@ -530,7 +506,7 @@ open class NFTSession {
  
     func formatNftToken(_ baseNFT: NftBaseNFT) -> NFTToken {
         let token = NFTToken()
-        token.owner = Bech32Utils.toBech32(hrp: AddressUtils.HRP, pubkeyHexData: baseNFT.owner)
+        token.owner = baseNFT.owner
         token.id = baseNFT.id
         token.name = baseNFT.name
         token.data = baseNFT.data
@@ -551,9 +527,9 @@ open class NFTSession {
                        errorCallback: @escaping FPErrorCallback) {
         var nftList = [NFT]()
         for idCollection in idCollectionList {
-            let denom = idCollection.denom
+            let denom = idCollection.denomID
             self.nftInfo(denom: denom) { nft in
-                let tokenids = idCollection.ids
+                let tokenids = idCollection.tokenIds
                 let nftTokens = nft.tokens
                 var nftTokenList = [NFTToken]()
                 for nftToken in nftTokens {
@@ -574,12 +550,12 @@ open class NFTSession {
     func formatNfts(_ idCollectionList:[NftIDCollection]) -> [NFT] {
         var nftList = [NFT]()
         for idCollection in idCollectionList {
-            let denom = idCollection.denom
+            let denom = idCollection.denomID
             
             let nft = NFT()
             nft.id = denom
             
-            let tokenids = idCollection.ids
+            let tokenids = idCollection.tokenIds
             var list = [NFTToken]()
             for tokenid in tokenids {
                 let nftToken = NFTToken()
