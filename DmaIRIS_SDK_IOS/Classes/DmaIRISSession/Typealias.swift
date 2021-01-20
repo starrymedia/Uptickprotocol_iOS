@@ -19,6 +19,7 @@ typealias TxSignDoc = Cosmos_Tx_V1beta1_SignDoc
 typealias AuthQueryClient = Cosmos_Auth_V1beta1_QueryClient
 typealias AuthQueryAccountRequest = Cosmos_Auth_V1beta1_QueryAccountRequest
 typealias AuthBaseAccount = Cosmos_Auth_V1beta1_BaseAccount
+typealias PageRequest = Cosmos_Query_PageRequest
 
 typealias BankQueryClient = Cosmos_Bank_V1beta1_QueryClient
 typealias BankQueryBalanceRequest = Cosmos_Bank_V1beta1_QueryBalanceRequest

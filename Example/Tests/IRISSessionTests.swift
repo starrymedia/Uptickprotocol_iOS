@@ -15,7 +15,7 @@ class IRISSessionTests: XCTestCase {
         // Put setup code here. This method is called before the invocation of each test method in the class.
         IRISServive.host = "34.80.22.255"
         IRISServive.port = 9090
-        IRISServive.chainId = "bifrost-1"
+        IRISServive.chainId = "bifrost-2"
         MerchantService.nodeUrl = "http://52.81.146.252:8091"
         RpcService.rpcUrl = "http://34.80.22.255:26657"
 
@@ -54,33 +54,32 @@ class IRISSessionTests: XCTestCase {
         waitForExpectations(timeout: 15, handler: nil)
     }
     
-    func testRequestQueryBalance() {
-        let expectation = self.expectation(description: "testRequestQueryBalance")
+    func testTokenServiceBalance() {
+        let expectation = self.expectation(description: "testTokenServiceBalance")
 
-//        NFTService.balance(owner: "iaa1fu5xru6umtfqthe588z6zk37gdknulr55ee5qf",
-//                           denom: "") successCallback: { list in
-//            print("amount:\(list)")
-//            expectation.fulfill()
-//
-//        } errorCallback: { error in
-//            print("error:\(error)")
-//            expectation.fulfill()
-//
-//        }
-
+        TokenService.balance(address: "iaa1fu5xru6umtfqthe588z6zk37gdknulr55ee5qf",
+                             denom: "ubif") { coin in
+            print(coin.denom)
+            print(coin.amount)
+            expectation.fulfill()
+        } errorCallback: { error in
+            print(error)
+            expectation.fulfill()
+        }
         waitForExpectations(timeout: 15, handler: nil)
     }
     
-
-
-
     
-    func testQueryAllNfts() {
-        let expectation = self.expectation(description: "testQueryAllNfts")
-        NFTService.allNfts { denoms in
-//            print(denoms)
-            for de in denoms {
-                print(de.name)
+    func testAllNfts() {
+        let expectation = self.expectation(description: "testAllNfts")
+        NFTService.allNfts { list in
+            print(list)
+            for l in list {
+                print(l.creator)
+                print(l.name)
+                print(l.id)
+                print(l.schema)
+                print(l.tokens)
             }
             expectation.fulfill()
         } errorCallback: { error in

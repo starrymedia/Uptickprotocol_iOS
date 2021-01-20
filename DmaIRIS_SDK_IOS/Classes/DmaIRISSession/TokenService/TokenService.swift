@@ -274,6 +274,7 @@ open class TokenServiceSession {
         }
     }
     
+
     /**
      * 根据地址查询拥有的token
      *
@@ -282,27 +283,64 @@ open class TokenServiceSession {
      * @throws InvalidProtocolBufferException
      */
     public func tokensByOwner(owner: String,
-                              successCallback: @escaping (_ tokenList: [Token]) -> (),
+                              successCallback: @escaping (_ list: [Token]) -> (),
                               errorCallBack: @escaping FPErrorCallback) {
         
-        var request = TokenQueryTokensRequest()
+        
+        
+        DispatchQueue.global().async {
+            
+            var pageRequest = PageRequest()
+            pageRequest.countTotal = true
+            pageRequest.limit = 100
+            
+            var anyList = [ProtobufAny]()
+            var errorResult = ""
+            var flag = true
+            
+            while flag {
+                let group = DispatchGroup()
+                group.enter()
 
-        request.owner = owner
-        let client = TokenQueryClient(channel: IRISServive.channel)
-        let response = client.tokens(request).response
-        response.whenComplete { result in
-            switch result {
-            case .success(let value):
-                let dataList = value.tokens
-                var tokenList = [Token]()
-                for data in dataList {
-                    if let token = try? TokenToken(serializedData: data.value) {
-                        tokenList.append(self.formatToken(token))
+                var request = TokenQueryTokensRequest()
+                request.pagination = pageRequest
+                request.owner = owner
+         
+                let client = TokenQueryClient(channel: IRISServive.channel)
+                let response = client.tokens(request).response
+                response.whenComplete { result in
+                    switch result {
+                    case .success(let value):
+                        let dataList = value.tokens
+                        anyList.append(contentsOf: dataList)
+                        
+                        if value.pagination.nextKey.isEmpty {
+                            flag = false
+                            group.leave()
+                        } else {
+                            pageRequest.key = value.pagination.nextKey
+                            group.leave()
+                        }
+                    case .failure(let error):
+                        errorResult = error.localizedDescription
+                        flag = false
+                        group.leave()
                     }
                 }
+                group.wait()
+            }
+            
+            var tokenList = [Token]()
+            for item in anyList {
+                if let token = try? TokenToken(serializedData: item.value) {
+                    tokenList.append(self.formatToken(token))
+                }
+            }
+            
+            if errorResult.isEmpty {
                 successCallback(tokenList)
-            case .failure(let error):
-                errorCallBack("\(error)")
+            } else {
+                errorCallBack(errorResult)
             }
         }
     }
@@ -369,6 +407,7 @@ open class TokenServiceSession {
         }
     }
     
+
     /**
       * 查询所拥有的token
       * @param owner
@@ -377,22 +416,59 @@ open class TokenServiceSession {
                             successCallback: @escaping (_ coins: [Coin]) -> (),
                             errorCallback: @escaping FPErrorCallback) {
                 
-        let client = BankQueryClient(channel: IRISServive.channel)
-        var req = BankQueryAllBalancesRequest()
-        req.address = owner
-        let res = client.allBalances(req)
-        res.response.whenComplete { result in
-            switch result {
-            case .success(let value):
-                self.formatCoinArray(coinList: value.balances) { coins in
-                    successCallback(coins)
+        
+        DispatchQueue.global().async {
+            
+            var pageRequest = Cosmos_Base_Query_V1beta1_PageRequest()
+            pageRequest.countTotal = true
+            pageRequest.limit = 100
+            
+            var coinList = [BaseCoin]()
+            var errorResult = ""
+            var flag = true
+            
+            while flag {
+                let group = DispatchGroup()
+                group.enter()
+
+                let client = BankQueryClient(channel: IRISServive.channel)
+                var request = BankQueryAllBalancesRequest()
+                request.address = owner
+                request.pagination = pageRequest
+                let response = client.allBalances(request)
+                response.response.whenComplete { result in
+                    switch result {
+                    case .success(let value):
+                        
+                        coinList.append(contentsOf: value.balances)
+                        
+                        if value.pagination.nextKey.isEmpty {
+                            flag = false
+                            group.leave()
+                        } else {
+                            pageRequest.key = value.pagination.nextKey
+                            group.leave()
+                        }
+                    case .failure(let error):
+                        errorResult = error.localizedDescription
+                        flag = false
+                        group.leave()
+                    }
+                }
+                group.wait()
+            }
+            
+            if errorResult.isEmpty {
+                self.formatCoinArray(coinList: coinList) { list in
+                    successCallback(list)
                 } errorCallBack: { error in
                     errorCallback(error)
                 }
-            case .failure(let error):
-                errorCallback("\(error)")
+            } else {
+                errorCallback(errorResult)
             }
         }
+
     }
     
     /**

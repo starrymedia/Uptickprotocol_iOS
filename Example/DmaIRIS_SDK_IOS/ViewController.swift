@@ -29,34 +29,8 @@ class ViewController: UIViewController {
         IRISServive.chainId = "bifrost-2"
         MerchantService.nodeUrl = "http://52.81.146.252:8091"
         RpcService.rpcUrl = "http://34.80.22.255:26657"
-        
-//        TokenService.balance(address: "iaa1fu5xru6umtfqthe588z6zk37gdknulr55ee5qf",
-//                             denom: "ubif") { coin in
-//            print(coin.denom)
-//            print(coin.amount)
-//
-//        } errorCallback: { error in
-//            print(error)
-//        }
-        
-        NFTService.supply(owner: "iaa1fu5xru6umtfqthe588z6zk37gdknulr55ee5qf",
-                          denom: "ghjfjdjjdjdjjfjf") { result in
-            print("querySupply:\(result)")
-    
-            
-        } errorCallback: { error in
-            print(error)
-        }
 
-        TokenService.allBalances(owner: "iaa1fu5xru6umtfqthe588z6zk37gdknulr55ee5qf") { list in
-            print(list)
-            for l in list {
-                print(l.denom)
-                print(l.amount)
-            }
-        } errorCallback: { error in
-            print(error)
-        }    
+
      }
 
  

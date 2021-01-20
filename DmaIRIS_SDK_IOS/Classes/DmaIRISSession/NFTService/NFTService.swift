@@ -322,23 +322,64 @@ open class NFTSession {
         }
     }
     
+
     /// 查询链上所有nft信息
     /// - Parameter callback: callback description
     public func allNfts(successCallback: @escaping (_ denoms: [NFT]) -> (),
                         errorCallback: @escaping FPErrorCallback) {
-        let request = NftQueryDenomsRequest()
-        let client = NftQueryClient(channel: IRISServive.channel)
-        let response = client.denoms(request).response
-        response.whenComplete { result in
-            switch result {
-            case .success(let value):
-                let list = self.formatNftList(value.denoms)
-                successCallback(list)
-            case .failure(let error):
-                errorCallback("\(error)")
+        
+        DispatchQueue.global().async {
+            
+            var pageRequest = PageRequest()
+            pageRequest.countTotal = true
+            pageRequest.limit = 100
+            
+            var denoms = [NFT]()
+            var errorResult = ""
+            var flag = true
+
+            while flag {
+                
+                let group = DispatchGroup()
+                group.enter()
+
+                var request = NftQueryDenomsRequest()
+                request.pagination = pageRequest
+                let client = NftQueryClient(channel: IRISServive.channel)
+                let response = client.denoms(request).response
+
+                response.whenComplete { result in
+                    switch result {
+                    case .success(let value):
+
+                        let list = self.formatNftList(value.denoms)
+                        denoms.append(contentsOf: list)
+                        print(value.pagination.nextKey.count)
+                        if value.pagination.nextKey.isEmpty {
+                            flag = false
+                            group.leave()
+                        } else {
+                            pageRequest.key = value.pagination.nextKey
+                            group.leave()
+                        }
+                     case .failure(let error):
+                        errorResult = error.localizedDescription
+                        flag = false
+                        group.leave()
+                     }
+                }
+                
+                group.wait()
+            }
+            
+            if errorResult.isEmpty {
+                successCallback(denoms)
+            } else {
+                errorCallback(errorResult)
             }
         }
     }
+    
     
     /// 根据nft id查询nft token 详情
     /// - Parameters:
@@ -346,28 +387,65 @@ open class NFTSession {
     ///   - successCallback: successCallback description
     ///   - errorCallback: errorCallback description
     public func nftTokens(denom: String,
-                          successCallback: @escaping (_ nft: NFT) -> (),
+                          successCallback: @escaping (_ denom: NFT) -> (),
                           errorCallback: @escaping FPErrorCallback) {
-        var request = NftQueryCollectionRequest()
-        request.denomID = denom
-        let client = NftQueryClient(channel: IRISServive.channel)
-        let response = client.collection(request).response
-        response.whenComplete { result in
-            switch result {
-            case .success(let value):
-                print(value)
-                let denom = value.collection.denom
-                let nft = self.formatNft(denom)
+        
+        DispatchQueue.global().async {
+            
+            var pageRequest = PageRequest()
+            pageRequest.countTotal = true
+            pageRequest.limit = 100
+            
+            var nftList = [NftBaseNFT]()
+            var nftdenom = NftDenom()
+            var errorResult = ""
+            var flag = true
+
+            while flag {
                 
-                let nftList = value.collection.nfts
+                let group = DispatchGroup()
+                group.enter()
+
+                var request = NftQueryCollectionRequest()
+                request.denomID = denom
+                request.pagination = pageRequest
+                let client = NftQueryClient(channel: IRISServive.channel)
+                let response = client.collection(request).response
+
+                response.whenComplete { result in
+                    switch result {
+                    case .success(let value):
+                        nftdenom = value.collection.denom
+                        let baseNFTList = value.collection.nfts
+                        nftList.append(contentsOf: baseNFTList)
+                        print(value.pagination.nextKey.count)
+                        if value.pagination.nextKey.isEmpty {
+                            flag = false
+                            group.leave()
+                        } else {
+                            pageRequest.key = value.pagination.nextKey
+                            group.leave()
+                        }
+                     case .failure(let error):
+                        errorResult = error.localizedDescription
+                        flag = false
+                        group.leave()
+                     }
+                }
+                group.wait()
+            }
+            
+            if errorResult.isEmpty {
+                let nft = self.formatNft(nftdenom)
                 let tokenList = self.formatNftTokenList(nftList)
                 nft.tokens = tokenList
-                
                 successCallback(nft)
-            case .failure(let error):
-                errorCallback("\(error)")
+            } else {
+                errorCallback(errorResult)
             }
+ 
         }
+
     }
     
     
@@ -409,21 +487,69 @@ open class NFTSession {
                         successCallback: @escaping (_ list: [NFT]) -> (),
                         errorCallback: @escaping FPErrorCallback) {
 
-        var request = NftQueryOwnerRequest()
-        request.denomID = denom
-        request.owner = owner
-    
-        let client = NftQueryClient(channel: IRISServive.channel)
-        let response = client.owner(request).response
-        response.whenComplete { result in
-            switch result {
-            case .success(let value):
-                successCallback(self.formatNfts(value.owner.idCollections))
-            case .failure(let error):
-                errorCallback("\(error)")
+        
+        
+        DispatchQueue.global().async {
+            
+            var pageRequest = PageRequest()
+            pageRequest.countTotal = true
+            pageRequest.limit = 100
+            
+            var map = [String: [String]]()
+            var errorResult = ""
+            var flag = true
+
+            while flag {
+                
+                let group = DispatchGroup()
+                group.enter()
+
+                var request = NftQueryOwnerRequest()
+                request.denomID = denom.lowercased()
+                request.owner = owner
+                request.pagination = pageRequest
+                
+                let client = NftQueryClient(channel: IRISServive.channel)
+                let response = client.owner(request).response
+
+                response.whenComplete { result in
+                    switch result {
+                    case .success(let value):
+                        
+                        let idCollectionsList = value.owner.idCollections
+                        var tokens = [String]()
+                        for item in idCollectionsList {
+                            tokens = map[item.denomID] ?? []
+                            tokens.append(contentsOf: item.tokenIds)
+                            map[item.denomID] = tokens
+                        }
+
+                        if value.pagination.nextKey.isEmpty {
+                            flag = false
+                            group.leave()
+                        } else {
+                            pageRequest.key = value.pagination.nextKey
+                            group.leave()
+                        }
+                     case .failure(let error):
+                        errorResult = error.localizedDescription
+                        flag = false
+                        group.leave()
+                     }
+                }
+                group.wait()
             }
+            
+            if errorResult.isEmpty {
+                 successCallback(self.formatNfts(map))
+            } else {
+                errorCallback(errorResult)
+            }
+            
         }
+
     }
+    
     
     /// 根据地址和分类查询拥有的NFT 资产
     /// - Parameters:
@@ -436,24 +562,73 @@ open class NFTSession {
                             successCallback: @escaping (_ nftList: [NFT]) -> (),
                             errorCallback: @escaping FPErrorCallback) {
 
-        var request = NftQueryOwnerRequest()
-        request.denomID = denom
-        request.owner = owner
-    
-        let client = NftQueryClient(channel: IRISServive.channel)
-        let response = client.owner(request).response
-        response.whenComplete { result in
-            switch result {
-            case .success(let value):
-                self.formatNftInfo(value.owner.idCollections) { nftList in
-                    successCallback(nftList)
+        DispatchQueue.global().async {
+            
+            var pageRequest = PageRequest()
+            pageRequest.countTotal = true
+            pageRequest.limit = 100
+            
+            var idCollections = [NftIDCollection]()
+            var map = [String:[String]]()
+            var errorResult = ""
+            var flag = true
+            
+            while flag {
+                let group = DispatchGroup()
+                group.enter()
+
+                var request = NftQueryOwnerRequest()
+                request.denomID = denom.lowercased()
+                request.owner = owner
+                request.pagination = pageRequest
+                
+                let client = NftQueryClient(channel: IRISServive.channel)
+                let response = client.owner(request).response
+
+                response.whenComplete { result in
+                    switch result {
+                    case .success(let value):
+                        
+                        let idCollectionsList = value.owner.idCollections
+                        var tokens = [String]()
+                        for item in idCollectionsList {
+                            tokens = map[item.denomID] ?? []
+                            tokens.append(contentsOf: item.tokenIds)
+                            map[item.denomID] = tokens
+                        }
+                        
+                        idCollections.append(contentsOf: idCollectionsList)
+                        
+                        if value.pagination.nextKey.isEmpty {
+                            flag = false
+                            group.leave()
+                        } else {
+                            pageRequest.key = value.pagination.nextKey
+                            group.leave()
+                        }
+                    case .failure(let error):
+                        errorResult = error.localizedDescription
+                        flag = false
+                        group.leave()
+
+                    }
+                }
+                group.wait()
+            }
+            if errorResult.isEmpty {
+                
+                self.formatNftInfo(map) { list in
+                    successCallback(list)
                 } errorCallback: { error in
                     errorCallback(error)
                 }
-            case .failure(let error):
-                errorCallback("\(error)")
+            } else {
+                errorCallback(errorResult)
             }
+            
         }
+        
+  
     }
     
     /// 根据地址和分类查询拥有资产总数
@@ -484,10 +659,6 @@ open class NFTSession {
     
     func formatNft(_ denom: NftDenom) -> NFT {
         let nft = NFT()
-        print(denom.creator)
-        print(denom.id)
-        print(denom.name)
-
         nft.creator = denom.creator
         nft.id = denom.id
         nft.name = denom.name
@@ -522,14 +693,15 @@ open class NFTSession {
         return list
     }
 
-    func formatNftInfo(_ idCollectionList:[NftIDCollection],
+    func formatNftInfo(_ map:[String:[String]],
                        successCallback: @escaping (_ nftList: [NFT]) -> (),
                        errorCallback: @escaping FPErrorCallback) {
         var nftList = [NFT]()
-        for idCollection in idCollectionList {
-            let denom = idCollection.denomID
+        for denom in map.keys {
+
             self.nftInfo(denom: denom) { nft in
-                let tokenids = idCollection.tokenIds
+                
+                let tokenids = map[denom] ?? []
                 let nftTokens = nft.tokens
                 var nftTokenList = [NFTToken]()
                 for nftToken in nftTokens {
@@ -547,15 +719,16 @@ open class NFTSession {
         }
     }
 
-    func formatNfts(_ idCollectionList:[NftIDCollection]) -> [NFT] {
+    func formatNfts(_ map:[String:[String]]) -> [NFT] {
         var nftList = [NFT]()
-        for idCollection in idCollectionList {
-            let denom = idCollection.denomID
-            
+        
+        for denom in map.keys {
+
             let nft = NFT()
             nft.id = denom
+
+            let tokenids = map[denom] ?? []
             
-            let tokenids = idCollection.tokenIds
             var list = [NFTToken]()
             for tokenid in tokenids {
                 let nftToken = NFTToken()
