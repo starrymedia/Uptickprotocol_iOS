@@ -38,7 +38,7 @@ struct UnsafeControlMessageStorage: Collection {
     ///   - msghdrCount: How many `msghdr` structures will be fed from this buffer - we assume 4 Int32 cmsgs for each.
     static func allocate(msghdrCount: Int) -> UnsafeControlMessageStorage {
         // Guess that 4 Int32 payload messages is enough for anyone.
-        let bytesPerMessage = Posix.cmsgSpace(payloadSize: MemoryLayout<Int32>.stride) * 4
+        let bytesPerMessage = NIOBSDSocketControlMessage.space(payloadSize: MemoryLayout<Int32>.stride) * 4
         let buffer = UnsafeMutableRawBufferPointer.allocate(byteCount: bytesPerMessage * msghdrCount,
                                                              alignment: MemoryLayout<cmsghdr>.alignment)
         return UnsafeControlMessageStorage(bytesPerMessage: bytesPerMessage, buffer: buffer)
@@ -52,7 +52,7 @@ struct UnsafeControlMessageStorage: Collection {
     /// Get the part of the buffer for use with a message.
     public subscript(position: Int) -> UnsafeMutableRawBufferPointer {
         return UnsafeMutableRawBufferPointer(
-            rebasing: self.buffer[(position * self.bytesPerMessage)..<((position+1) * self.bytesPerMessage)])
+            fastRebase: self.buffer[(position * self.bytesPerMessage)..<((position+1) * self.bytesPerMessage)])
     }
 
     var startIndex: Int { return 0 }
@@ -111,7 +111,7 @@ extension UnsafeControlMessageCollection: Collection {
     var startIndex: Index {
         var messageHeader = self.messageHeader
         return withUnsafePointer(to: &messageHeader) { messageHeaderPtr in
-            let firstCMsg = Posix.cmsgFirstHeader(inside: messageHeaderPtr)
+            let firstCMsg = NIOBSDSocketControlMessage.firstHeader(inside: messageHeaderPtr)
             return Index(cmsgPointer: firstCMsg)
         }
     }
@@ -121,7 +121,7 @@ extension UnsafeControlMessageCollection: Collection {
     func index(after: Index) -> Index {
         var msgHdr = messageHeader
         return withUnsafeMutablePointer(to: &msgHdr) { messageHeaderPtr in
-            return Index(cmsgPointer: Posix.cmsgNextHeader(inside: messageHeaderPtr,
+            return Index(cmsgPointer: NIOBSDSocketControlMessage.nextHeader(inside: messageHeaderPtr,
                                                            after: after.cmsgPointer!))
         }
     }
@@ -130,7 +130,7 @@ extension UnsafeControlMessageCollection: Collection {
         let cmsg = position.cmsgPointer!
         return UnsafeControlMessage(level: cmsg.pointee.cmsg_level,
                                     type: cmsg.pointee.cmsg_type,
-                                    data: Posix.cmsgData(for: cmsg))
+                                    data: NIOBSDSocketControlMessage.data(for: cmsg))
     }
 }
 
@@ -239,9 +239,9 @@ struct UnsafeOutboundControlBytes {
     private mutating func appendGenericControlMessage<PayloadType>(level: CInt,
                                                                    type: CInt,
                                                                    payload: PayloadType) {
-        let writableBuffer = UnsafeMutableRawBufferPointer(rebasing: self.controlBytes[writePosition...])
+        let writableBuffer = UnsafeMutableRawBufferPointer(fastRebase: self.controlBytes[writePosition...])
         
-        let requiredSize = Posix.cmsgSpace(payloadSize: MemoryLayout.stride(ofValue: payload))
+        let requiredSize = NIOBSDSocketControlMessage.space(payloadSize: MemoryLayout.stride(ofValue: payload))
         precondition(writableBuffer.count >= requiredSize, "Insufficient size for cmsghdr and data")
         
         let bufferBase = writableBuffer.baseAddress!
@@ -249,9 +249,9 @@ struct UnsafeOutboundControlBytes {
         let cmsghdrPtr = bufferBase.bindMemory(to: cmsghdr.self, capacity: 1)
         cmsghdrPtr.pointee.cmsg_level = level
         cmsghdrPtr.pointee.cmsg_type = type
-        cmsghdrPtr.pointee.cmsg_len = .init(Posix.cmsgLen(payloadSize: MemoryLayout.size(ofValue: payload)))
+        cmsghdrPtr.pointee.cmsg_len = .init(NIOBSDSocketControlMessage.length(payloadSize: MemoryLayout.size(ofValue: payload)))
         
-        let dataPointer = Posix.cmsgData(for: cmsghdrPtr)!
+        let dataPointer = NIOBSDSocketControlMessage.data(for: cmsghdrPtr)!
         precondition(dataPointer.count >= MemoryLayout<PayloadType>.stride)
         dataPointer.storeBytes(of: payload, as: PayloadType.self)
         
@@ -263,7 +263,7 @@ struct UnsafeOutboundControlBytes {
         if writePosition == 0 {
             return UnsafeMutableRawBufferPointer(start: nil, count: 0)
         }
-        return UnsafeMutableRawBufferPointer(rebasing: self.controlBytes[0 ..< self.writePosition])
+        return UnsafeMutableRawBufferPointer(fastRebase: self.controlBytes[0 ..< self.writePosition])
     }
     
 }

@@ -42,7 +42,7 @@ Pod::Spec.new do |s|
   # s.dependency 'AFNetworking', '~> 2.3'
   s.dependency 'Alamofire', '~> 5.2'
   s.dependency 'web3swift', '~>1.1.10'
-  s.dependency 'HandyJSON', '5.0.0-beta'
+  s.dependency 'HandyJSON', '5.0.0-beta.1'
   s.dependency 'gRPC-Swift', '1.0.0-alpha.20'
 
 end

@@ -46,6 +46,11 @@ public class NIOSSLCertificate {
         case ipv4(in_addr)
         case ipv6(in6_addr)
     }
+    
+    public var serialNumber: [UInt8] {
+        let serialNumber = CNIOBoringSSL_X509_get_serialNumber(self.ref)!
+        return Array(UnsafeBufferPointer(start: serialNumber.pointee.data, count: Int(serialNumber.pointee.length)))
+    }
 
     private init(withOwnedReference ref: UnsafeMutablePointer<X509>) {
         self._ref = UnsafeMutableRawPointer(ref) // erasing the type for @_implementationOnly import CNIOBoringSSL
@@ -433,4 +438,68 @@ internal class SubjectAltNameSequence: Sequence, IteratorProtocol {
     deinit {
         CNIOBoringSSL_GENERAL_NAMES_free(self.nameStack)
     }
+}
+
+extension NIOSSLCertificate: CustomStringConvertible {
+    
+    public var description: String {
+        let serialNumber = self.serialNumber.map { String($0, radix: 16) }.reduce("", +)
+        var desc = "<NIOSSLCertificate;serial_number=\(serialNumber)"
+        if let commonNameBytes = self.commonName() {
+            let commonName = String(decoding: commonNameBytes, as: UTF8.self)
+            desc += ";common_name=" + commonName
+        }
+        if let alternativeName = self.subjectAlternativeNames() {
+            let altNames = alternativeName.map { name in
+                switch name {
+                case .dnsName(let bytes):
+                    return String(decoding: bytes, as: UTF8.self)
+                case .ipAddress(let address):
+                    return String(describing: address)
+                }
+            }.joined(separator: ",")
+            desc += ";alternative_names=\(altNames)"
+        }
+        return desc + ">"
+    }
+    
+}
+
+extension NIOSSLCertificate.IPAddress: CustomStringConvertible {
+    
+    private static let ipv4AddressLength = 16
+    private static let ipv6AddressLength = 46
+    
+    /// A string representation of the IP address.
+    /// E.g. IPv4: `192.168.0.1`
+    /// E.g. IPv6: `2001:db8::1`
+    public var description: String {
+        switch self {
+        case .ipv4(let addr):
+            return self.ipv4ToString(addr)
+        case .ipv6(let addr):
+            return self.ipv6ToString(addr)
+        }
+    }
+    
+    private func ipv4ToString(_ address: in_addr) -> String {
+        var address = address
+        var dest: [CChar] = Array(repeating: 0, count: NIOSSLCertificate.IPAddress.ipv4AddressLength)
+        dest.withUnsafeMutableBufferPointer { pointer in
+            let result = inet_ntop(AF_INET, &address, pointer.baseAddress!, socklen_t(pointer.count))
+            precondition(result != nil, "The IP address was invalid. This should never happen as we're within the IP address struct.")
+        }
+        return String(cString: &dest)
+    }
+    
+    private func ipv6ToString(_ address: in6_addr) -> String {
+        var address = address
+        var dest: [CChar] = Array(repeating: 0, count: NIOSSLCertificate.IPAddress.ipv6AddressLength)
+        dest.withUnsafeMutableBufferPointer { pointer in
+            let result = inet_ntop(AF_INET6, &address, pointer.baseAddress!, socklen_t(pointer.count))
+            precondition(result != nil, "The IP address was invalid. This should never happen as we're within the IP address struct.")
+        }
+        return String(cString: &dest)
+    }
+    
 }

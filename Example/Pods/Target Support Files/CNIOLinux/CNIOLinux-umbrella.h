@@ -11,7 +11,6 @@
 #endif
 
 #import "CNIOLinux.h"
-#import "ifaddrs-android.h"
 
 FOUNDATION_EXPORT double CNIOLinuxVersionNumber;
 FOUNDATION_EXPORT const unsigned char CNIOLinuxVersionString[];

@@ -14,12 +14,44 @@
 import NIO
 
 /// A structure that manages buffering outbound frames for active streams to ensure that those streams do not violate flow control rules.
+///
+/// This buffer is an extremely performance sensitive part of the HTTP/2 stack. This is because all outbound data passes through it, and
+/// all application data needs to be actively buffered by it. The result of this is that state management is extremely expensive, and we
+/// need efficient algorithms to process them.
+///
+/// The core of the data structure are a collection of `StreamFlowControlState` objects. These objects keep track of the flow control window
+/// available for a given stream, as well as any pending writes that may be present on the stream. The pending writes include both DATA and
+/// HEADERS frames, as if we've buffered any DATA frames we need to queue HEADERS frames up behind them.
+///
+/// Data is appended to these objects on write(). Each write() will trigger both a lookup in the stream data buffers _and_ an append to a
+/// data buffer. It is therefore deeply important that both of these operations are as cheap as possible.
+///
+/// However, these operations are fundamentally constant in size. Once we have found the stream data buffer, we do not need to worry about
+/// all the others. The cost of the write() operation is therefore no more expensive than the cost of the lookup. The same is unfortunately
+/// not true for flush().
+///
+/// When we get a flush(), we need to update a bunch of state. In particular, we need to record any previously-written frames that are
+/// now flushed, as well as compute which streams may have become writable as a result of the flush call. In early versions of this code
+/// we would do a linear scan across _all buffers_, check whether they were writable before, mark their flush point, check if they'd become
+/// writable, and then store them in the set of flushable streams. This was monstrously expensive, and worse still the cost was not proportional
+/// to the amount of writing done but to the amount of flushing done and the number of active streams.
+///
+/// The current design avoids this by having the `StreamFlowControlState` be much more explicit about when it transitions from non-writable to
+/// writable and back again. This allows us to keep an Array of writable streams that we use to avoid needing to touch all the streams whenever
+/// a flush occurs. This greatly reduces our workload! Additionally, by caching all stream state changes we are not forced to perform repeated
+/// expensive computations, but can instead incrementalise the cost on a per-write instead of per-flush basis, keeping track of exactly the
+/// decisions we're making.
 internal struct OutboundFlowControlBuffer {
     /// A buffer of the data sent on the stream that has not yet been passed to the the connection state machine.
-    private var streamDataBuffers: [HTTP2StreamID: StreamFlowControlState]
+    private var streamDataBuffers: StreamMap<StreamFlowControlState>
 
-    // TODO(cory): This will eventually need to grow into a priority implementation. For now, it's sufficient to just
-    // use a set and worry about the data structure costs later.
+    /// The streams that have been written to since the last flush.
+    ///
+    /// This object is a cache that is used to keep track of what streams need to be modified whenever we get a flush()
+    /// call. Streams that have been invalidated or removed don't get removed from here: we deal with them once we flush
+    /// and go to find them to actually write from them. They are not a correctness problem.
+    private var writableStreams: Set<HTTP2StreamID> = Set()
+
     /// The streams with pending data to output.
     private var flushableStreams: Set<HTTP2StreamID> = Set()
 
@@ -30,34 +62,40 @@ internal struct OutboundFlowControlBuffer {
     internal var maxFrameSize: Int
 
     internal init(initialConnectionWindowSize: Int = 65535, initialMaxFrameSize: Int = 1<<14) {
-        /// By and large there won't be that many concurrent streams floating around, so we pre-allocate a decent-ish
-        /// size.
         // TODO(cory): HEAP! This should be a heap, sorted off the number of pending bytes!
-        self.streamDataBuffers = Dictionary(minimumCapacity: 16)
+        self.streamDataBuffers = StreamMap()
         self.connectionWindowSize = initialConnectionWindowSize
         self.maxFrameSize = initialMaxFrameSize
+
+        // Avoid some resizes.
+        self.writableStreams.reserveCapacity(16)
+        self.flushableStreams.reserveCapacity(16)
     }
 
     internal mutating func processOutboundFrame(_ frame: HTTP2Frame, promise: EventLoopPromise<Void>?) throws -> OutboundFrameAction {
         // A side note: there is no special handling for RST_STREAM frames here, unlike in the concurrent streams buffer. This is because
         // RST_STREAM frames will cause stream closure notifications, which will force us to drop our buffers. For this reason we can
         // simplify our code here, which helps a lot.
+        let streamID = frame.streamID
+
         switch frame.payload {
-        case .data(let body):
+        case .data:
             // We buffer DATA frames.
-            if !self.streamDataBuffers[frame.streamID].apply({ $0.dataBuffer.bufferWrite((.data(body), promise)) }) {
+            if !self.streamDataBuffers.apply(streamID: streamID, { $0.bufferWrite((frame.payload, promise)) }) {
                 // We don't have this stream ID. This is an internal error, but we won't precondition on it as
                 // it can happen due to channel handler misconfiguration or other weirdness. We'll just complain.
-                throw NIOHTTP2Errors.noSuchStream(streamID: frame.streamID)
+                throw NIOHTTP2Errors.noSuchStream(streamID: streamID)
             }
+
+            self.writableStreams.insert(streamID)
             return .nothing
-        case .headers(let headerContent):
+        case .headers:
             // Headers are special. If we have a data frame buffered, we buffer behind it to avoid frames
             // being reordered. However, if we don't have a data frame buffered we pass the headers frame on
             // immediately, as there is no risk of violating ordering guarantees.
-            let bufferResult = self.streamDataBuffers[frame.streamID].modify { (state: inout StreamFlowControlState) -> Bool in
-                if state.dataBuffer.haveBufferedDataFrame {
-                    state.dataBuffer.bufferWrite((.headers(headerContent), promise))
+            let bufferResult = self.streamDataBuffers.modify(streamID: streamID) { (state: inout StreamFlowControlState) -> Bool in
+                if state.haveBufferedDataFrame {
+                    state.bufferWrite((frame.payload, promise))
                     return true
                 } else {
                     return false
@@ -66,7 +104,7 @@ internal struct OutboundFlowControlBuffer {
 
             switch bufferResult {
             case .some(true):
-                // Buffered, do nothing.
+                self.writableStreams.insert(streamID)
                 return .nothing
             case .some(false), .none:
                 // We don't need to buffer this, pass it on.
@@ -79,15 +117,21 @@ internal struct OutboundFlowControlBuffer {
     }
 
     internal mutating func flushReceived() {
-        // Mark the flush points on all the streams we have.
-        self.streamDataBuffers.mutatingForEachValue {
-            let hadData = $0.hasPendingData
-            $0.dataBuffer.markFlushPoint()
-            if $0.hasPendingData && !hadData {
-                assert(!self.flushableStreams.contains($0.streamID))
-                self.flushableStreams.insert($0.streamID)
+        // Mark the flush points on all the streams we believe are writable.
+        // We need to double-check here: has their flow control window dropped below zero? If it
+        // has, the streamID isn't actually writable, and we should abandon adding it here. However,
+        // we still mark the flush point.
+        for streamID in self.writableStreams {
+            let actuallyWritable: Bool? = self.streamDataBuffers.modify(streamID: streamID) { dataBuffer in
+                dataBuffer.markFlushPoint()
+                return dataBuffer.hasFlowControlWindowSpaceForNextWrite
+            }
+            if let actuallyWritable = actuallyWritable, actuallyWritable {
+                self.flushableStreams.insert(streamID)
             }
         }
+
+        self.writableStreams.removeAll(keepingCapacity: true)
     }
 
     private func nextStreamToSend() -> HTTP2StreamID? {
@@ -97,22 +141,24 @@ internal struct OutboundFlowControlBuffer {
     internal mutating func updateWindowOfStream(_ streamID: HTTP2StreamID, newSize: Int32) {
         assert(streamID != .rootStream)
 
-        self.streamDataBuffers[streamID].apply {
-            let hadData = $0.hasPendingData
-            $0.currentWindowSize = Int(newSize)
-            if $0.hasPendingData && !hadData {
-                assert(!self.flushableStreams.contains($0.streamID))
-                self.flushableStreams.insert($0.streamID)
-            } else if !$0.hasPendingData && hadData {
-                assert(self.flushableStreams.contains($0.streamID))
-                self.flushableStreams.remove($0.streamID)
+        self.streamDataBuffers.apply(streamID: streamID) {
+            switch $0.updateWindowSize(newSize: Int(newSize)) {
+            case .unchanged:
+                // No change, do nothing.
+                ()
+            case .changed(newValue: true):
+                // Became writable, and specifically became _flushable_.
+                self.flushableStreams.insert(streamID)
+            case .changed(newValue: false):
+                // Became unwritable.
+                self.flushableStreams.remove(streamID)
             }
         }
     }
 
     internal func invalidateBuffer(reason: ChannelError) {
-        for buffer in self.streamDataBuffers.values {
-            buffer.dataBuffer.failAllWrites(error: reason)
+        self.streamDataBuffers.forEachValue { buffer in
+            buffer.failAllWrites(error: reason)
         }
     }
 
@@ -120,7 +166,7 @@ internal struct OutboundFlowControlBuffer {
         assert(streamID != .rootStream)
 
         let streamState = StreamFlowControlState(streamID: streamID, initialWindowSize: Int(initialWindowSize))
-        self.streamDataBuffers[streamID] = streamState
+        self.streamDataBuffers.insert(streamState)
     }
 
     // We received a stream closed event. Drop any stream state we're holding.
@@ -128,13 +174,13 @@ internal struct OutboundFlowControlBuffer {
     // - returns: Any buffered stream state we may have been holding so their promises can be failed.
     internal mutating func streamClosed(_ streamID: HTTP2StreamID) -> MarkedCircularBuffer<(HTTP2Frame.FramePayload, EventLoopPromise<Void>?)>? {
         self.flushableStreams.remove(streamID)
-        guard var streamData = self.streamDataBuffers.removeValue(forKey: streamID) else {
+        guard var streamData = self.streamDataBuffers.removeValue(forStreamID: streamID) else {
             // Huh, we didn't have any data for this stream. Oh well. That was easy.
             return nil
         }
 
         // To avoid too much work higher up the stack, we only return writes from here if there actually are any.
-        let writes = streamData.dataBuffer.evacuatePendingWrites()
+        let writes = streamData.evacuatePendingWrites()
         if writes.count > 0 {
             return writes
         } else {
@@ -148,11 +194,16 @@ internal struct OutboundFlowControlBuffer {
             return nil
         }
 
-        let nextWrite = self.streamDataBuffers[nextStreamID].modify { (state: inout StreamFlowControlState) -> DataBuffer.BufferElement in
-            let nextWrite = state.nextWrite(maxSize: min(self.connectionWindowSize, self.maxFrameSize))
-            if !state.hasPendingData {
+        let nextWrite = self.streamDataBuffers.modify(streamID: nextStreamID) { (state: inout StreamFlowControlState) -> DataBuffer.BufferElement in
+            let (nextWrite, writabilityState) = state.nextWrite(maxSize: min(self.connectionWindowSize, self.maxFrameSize))
+
+            switch writabilityState {
+            case .changed(newValue: false):
                 self.flushableStreams.remove(nextStreamID)
+            case .changed(newValue: true), .unchanged:
+                ()
             }
+
             return nextWrite
         }
         guard let (payload, promise) = nextWrite else {
@@ -167,15 +218,15 @@ internal struct OutboundFlowControlBuffer {
 
     internal mutating func initialWindowSizeChanged(_ delta: Int) {
         self.streamDataBuffers.mutatingForEachValue {
-            let hadPendingData = $0.hasPendingData
-            $0.currentWindowSize += delta
-            let hasPendingData = $0.hasPendingData
-
-            if !hadPendingData && hasPendingData {
-                assert(!self.flushableStreams.contains($0.streamID))
+            switch $0.updateWindowSize(newSize: $0.currentWindowSize + delta) {
+            case .unchanged:
+                // No change, do nothing.
+                ()
+            case .changed(newValue: true):
+                // Became flushable
                 self.flushableStreams.insert($0.streamID)
-            } else if hadPendingData && !hasPendingData {
-                assert(self.flushableStreams.contains($0.streamID))
+            case .changed(newValue: false):
+                // Became unflushable.
                 self.flushableStreams.remove($0.streamID)
             }
         }
@@ -197,13 +248,17 @@ extension OutboundFlowControlBuffer {
 }
 
 
-private struct StreamFlowControlState {
+private struct StreamFlowControlState: PerStreamData {
     let streamID: HTTP2StreamID
-    var currentWindowSize: Int
-    var dataBuffer: DataBuffer
+    internal private(set) var currentWindowSize: Int
+    private var dataBuffer: DataBuffer
 
-    var hasPendingData: Bool {
-        return self.dataBuffer.hasMark && (self.currentWindowSize > 0 || self.dataBuffer.nextWriteIsHeaders)
+    var haveBufferedDataFrame: Bool {
+        return self.dataBuffer.haveBufferedDataFrame
+    }
+
+    var hasFlowControlWindowSpaceForNextWrite: Bool {
+        return self.currentWindowSize > 0 || self.dataBuffer.nextWriteIsZeroSized
     }
 
     init(streamID: HTTP2StreamID, initialWindowSize: Int) {
@@ -212,17 +267,72 @@ private struct StreamFlowControlState {
         self.dataBuffer = DataBuffer()
     }
 
-    mutating func nextWrite(maxSize: Int) -> DataBuffer.BufferElement {
+    mutating func bufferWrite(_ write: DataBuffer.BufferElement) {
+        self.dataBuffer.bufferWrite(write)
+    }
+
+    mutating func updateWindowSize(newSize: Int) -> WritabilityState {
+        let oldWindowSize = self.currentWindowSize
+        self.currentWindowSize = newSize
+
+        // If we have no marked writes, nothing changed.
+        guard self.dataBuffer.hasMark else {
+            return .unchanged
+        }
+
+        if oldWindowSize <= 0 && self.currentWindowSize > 0 {
+            // Window opened. We can now write.
+            return .changed(newValue: true)
+        }
+
+        if self.currentWindowSize <= 0 && oldWindowSize > 0 {
+            // Window closed. We can now only write if the first write is zero-sized.
+            if self.dataBuffer.nextWriteIsZeroSized {
+                return .unchanged
+            }
+
+            return .changed(newValue: false)
+        }
+
+        return .unchanged
+    }
+
+    mutating func markFlushPoint() {
+        self.dataBuffer.markFlushPoint()
+    }
+
+    /// Removes all pending writes, invalidating this structure as it does so.
+    mutating func evacuatePendingWrites() -> MarkedCircularBuffer<DataBuffer.BufferElement> {
+        return self.dataBuffer.evacuatePendingWrites()
+    }
+
+    func failAllWrites(error: ChannelError) {
+        self.dataBuffer.failAllWrites(error: error)
+    }
+
+    mutating func nextWrite(maxSize: Int) -> (DataBuffer.BufferElement, WritabilityState) {
         assert(maxSize > 0)
         let writeSize = min(maxSize, currentWindowSize)
         let nextWrite = self.dataBuffer.nextWrite(maxSize: writeSize)
+        var writabilityState = WritabilityState.unchanged
 
         if case .data(let payload) = nextWrite.0 {
             self.currentWindowSize -= payload.data.readableBytes
+
+            if !self.dataBuffer.hasMark {
+                // Eaten the mark, no longer writable.
+                writabilityState = .changed(newValue: false)
+            } else if !self.hasFlowControlWindowSpaceForNextWrite {
+                // No flow control space for writing anymore.
+                writabilityState = .changed(newValue: false)
+            }
+        } else if !self.dataBuffer.hasMark {
+            // Eaten the mark, no longer writable.
+            writabilityState = .changed(newValue: false)
         }
 
         assert(self.currentWindowSize >= 0)
-        return nextWrite
+        return (nextWrite, writabilityState)
     }
 }
 
@@ -232,18 +342,12 @@ private struct DataBuffer {
 
     private var bufferedChunks: MarkedCircularBuffer<BufferElement>
 
-    internal private(set) var flushedBufferedBytes: UInt
-
     var haveBufferedDataFrame: Bool {
         return self.bufferedChunks.count > 0
     }
 
-    var nextWriteIsHeaders: Bool {
-        if case .some(.headers) = self.bufferedChunks.first?.0 {
-            return true
-        } else {
-            return false
-        }
+    var nextWriteIsZeroSized: Bool {
+        return self.bufferedChunks.first?.0.isZeroSizedWrite ?? false
     }
 
     var hasMark: Bool {
@@ -255,7 +359,6 @@ private struct DataBuffer {
 
     init() {
         self.bufferedChunks = MarkedCircularBuffer(initialCapacity: 8)
-        self.flushedBufferedBytes = 0
     }
 
     mutating func bufferWrite(_ write: BufferElement) {
@@ -264,25 +367,12 @@ private struct DataBuffer {
 
     /// Marks the current point in the buffer as the place up to which we have flushed.
     mutating func markFlushPoint() {
-        if let markIndex = self.bufferedChunks.markedElementIndex {
-            for element in self.bufferedChunks.suffix(from: markIndex) {
-                if case .data(let contents) = element.0 {
-                    self.flushedBufferedBytes += UInt(contents.data.readableBytes)
-                }
-            }
-            self.bufferedChunks.mark()
-        } else if self.bufferedChunks.count > 0 {
-            for element in self.bufferedChunks {
-                if case .data(let contents) = element.0 {
-                    self.flushedBufferedBytes += UInt(contents.data.readableBytes)
-                }
-            }
-            self.bufferedChunks.mark()
-        }
+        self.bufferedChunks.mark()
     }
 
     mutating func nextWrite(maxSize: Int) -> BufferElement {
         assert(maxSize >= 0)
+        assert(self.hasMark)
         precondition(self.bufferedChunks.count > 0)
 
         let firstElementIndex = self.bufferedChunks.startIndex
@@ -296,14 +386,12 @@ private struct DataBuffer {
         let firstElementReadableBytes = contents.data.readableBytes
         if firstElementReadableBytes <= maxSize {
             // Return the whole element.
-            self.flushedBufferedBytes -= UInt(firstElementReadableBytes)
             return self.bufferedChunks.removeFirst()
         }
 
         // Here we have too many bytes. So we need to slice out a copy of the data we need
         // and leave the rest.
         let dataSlice = contents.data.slicePrefix(maxSize)
-        self.flushedBufferedBytes -= UInt(maxSize)
         self.bufferedChunks[self.bufferedChunks.startIndex].0 = .data(contents)
         return (.data(.init(data: dataSlice)), nil)
     }
@@ -320,6 +408,13 @@ private struct DataBuffer {
             chunk.1?.fail(error)
         }
     }
+}
+
+
+/// Used to communicate whether a stream has had its writability state change.
+fileprivate enum WritabilityState {
+    case changed(newValue: Bool)
+    case unchanged
 }
 
 
@@ -344,16 +439,19 @@ private extension IOData {
 }
 
 
-private extension Optional where Wrapped == StreamFlowControlState {
-    // This function exists as a performance optimisation: by mutating the optional returned from Dictionary directly
-    // inline, we can avoid the dictionary needing to hash the key twice, which it would have to do if we removed the
-    // value, mutated it, and then re-inserted it.
-    //
-    // However, we need to be a bit careful here, as the performance gain from doing this would be completely swamped
-    // if the Swift compiler failed to inline this method into its caller. This would force the closure to have its
-    // context heap-allocated, and the cost of doing that is vastly higher than the cost of hashing the key a second
-    // time. So for this reason we make it clear to the compiler that this method *must* be inlined at the call-site.
-    // Sorry about doing this!
+extension HTTP2Frame.FramePayload {
+    fileprivate var isZeroSizedWrite: Bool {
+        switch self {
+        case .data(let payload):
+            return payload.data.readableBytes == 0 && payload.paddingBytes == nil
+        default:
+            return true
+        }
+    }
+}
+
+
+extension StreamMap where Element == StreamFlowControlState {
     //
     /// Apply a transform to a wrapped DataBuffer.
     ///
@@ -361,45 +459,8 @@ private extension Optional where Wrapped == StreamFlowControlState {
     ///     - body: A block that will modify the contained value in the
     ///         optional, if there is one present.
     /// - returns: Whether the value was present or not.
-    @inline(__always)
     @discardableResult
-    mutating func apply(_ body: (inout Wrapped) -> Void) -> Bool {
-        if self == nil {
-            return false
-        }
-
-        var unwrapped = self!
-        self = nil
-        body(&unwrapped)
-        self = unwrapped
-        return true
-    }
-
-    // This function exists as a performance optimisation: by mutating the optional returned from Dictionary directly
-    // inline, we can avoid the dictionary needing to hash the key twice, which it would have to do if we removed the
-    // value, mutated it, and then re-inserted it.
-    //
-    // However, we need to be a bit careful here, as the performance gain from doing this would be completely swamped
-    // if the Swift compiler failed to inline this method into its caller. This would force the closure to have its
-    // context heap-allocated, and the cost of doing that is vastly higher than the cost of hashing the key a second
-    // time. So for this reason we make it clear to the compiler that this method *must* be inlined at the call-site.
-    // Sorry about doing this!
-    //
-    /// Apply a transform to a wrapped DataBuffer and return the result.
-    ///
-    /// - parameters:
-    ///     - body: A block that will modify the contained value in the
-    ///         optional, if there is one present.
-    /// - returns: The return value of the modification, or nil if there was no object to modify.
-    mutating func modify<T>(_ body: (inout Wrapped) -> T) -> T? {
-        if self == nil {
-            return nil
-        }
-
-        var unwrapped = self!
-        self = nil
-        let r = body(&unwrapped)
-        self = unwrapped
-        return r
+    fileprivate mutating func apply(streamID: HTTP2StreamID, _ body: (inout Element) -> Void) -> Bool {
+        return self.modify(streamID: streamID, body) != nil
     }
 }

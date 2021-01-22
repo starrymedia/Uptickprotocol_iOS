@@ -349,13 +349,26 @@ extension TimeAmount: Comparable {
     }
 }
 
-extension TimeAmount {
+extension TimeAmount: AdditiveArithmetic {
+    /// The zero value for `TimeAmount`.
+    public static var zero: TimeAmount {
+        return TimeAmount.nanoseconds(0)
+    }
+
     public static func + (lhs: TimeAmount, rhs: TimeAmount) -> TimeAmount {
         return TimeAmount(lhs.nanoseconds + rhs.nanoseconds)
+    }
+    
+    public static func +=(lhs: inout TimeAmount, rhs: TimeAmount) {
+        lhs = lhs + rhs
     }
 
     public static func - (lhs: TimeAmount, rhs: TimeAmount) -> TimeAmount {
         return TimeAmount(lhs.nanoseconds - rhs.nanoseconds)
+    }
+    
+    public static func -=(lhs: inout TimeAmount, rhs: TimeAmount) {
+        lhs = lhs - rhs
     }
 
     public static func * <T: BinaryInteger>(lhs: T, rhs: TimeAmount) -> TimeAmount {
@@ -719,7 +732,7 @@ enum NIORegistration: Registration {
 }
 
 /// Provides an endless stream of `EventLoop`s to use.
-public protocol EventLoopGroup: class {
+public protocol EventLoopGroup: AnyObject {
     /// Returns the next `EventLoop` to use.
     ///
     /// The algorithm that is used to select the next `EventLoop` is specific to each `EventLoopGroup`. A common choice
