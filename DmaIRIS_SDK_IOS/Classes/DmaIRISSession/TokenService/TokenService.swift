@@ -29,6 +29,7 @@ open class TokenServiceSession {
                            denom: String,
                            mintAble: Bool,
                            owner: String,
+                           gasLimit: UInt64 = 0,
                            privateKey: String,
                            method: RpcMethods = .broadcastTxAsync,
                            successCallback: @escaping (_ res: BroadcastModel) -> (),
@@ -50,7 +51,9 @@ open class TokenServiceSession {
             txBody.messages.append(any)
         }
         
-        TxService.signTx(txBody: txBody, privateKey: privateKey) { tx in
+        TxService.signTx(txBody: txBody,
+                         gasLimit: gasLimit,
+                         privateKey: privateKey) { tx in
             RpcService.broadcast(tx: tx, method: method) { broadcast in
                 successCallback(broadcast)
             } errorCallBack: { error in
@@ -73,6 +76,7 @@ open class TokenServiceSession {
                           amount: UInt64,
                           tokenOwner: String,
                           recipient: String,
+                          gasLimit: UInt64 = 0,
                           privateKey: String,
                           method: RpcMethods = .broadcastTxAsync,
                           successCallback: @escaping (_ res: BroadcastModel) -> (),
@@ -93,7 +97,9 @@ open class TokenServiceSession {
         
         let fee = TxUtils.getFee(gasLimit: txGasLimit, amount: txAmount, denom: txDenom)
         
-        TxService.signTx(txBody: txBody, privateKey: privateKey) { tx in
+        TxService.signTx(txBody: txBody,
+                         gasLimit: gasLimit,
+                         privateKey: privateKey) { tx in
             RpcService.broadcast(tx: tx, method: method) { broadcast in
                 successCallback(broadcast)
             } errorCallBack: { error in
@@ -116,6 +122,7 @@ open class TokenServiceSession {
     public func transferOwnership(denom: String,
                                   tokenOwner: String,
                                   recipient: String,
+                                  gasLimit: UInt64 = 0,
                                   privateKey: String,
                                   method: RpcMethods = .broadcastTxAsync,
                                   successCallback: @escaping (_ res: BroadcastModel) -> (),
@@ -134,7 +141,9 @@ open class TokenServiceSession {
         
         let fee = TxUtils.getFee(gasLimit: txGasLimit, amount: txAmount, denom: txDenom)
         
-        TxService.signTx(txBody: txBody, privateKey: privateKey) { tx in
+        TxService.signTx(txBody: txBody,
+                         gasLimit: gasLimit,
+                         privateKey: privateKey) { tx in
             RpcService.broadcast(tx: tx, method: method) { res in
                 successCallback(res)
             } errorCallBack: { error in
@@ -211,6 +220,7 @@ open class TokenServiceSession {
                       denom: String,
                       amount: String,
                       memo: String,
+                      gasLimit: UInt64 = 0,
                       privateKey: String,
                       method: RpcMethods = .broadcastTxAsync,
                       successCallback: @escaping (_ res: BroadcastModel) -> (),
@@ -232,6 +242,7 @@ open class TokenServiceSession {
         
         //调用签名方法
         TxService.signTx(txBody: txBody,
+                         gasLimit: gasLimit,
                          privateKey: privateKey) { tx in
             RpcService.broadcast(tx: tx, method: method) { result in
                 successCallback(result)

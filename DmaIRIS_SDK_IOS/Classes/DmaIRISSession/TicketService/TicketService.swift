@@ -56,6 +56,7 @@ open class TicketServiceSession  {
                             recipient: String,
                             privateKey: String,
                             isSign: Bool,
+                            gasLimit: UInt64 = 0,
                             method: RpcMethods,
                             successCallback: @escaping (_ res: BroadcastModel) -> (),
                             errorCallback: @escaping FPErrorCallback) {
@@ -96,6 +97,7 @@ open class TicketServiceSession  {
         
         
         TxService.signTx(txBody: builder,
+                         gasLimit: gasLimit,
                          privateKey: privateKey) { tx in
             
             RpcService.broadcast(tx: tx, method: method) { res in

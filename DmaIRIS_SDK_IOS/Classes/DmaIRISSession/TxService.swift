@@ -16,6 +16,7 @@ open class TxService {
     
 
     class func signTx(txBody: TxBody,
+                      gasLimit: UInt64 = 0,
                       privateKey: String,
                       _ callback: @escaping (_ tx: TxTx) -> Void,
                       errorCallBack: @escaping FPErrorCallback) {
@@ -54,7 +55,6 @@ open class TxService {
             
        
 
-            let gasLimit = UInt64(20000)
             TxService.forRequestSimulate(signerInfo: signerInfo,
                                          chainId: IRISServive.chainId,
                                          txBody: txBody,
@@ -81,7 +81,7 @@ open class TxService {
                                txBody:TxBody,
                                accountNumber: UInt64,
                                privateKey: String,
-                               gasLimit: UInt64,
+                               gasLimit: UInt64 = 0,
                                successCallback: @escaping (_ txSign: TxTx) -> (),
                                errorCallBack: @escaping FPErrorCallback) {
         var myGasLimit = gasLimit

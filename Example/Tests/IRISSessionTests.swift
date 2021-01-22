@@ -89,15 +89,24 @@ class IRISSessionTests: XCTestCase {
         waitForExpectations(timeout: 15, handler: nil)
     }
     
-    func testQuerySupply() {
-        let expectation = self.expectation(description: "testQuerySupply")
-//        NFTService.supply(owner: "iaa1fu5xru6umtfqthe588z6zk37gdknulr55ee5qf", denom: "ubif") successCallback: { amount in
-//            print("amount:\(amount)")
-//            expectation.fulfill()
-//        } errorCallback: { error in
-//            print(error)
-//            expectation.fulfill()
-//        }
+    func testNFTServicebalance() {
+        let expectation = self.expectation(description: "testNFTServicebalance")
+
+        NFTService.balance(owner: "iaa1fu5xru6umtfqthe588z6zk37gdknulr55ee5qf",
+                           denom: "") { nftList in
+            print(nftList)
+            for nft in nftList {
+                for token in nft.tokens {
+                    print(token)
+                }
+            }
+
+            expectation.fulfill()
+
+        } errorCallback: { error in
+            print(error)
+            expectation.fulfill()
+        }
         waitForExpectations(timeout: 15, handler: nil)
     }
     

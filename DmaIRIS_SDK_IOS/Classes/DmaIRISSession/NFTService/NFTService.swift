@@ -26,6 +26,7 @@ open class NFTSession {
                          nftName: String,
                          nftSchema: String,
                          denom: String,
+                         gasLimit: UInt64 = 0,
                          privateKey: String,
                          method: RpcMethods,
                          successCallback: @escaping (_ res: BroadcastModel) -> (),
@@ -48,6 +49,7 @@ open class NFTSession {
         
         //签名交易
         TxService.signTx(txBody: txBody,
+                         gasLimit: gasLimit,
                          privateKey: privateKey) { tx in
             //广播交易
             RpcService.broadcast(tx: tx, method: method) { res in
@@ -82,6 +84,7 @@ open class NFTSession {
                           name: String,
                           data: String,
                           uri: String,
+                          gasLimit: UInt64 = 0,
                           privateKey: String,
                           method: RpcMethods,
                           successCallback: @escaping (_ res: BroadcastModel) -> (),
@@ -108,6 +111,7 @@ open class NFTSession {
         }
         
         TxService.signTx(txBody: txBody,
+                         gasLimit: gasLimit,
                          privateKey: privateKey) { tx in
             
             RpcService.broadcast(tx: tx, method: method) { res in
@@ -134,6 +138,7 @@ open class NFTSession {
                    denom: String,
                    tokenId: String,
                    privateKey: String,
+                   gasLimit: UInt64 = 0,
                    method: RpcMethods,
                    successCallback: @escaping (_ string: BroadcastModel) -> (),
                    errorCallback: @escaping FPErrorCallback) {
@@ -149,7 +154,9 @@ open class NFTSession {
             txBody.messages.append(any)
         }
                 
-        TxService.signTx(txBody: txBody, privateKey: privateKey) { tx in
+        TxService.signTx(txBody: txBody,
+                         gasLimit: gasLimit,
+                         privateKey: privateKey) { tx in
             
             RpcService.broadcast(tx: tx, method: method) { res in
                 successCallback(res)
@@ -179,6 +186,7 @@ open class NFTSession {
                           data: String = "[do-not-modify]",
                           name: String = "[do-not-modify]",
                           uri: String = "[do-not-modify]",
+                          gasLimit: UInt64 = 0,
                           privateKey: String,
                           method: RpcMethods,
                           successCallback: @escaping (_ res: BroadcastModel) -> (),
@@ -211,6 +219,7 @@ open class NFTSession {
 
         
         TxService.signTx(txBody: txBody,
+                         gasLimit: gasLimit,
                          privateKey: privateKey) { tx in
             
             RpcService.broadcast(tx: tx, method: method) { res in
@@ -230,15 +239,16 @@ open class NFTSession {
                               denom: String,
                               tokenIds: [String],
                               privateKey: String,
+                              gasLimit: UInt64 = 0,
                               method: RpcMethods,
                               successCallback: @escaping (_ res: BroadcastModel) -> (),
                               errorCallback: @escaping FPErrorCallback) {
         self.transferToken(sender: sender,
-                           recipient:
-                            recipient,
+                           recipient: recipient,
                            denom: denom,
                            tokenIds: tokenIds,
                            memo: "",
+                           gasLimit: gasLimit,
                            privateKey: privateKey,
                            method: method,
                            successCallback: successCallback,
@@ -260,6 +270,7 @@ open class NFTSession {
                               denom: String,
                               tokenIds: [String],
                               memo: String,
+                              gasLimit: UInt64 = 0,
                               privateKey: String,
                               method: RpcMethods,
                               successCallback: @escaping (_ res: BroadcastModel) -> (),
@@ -282,6 +293,7 @@ open class NFTSession {
         }
                 
         TxService.signTx(txBody: txBody,
+                         gasLimit: gasLimit,
                          privateKey: privateKey) { tx in
             
             RpcService.broadcast(tx: tx, method: method) { res in
