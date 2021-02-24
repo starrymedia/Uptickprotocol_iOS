@@ -24,8 +24,8 @@ open class NFTSession {
     ///   - errorCallback: errorCallback description
     public func issueNft(sender: String,
                          nftName: String,
-                         nftSchema: String,
                          denom: String,
+                         nftSchema: String,
                          gasLimit: UInt64 = 0,
                          privateKey: String,
                          method: RpcMethods,
@@ -467,7 +467,7 @@ open class NFTSession {
     ///   - tokenId: 资产ID
     ///   - successCallback: successCallback description
     ///   - errorCallback: errorCallback description
-    public func tokenById(denom: String,
+    public func tokenInfo(denom: String,
                           tokenId: String,
                           successCallback: @escaping (_ value: NFTToken) -> (),
                           errorCallback: @escaping FPErrorCallback) {
