@@ -116,12 +116,14 @@ open class TxService {
                          gasLimit: UInt64) -> TxTx {
         
         var gasLimint = Decimal(gasLimit)
-        var gasPrice = Decimal(0.025)
+        var gasPrice = Decimal(IRISServive.defaultGasPrice)
+        //乘以0.3
         var gasPriceUp = Decimal()
-        NSDecimalRound(&gasPriceUp, &gasPrice, 0, .up)
-        
+        NSDecimalMultiply(&gasPriceUp, &gasLimint, &gasPrice, .plain)
+        //去除小数位
         var amount = Decimal()
-        NSDecimalMultiply(&amount, &gasLimint, &gasPriceUp, .plain)
+        NSDecimalRound(&amount, &gasPriceUp, 0, .up)
+
         var amountString = NSDecimalString(&amount, nil)
         let fee = TxUtils.getFee(gasLimit: gasLimit,
                                  amount: amountString,

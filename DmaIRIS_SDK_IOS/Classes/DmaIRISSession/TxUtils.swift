@@ -10,7 +10,7 @@ import SwiftProtobuf
 
 public let txGasLimit:UInt64 = 200000
 public let txAmount = "1"
-public let txDenom = "ubif"
+public let txDenom = IRISServive.defaultCoin
 
 open class TxUtils {
    

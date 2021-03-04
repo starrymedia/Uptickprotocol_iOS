@@ -22,6 +22,9 @@ open class DmaIRISSession {
     open var host = ""
     open var port = 0
     open var chainId = ""
+    open var defaultCoin = "uiris"
+    open var defaultGasPrice = 0.3
+
     //MARK:- init
     init() { }
     

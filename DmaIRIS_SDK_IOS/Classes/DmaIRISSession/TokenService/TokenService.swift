@@ -181,6 +181,7 @@ open class TokenServiceSession {
                       successCallback: successCallback,
                       errorCallBack: errorCallBack)
     }
+    
     /**
        * 转送同质化token
        * @param from
@@ -244,6 +245,7 @@ open class TokenServiceSession {
         TxService.signTx(txBody: txBody,
                          gasLimit: gasLimit,
                          privateKey: privateKey) { tx in
+            
             RpcService.broadcast(tx: tx, method: method) { result in
                 successCallback(result)
             } errorCallBack: { error in
@@ -256,6 +258,43 @@ open class TokenServiceSession {
         
     }
     
+    func gasLimit(from: String,
+                  to: String,
+                  denom: String,
+                  amount: String,
+                  memo: String = "",
+                  gasLimit: UInt64 = 0,
+                  privateKey: String,
+                  method: RpcMethods = .broadcastTxAsync,
+                  successCallback: @escaping (_ gasLimit: UInt64) -> (),
+                  errorCallBack: @escaping FPErrorCallback) {
+        
+        var coin = BaseCoin()
+        coin.amount = amount
+        coin.denom = denom
+        
+        var msgSend = BankMsgSend()
+        msgSend.fromAddress = from
+        msgSend.toAddress = to
+        msgSend.amount.append(coin)
+        
+        var txBody = TxUtils.getBody(meno: memo, timeoutHeight: 0)
+        if let any = TxUtils.getProtobufAny(message: msgSend, typePrefix: "") {
+            txBody.messages.append(any)
+        }
+        
+        //调用签名方法
+        TxService.signTx(txBody: txBody,
+                         gasLimit: gasLimit,
+                         privateKey: privateKey) { tx in
+            let gasLimit = tx.authInfo.fee.gasLimit
+            successCallback(gasLimit)
+        } errorCallBack: { error in
+            errorCallBack(error)
+        }
+        
+    }
+        
     /// 根据denom(创建时的symbol)查询token信息
     /// - Parameters:
     ///   - denom: 分类ID
@@ -393,7 +432,7 @@ open class TokenServiceSession {
        * @throws ServiceException
     */
     public func balance(address: String,
-                        denom: String,
+                        denom: String = IRISServive.defaultCoin,
                         successCallback: @escaping (_ coin: Coin) -> (),
                         errorCallback: @escaping FPErrorCallback) {
                 
