@@ -65,18 +65,6 @@ public struct TokensModel: HandyJSON {
 }
 
 
-struct MerchantTransfer: Encodable {
-    
-    let callBack: String
-    let payerPubKey: String
-    let denom: String
-    let payer: String
-    let recipien: String
-    var signatures: String?
-    let ids: [String]
-    var memo: String
-}
-
 public struct MerchantResponseModel: HandyJSON {
     public init() {}
     public var code: Int?

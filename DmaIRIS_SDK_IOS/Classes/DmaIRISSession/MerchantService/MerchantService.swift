@@ -127,91 +127,75 @@ public class Merchant {
     public func onsale(denom: String,
                        tokenids: [String],
                        price: String,
-                       coin: String,
+                       transfers: [String: String]? = nil,
                        privateKey: String,
-                       callback: String,
+                       callback: String = "",
                        successCallback: @escaping (_ value: String) -> (),
                        errorCallback: @escaping FPErrorCallback) {
         
 
-        TokenService.toWei(tokenSymblol: coin,
-                           amount: Decimal(Double(price) ?? 0.00)) { amount in
-            
-            self.onsaleRequset(denom: denom,
-                               tokenids: tokenids,
-                               price: amount,
-                               coin: coin,
-                               privateKey: privateKey,
-                               callback: callback) { value in
-                successCallback(value)
-            } errorCallback: { error in
-                errorCallback(error)
-            }
-
-        } errorCallBack: { error in
-            
-            errorCallback(error)
-
-        }
-
-   
+        //转换位数
+        let amount = self.toWei(tokenSymblol: IRISServive.defaultCoin,
+                                amount: Decimal(Double(price) ?? 0.0))
+        print("amount:\(amount)")
+        self.onsaleRequset(denom: denom,
+                           tokenids: tokenids,
+                           price: amount,
+                           transfers: transfers,
+                           privateKey: privateKey,
+                           callback: callback,
+                           successCallback: successCallback,
+                           errorCallback: errorCallback)
     }
     
     func onsaleRequset(denom: String,
                        tokenids: [String],
                        price: String,
-                       coin: String,
+                       transfers: [String: String]? = nil,
                        privateKey: String,
                        callback: String,
                        successCallback: @escaping (_ value: String) -> (),
                        errorCallback: @escaping FPErrorCallback) {
         
-        guard let publicKeyData = try? WalletManager.exportPublicKey(privateKey: privateKey) else {
-            print("publicKey error")
-            return
-        }
-        let publicKeyString = publicKeyData.base64EncodedString() ?? ""
-        let address = WalletManager.exportBech32Address(privateKey: privateKey)
-        var params = MerchantOnSale(callback: callback,
-//                                    pubKey: publicKeyString,
-                                    denom: denom,
-                                    owner: address)
+        var params = OnsaleRequest()
+        params.denom = denom
+        params.owner = WalletManager.exportBech32Address(privateKey: privateKey)
+        params.callback = callback
         
-        var labels = [MerchantOnSaleLabels]()
-        for tokenId in tokenids {
-            let label = MerchantOnSaleLabels(tokenId: tokenId,
-                                             price: price)
+        var labels = [Labels]()
+        for tokenid in tokenids {
+            let label = Labels(tokenId: tokenid, price: Int(price))
             labels.append(label)
         }
         params.labels = labels
-        print(params)
-
-        let url = nodeUrl + onsaleUrl
-
-        self.onSaleRequest(url: url, parameters: params, privateKey: privateKey) { jsonString in
-            successCallback(jsonString)
-        } errorCallback: { error in
-            errorCallback(error)
-        }
-    }
-    
-    func onSaleRequest(url: String,
-                       parameters: MerchantOnSale,
-                       privateKey: String,
-                       successCallback: @escaping (_ jsonString: String) -> (),
-                       errorCallback: @escaping FPErrorCallback) {
         
-        self.getOnSaleTxBody(url: url,
-                             parameters: parameters,
+        //判断是否需要转账
+        if (transfers != nil && transfers!.count > 0) {
+            //需要转账数组
+            var transferEntityList = [TransferEntity]()
+            for (key,value) in transfers! {
+                var transferEntity = TransferEntity()
+                let amount = Decimal(string: value)!
+                let result = MerchantService.toWei(tokenSymblol:IRISServive.defaultCoin, amount: amount)
+                transferEntity.received = key
+                transferEntity.amount = result
+                transferEntityList.append(transferEntity)
+            }
+            params.transfers = transferEntityList
+        }
+
+        self.getOnSaleTxBody(url: nodeUrl + onsaleUrl,
+                             parameters: params,
                              privateKey: privateKey,
                              successCallback: successCallback,
                              errorCallback: errorCallback)
     }
     
+ 
     
     //http请求merchant 获取 TxBody
     func getOnSaleTxBody(url: String,
-                         parameters: MerchantOnSale,
+                         parameters: OnsaleRequest,
                          privateKey: String,
                          successCallback: @escaping (_ jsonString: String) -> (),
                          errorCallback: @escaping FPErrorCallback)
@@ -256,7 +240,7 @@ public class Merchant {
     //获取签名
     func getOnSaleSignatures(url: String,
                              txBody: TxBody,
-                             parameters: MerchantOnSale,
+                             parameters: OnsaleRequest,
                              privateKey: String,
                              successCallback: @escaping (_ jsonString: String) -> (),
                              errorCallback: @escaping FPErrorCallback) {
@@ -282,7 +266,7 @@ public class Merchant {
      
     //再次请求merchant,获取结果
     func requestOnSaleWithSignatures(url: String,
-                                 parameters: MerchantOnSale,
+                                 parameters: OnsaleRequest,
                                  privateKey: String,
                                  successCallback: @escaping (_ jsonString: String) -> (),
                                  errorCallback: @escaping FPErrorCallback) {
@@ -337,79 +321,172 @@ public class Merchant {
     //MARK:- 购买
     public func transfer(denom: String,
                         tokenIds: [String],
+                        shares: [String: Double]? = nil,
                         privateKey: String,
                         memo: String,
                         callback: String,
                         successCallback: @escaping (_ data: String) -> (),
                         errorCallback: @escaping FPErrorCallback) {
         
-        guard let publicKeyData = try? WalletManager.exportPublicKey(privateKey: privateKey) else {
-            print("publicKey error")
-            return
-        }
-        let publicKeyString = publicKeyData.base64EncodedString()
-        let address = WalletManager.exportBech32Address(privateKey: privateKey)
-
-        var param = MerchantTransfer(callBack: callback,
-                                     payerPubKey: publicKeyString,
-                                     denom: denom,
-                                     payer: address,
-                                     recipien: address,
-                                     ids: tokenIds,
-                                     memo: memo)
+        var param = TransferRequest()
+        param.denom = denom
+        param.tokenIds = tokenIds
+        param.recipien = WalletManager.exportBech32Address(privateKey: privateKey)
+        param.memo = memo
+        param.callback = callback
         
-        let url = nodeUrl + transferUrl
-
-        self.transferRequest(url: url, parameters: param, privateKey: privateKey, successCallback: successCallback, errorCallback: errorCallback)
+        
+        if shares != nil && shares!.count > 0 {
+            var shareEntityArrayList = [ShareEntity]()
+            var total: Double = 0
+            for (key,value) in shares! {
+                total = total + value
+                var shareEntity = ShareEntity()
+                shareEntity.received = key
+                shareEntity.rate = value
+                shareEntityArrayList.append(shareEntity)
+            }
+            if total > 1 {
+                errorCallback("Total rate greater than 1")
+                return
+            }
+            param.shares = shareEntityArrayList
+        }
+        
+        self.transferRequest(url: nodeUrl + transferUrl,
+                             parameters: param,
+                             privateKey: privateKey,
+                             successCallback: successCallback,
+                             errorCallback: errorCallback)
 
     }
     
     func transferRequest(url: String,
-                         parameters: MerchantTransfer,
+                         parameters: TransferRequest,
                          privateKey: String,
                          successCallback: @escaping (_ data: String) -> (),
                          errorCallback: @escaping FPErrorCallback) {
         
-        var param = parameters
-        IRISAF.postRequest(url: url, parameters: param) { jsonString in
+        IRISAF.postRequest(url: url, parameters: parameters) { jsonString in
             
+            guard let responseModel = MerchantResponseModel.deserialize(from: jsonString) else {
+                errorCallback("transfer data error")
+                return
+            }
+            
+            if responseModel.success == false {
+                errorCallback(responseModel.msg ?? "")
+                return
+            }
+            
+            guard let dataBase64String = responseModel.data  else {
+                errorCallback("transfer data error")
+                return
+            }
+           
+            
+            guard let base64Data = Data(base64Encoded: dataBase64String, options: Data.Base64DecodingOptions(rawValue:0)) else {
+                errorCallback("transfer base64Data error")
+                return
+            }
+            guard let body = try? TxBody(serializedData: base64Data) else {
+                errorCallback("transfer serializedTxbody error")
+                return
+            }
+            
+            //如果存在message,签名，不存在传address
+            if body.messages.count > 0 {
+                self.getTransferSignatures(url: url,
+                                           txBody: body,
+                                           parameters: parameters,
+                                           privateKey: privateKey,
+                                           successCallback: successCallback,
+                                           errorCallback: errorCallback)
+
+            } else {
+                var params = parameters
+                params.signatures = parameters.recipien
+                self.requestTransferResult(url: url,
+                                           parameters: params,
+                                           successCallback: successCallback,
+                                           errorCallback: errorCallback)
+
+            }
+        } errorCallBack: { error in
+            errorCallback(error)
+        }
+
+    }
+    
+    //获取签名
+    func getTransferSignatures(url: String,
+                               txBody: TxBody,
+                               parameters: TransferRequest,
+                               privateKey: String,
+                               successCallback: @escaping (_ jsonString: String) -> (),
+                               errorCallback: @escaping FPErrorCallback) {
+        
+        TxService.signTx(txBody: txBody, privateKey: privateKey) { tx in
+            guard  let txString = try? tx.serializedData().base64EncodedString() else {
+                errorCallback("onsale signTx error")
+                return
+            }
+            
+            var params = parameters
+            params.signatures = txString
+            self.requestTransferResult(url: url,
+                                       parameters: params,
+                                       successCallback: successCallback,
+                                       errorCallback: errorCallback)
+        } errorCallBack: { error in
+            errorCallback(error)
+        }
+        
+    }
+    
+    //再次请求merchant,获取结果
+    func requestTransferResult(url: String,
+                               parameters: TransferRequest,
+                               successCallback: @escaping (_ jsonString: String) -> (),
+                               errorCallback: @escaping FPErrorCallback) {
+        IRISAF.postRequest(url: url, parameters: parameters) { jsonString in
             if let responseModel = MerchantResponseModel.deserialize(from: jsonString) {
                 if responseModel.success == true {
-                    
-                    if let data = responseModel.data as? String {
-                        
-                        if let hashData = Data(base64Encoded: data)?.sha256() {
-                            param.signatures = WalletManager.signatureString(hashData: hashData, privateKey: privateKey)?.base64EncodedString()
-                      
-                            IRISAF.postRequest(url: url, parameters: param) { jsonString in
-                                print(jsonString)
-                                if let responseModel = MerchantResponseModel.deserialize(from: jsonString) {
-                                    
-                                    if responseModel.success == true {
-                                        successCallback(responseModel.data as? String ?? "")
-                                    } else {
-                                        errorCallback(responseModel.msg ?? "")
-                                    }
-                                }
-                            } errorCallBack: { error in
-                                errorCallback(error)
-                            }
-
-                        }
-                        
-                    } else {
-                        errorCallback("\(transferUrl) error")
-                    }
-                    
+                    successCallback(responseModel.data as? String ?? "")
                 } else {
                     errorCallback(responseModel.msg ?? "")
                 }
             }
-
-
         } errorCallBack: { error in
             errorCallback(error)
         }
+    }
+    
+    
+    /// 精度转换
+    public func toWei(tokenSymblol: String,
+               amount: Decimal) -> String {
+     
+        var resultstring = ""
+        let group = DispatchGroup()
+        group.enter()
+
+        TokenService.tokenInfo(denom: tokenSymblol) { token in
+            var amount = amount
+            var result = Decimal()
+            NSDecimalMultiplyByPowerOf10(&result, &amount, Int16(token.scale), .plain)
+            var rounded = Decimal()
+            NSDecimalRound(&rounded, &result, 0, .down)
+            resultstring = NSDecimalString(&rounded, nil)
+            group.leave()
+
+        } errorCallBack: { error in
+            group.leave()
+        }
+        
+        group.wait()
+        return resultstring
+
 
     }
 
