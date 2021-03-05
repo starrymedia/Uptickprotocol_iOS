@@ -82,23 +82,24 @@ public struct MerchantResponseModel: HandyJSON {
     public var code: Int?
     public var success: Bool?
     public var msg: String?
-    public var data: Any?
+    public var data: String?
 }
  
 
 struct MerchantOnSale: Encodable {
     
     let callback: String
-    let pubKey: String
+//    let pubKey: String
     let denom: String
     let owner: String
     var signatures: String?
     var labels: [MerchantOnSaleLabels]?
+    var transfers: [String]?
 }
  
 struct MerchantOnSaleLabels: Encodable {
     
-    let coin: String
+//    let coin: String
     let tokenId: String
     let price: String
 }

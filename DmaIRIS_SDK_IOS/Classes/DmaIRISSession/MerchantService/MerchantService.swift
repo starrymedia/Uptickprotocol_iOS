@@ -173,14 +173,13 @@ public class Merchant {
         let publicKeyString = publicKeyData.base64EncodedString() ?? ""
         let address = WalletManager.exportBech32Address(privateKey: privateKey)
         var params = MerchantOnSale(callback: callback,
-                                    pubKey: publicKeyString,
+//                                    pubKey: publicKeyString,
                                     denom: denom,
                                     owner: address)
         
         var labels = [MerchantOnSaleLabels]()
         for tokenId in tokenids {
-            let label = MerchantOnSaleLabels(coin: coin,
-                                             tokenId: tokenId,
+            let label = MerchantOnSaleLabels(tokenId: tokenId,
                                              price: price)
             labels.append(label)
         }
@@ -202,32 +201,98 @@ public class Merchant {
                        successCallback: @escaping (_ jsonString: String) -> (),
                        errorCallback: @escaping FPErrorCallback) {
         
-        var params = parameters
-        IRISAF.postRequest(url: url, parameters: params) { jsonString in
+        self.getOnSaleTxBody(url: url,
+                             parameters: parameters,
+                             privateKey: privateKey,
+                             successCallback: successCallback,
+                             errorCallback: errorCallback)
+    }
+    
+    
+    //http请求merchant 获取 TxBody
+    func getOnSaleTxBody(url: String,
+                         parameters: MerchantOnSale,
+                         privateKey: String,
+                         successCallback: @escaping (_ jsonString: String) -> (),
+                         errorCallback: @escaping FPErrorCallback)
+    {
+
+        IRISAF.postRequest(url: url, parameters: parameters) { jsonString in
+            
+            guard let responseModel = MerchantResponseModel.deserialize(from: jsonString) else {
+                errorCallback("onsale data error")
+                return
+            }
+            
+            if responseModel.success == false {
+                errorCallback(responseModel.msg ?? "")
+                return
+            }
+            
+            guard let dataBase64String = responseModel.data  else {
+                errorCallback("onsale data error")
+                return
+            }
+           
+            
+            guard let base64Data = Data(base64Encoded: dataBase64String, options: Data.Base64DecodingOptions(rawValue:0)) else {
+                errorCallback("onsale base64Data error")
+                return
+            }
+            guard let body = try? TxBody(serializedData: base64Data) else {
+                errorCallback("onsale serializedTxbody error")
+                return
+            }
+            self.getOnSaleSignatures(url: url,
+                                     txBody: body,
+                                     parameters: parameters,
+                                     privateKey: privateKey,
+                                     successCallback: successCallback,
+                                     errorCallback: errorCallback)
+        } errorCallBack: { error in
+            errorCallback(error)
+        }
+    }
+    //获取签名
+    func getOnSaleSignatures(url: String,
+                             txBody: TxBody,
+                             parameters: MerchantOnSale,
+                             privateKey: String,
+                             successCallback: @escaping (_ jsonString: String) -> (),
+                             errorCallback: @escaping FPErrorCallback) {
+        
+        TxService.signTx(txBody: txBody, privateKey: privateKey) { tx in
+            guard  let txString = try? tx.serializedData().base64EncodedString() else {
+                errorCallback("onsale signTx error")
+                return
+            }
+            
+            var params = parameters
+            params.signatures = txString
+            self.requestOnSaleWithSignatures(url: url,
+                                             parameters: params,
+                                             privateKey: privateKey,
+                                             successCallback: successCallback,
+                                             errorCallback: errorCallback)
+        } errorCallBack: { error in
+            errorCallback(error)
+        }
+        
+    }
+     
+    //再次请求merchant,获取结果
+    func requestOnSaleWithSignatures(url: String,
+                                 parameters: MerchantOnSale,
+                                 privateKey: String,
+                                 successCallback: @escaping (_ jsonString: String) -> (),
+                                 errorCallback: @escaping FPErrorCallback) {
+        IRISAF.postRequest(url: url, parameters: parameters) { jsonString in
             if let responseModel = MerchantResponseModel.deserialize(from: jsonString) {
                 if responseModel.success == true {
-                    if let data = responseModel.data as? String {
-                        if let hashData = Data(base64Encoded: data)?.sha256() {
-                            params.signatures = WalletManager.signatureString(hashData: hashData, privateKey: privateKey)?.base64EncodedString()
-                            
-                            IRISAF.postRequest(url: url, parameters: params) { jsonString in
-                                if let responseModel = MerchantResponseModel.deserialize(from: jsonString) {
-                                    if responseModel.success == true {
-                                        successCallback(responseModel.data as? String ?? "")
-                                    } else {
-                                        errorCallback(responseModel.msg ?? "")
-                                    }
-                                }
-                            } errorCallBack: { error in
-                                errorCallback(error)
-                            }
-                        }
-                    }
+                    successCallback(responseModel.data as? String ?? "")
                 } else {
                     errorCallback(responseModel.msg ?? "")
                 }
-            } else {
-                errorCallback("\(onsaleUrl) error")
             }
         } errorCallBack: { error in
             errorCallback(error)
