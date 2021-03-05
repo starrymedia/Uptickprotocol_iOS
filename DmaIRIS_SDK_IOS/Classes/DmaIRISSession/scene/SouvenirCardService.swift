@@ -66,14 +66,71 @@ open class SouvenirCardServiceSession: AbstractService  {
      * @return
      * @throws ServiceException
      */
-    public func mintToken( ticketEntities: [SouvenirCardInfo],
+    public func mintToken( tx: TxTx,
+                           method: RpcMethods,
+                           successCallback: @escaping (_ res: BroadcastModel) -> (),
+                           errorCallback: @escaping FPErrorCallback) {
+        
+        RpcService.broadcast(tx: tx, method: method) { res in
+            successCallback(res)
+        } errorCallBack: { error in
+            errorCallback(error)
+        }
+
+//        var builder = TxBody()
+//
+//        for ticketEntity in ticketEntities {
+//
+//            var dataStandard = DataStandard<SouvenirCardInfo>()
+//
+//            dataStandard.body = ticketEntity
+//            dataStandard.protoc = ProtocEnum.souvenirCard.rawValue
+//            if (isSign) {
+//                dataStandard.sign(signPriKey: privateKey, pubKeyEnum: .base64)
+//            }
+//
+//            var nft = NftMsgMintNFT()
+//            nft.data = dataStandard.toJSONString() ?? ""
+//            nft.recipient = recipient
+//            nft.sender = sender
+//
+//            nft.denomID = ticketEntity.denomId
+//            nft.name = ticketEntity.name
+//            nft.id = ticketEntity.tokenId
+//            nft.uri = ticketEntity.imgUrl
+//
+//            if let any =  TxUtils.getProtobufAny(message: nft, typePrefix: "") {
+//                builder.messages.append(any)
+//            }
+//        }
+//
+//        builder.memo = ""
+//        builder.timeoutHeight = 0
+//
+//
+//        TxService.signTx(txBody: builder,
+//                         gasLimit: gasLimit,
+//                         privateKey: privateKey) { tx in
+//
+//            RpcService.broadcast(tx: tx, method: method) { res in
+//                print(res)
+//                successCallback(res)
+//            } errorCallBack: { error in
+//                errorCallback(error)
+//            }
+//        } errorCallBack: { error in
+//            errorCallback(error)
+//        }
+    }
+    
+    public func mintTokenGas(ticketEntities: [SouvenirCardInfo],
                             sender: String,
                             recipient: String,
                             privateKey: String,
                             isSign: Bool,
                             gasLimit: UInt64 = 0,
                             method: RpcMethods,
-                            successCallback: @escaping (_ res: BroadcastModel) -> (),
+                            successCallback: @escaping (_ tx: TxTx) -> (),
                             errorCallback: @escaping FPErrorCallback) {
         
         var builder = TxBody()
@@ -110,18 +167,11 @@ open class SouvenirCardServiceSession: AbstractService  {
         TxService.signTx(txBody: builder,
                          gasLimit: gasLimit,
                          privateKey: privateKey) { tx in
-            
-            RpcService.broadcast(tx: tx, method: method) { res in
-                print(res)
-                successCallback(res)
-            } errorCallBack: { error in
-                errorCallback(error)
-            }
-        } errorCallBack: { error in
+            successCallback(tx)
+         } errorCallBack: { error in
             errorCallback(error)
         }
     }
-    
     /**
      * 获取票详情
      *

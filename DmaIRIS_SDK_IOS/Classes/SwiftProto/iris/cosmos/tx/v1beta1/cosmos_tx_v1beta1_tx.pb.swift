@@ -37,7 +37,7 @@ public struct Cosmos_Tx_V1beta1_Tx {
 
   /// auth_info is the authorization related content of the transaction,
   /// specifically signers, signer modes and fee
-  var authInfo: Cosmos_Tx_V1beta1_AuthInfo {
+  public var authInfo: Cosmos_Tx_V1beta1_AuthInfo {
     get {return _storage._authInfo ?? Cosmos_Tx_V1beta1_AuthInfo()}
     set {_uniqueStorage()._authInfo = newValue}
   }
@@ -155,7 +155,7 @@ struct Cosmos_Tx_V1beta1_TxBody {
 
 /// AuthInfo describes the fee and signer modes that are used to sign a
 /// transaction.
-struct Cosmos_Tx_V1beta1_AuthInfo {
+public struct Cosmos_Tx_V1beta1_AuthInfo {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -173,7 +173,7 @@ struct Cosmos_Tx_V1beta1_AuthInfo {
   /// primary signer and the one which pays the fee. The fee can be calculated
   /// based on the cost of evaluating the body and doing signature verification
   /// of the signers. This can be estimated via simulation.
-  var fee: Cosmos_Tx_V1beta1_Fee {
+  public var fee: Cosmos_Tx_V1beta1_Fee {
     get {return _storage._fee ?? Cosmos_Tx_V1beta1_Fee()}
     set {_uniqueStorage()._fee = newValue}
   }
@@ -182,9 +182,9 @@ struct Cosmos_Tx_V1beta1_AuthInfo {
   /// Clears the value of `fee`. Subsequent reads from it will return its default value.
   mutating func clearFee() {_uniqueStorage()._fee = nil}
 
-  var unknownFields = SwiftProtobuf.UnknownStorage()
+    public var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  init() {}
+    public init() {}
 
   fileprivate var _storage = _StorageClass.defaultInstance
 }
@@ -340,7 +340,7 @@ struct Cosmos_Tx_V1beta1_ModeInfo {
 /// Fee includes the amount of coins paid in fees and the maximum
 /// gas to be used by the transaction. The ratio yields an effective "gasprice",
 /// which must be above some miminum to be accepted into the mempool.
-struct Cosmos_Tx_V1beta1_Fee {
+public struct Cosmos_Tx_V1beta1_Fee {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -350,7 +350,7 @@ struct Cosmos_Tx_V1beta1_Fee {
 
   /// gas_limit is the maximum gas that can be used in transaction processing
   /// before an out of gas error occurs
-  var gasLimit: UInt64 = 0
+  public var gasLimit: UInt64 = 0
 
   /// if unset, the first signer is responsible for paying the fees. If set, the specified account must pay the fees.
   /// the payer must be a tx signer (and thus have signed this field in AuthInfo).
@@ -362,9 +362,9 @@ struct Cosmos_Tx_V1beta1_Fee {
   /// not support fee grants, this will fail
   var granter: String = String()
 
-  var unknownFields = SwiftProtobuf.UnknownStorage()
+    public var unknownFields = SwiftProtobuf.UnknownStorage()
 
-  init() {}
+    public init() {}
 }
 
 // MARK: - Code below here is support for the SwiftProtobuf runtime.
@@ -590,8 +590,8 @@ extension Cosmos_Tx_V1beta1_TxBody: SwiftProtobuf.Message, SwiftProtobuf._Messag
 }
 
 extension Cosmos_Tx_V1beta1_AuthInfo: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".AuthInfo"
-  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    public static let protoMessageName: String = _protobuf_package + ".AuthInfo"
+    public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .standard(proto: "signer_infos"),
     2: .same(proto: "fee"),
   ]
@@ -617,7 +617,7 @@ extension Cosmos_Tx_V1beta1_AuthInfo: SwiftProtobuf.Message, SwiftProtobuf._Mess
     return _storage
   }
 
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    mutating public func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     _ = _uniqueStorage()
     try withExtendedLifetime(_storage) { (_storage: _StorageClass) in
       while let fieldNumber = try decoder.nextFieldNumber() {
@@ -630,7 +630,7 @@ extension Cosmos_Tx_V1beta1_AuthInfo: SwiftProtobuf.Message, SwiftProtobuf._Mess
     }
   }
 
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     try withExtendedLifetime(_storage) { (_storage: _StorageClass) in
       if !_storage._signerInfos.isEmpty {
         try visitor.visitRepeatedMessageField(value: _storage._signerInfos, fieldNumber: 1)
@@ -642,7 +642,7 @@ extension Cosmos_Tx_V1beta1_AuthInfo: SwiftProtobuf.Message, SwiftProtobuf._Mess
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: Cosmos_Tx_V1beta1_AuthInfo, rhs: Cosmos_Tx_V1beta1_AuthInfo) -> Bool {
+    public static func ==(lhs: Cosmos_Tx_V1beta1_AuthInfo, rhs: Cosmos_Tx_V1beta1_AuthInfo) -> Bool {
     if lhs._storage !== rhs._storage {
       let storagesAreEqual: Bool = withExtendedLifetime((lhs._storage, rhs._storage)) { (_args: (_StorageClass, _StorageClass)) in
         let _storage = _args.0
@@ -915,15 +915,15 @@ extension Cosmos_Tx_V1beta1_ModeInfo.Multi: SwiftProtobuf.Message, SwiftProtobuf
 }
 
 extension Cosmos_Tx_V1beta1_Fee: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
-  static let protoMessageName: String = _protobuf_package + ".Fee"
-  static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
+    public static let protoMessageName: String = _protobuf_package + ".Fee"
+    public static let _protobuf_nameMap: SwiftProtobuf._NameMap = [
     1: .same(proto: "amount"),
     2: .standard(proto: "gas_limit"),
     3: .same(proto: "payer"),
     4: .same(proto: "granter"),
   ]
 
-  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    mutating public func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
       switch fieldNumber {
       case 1: try decoder.decodeRepeatedMessageField(value: &self.amount)
@@ -935,7 +935,7 @@ extension Cosmos_Tx_V1beta1_Fee: SwiftProtobuf.Message, SwiftProtobuf._MessageIm
     }
   }
 
-  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    public func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
     if !self.amount.isEmpty {
       try visitor.visitRepeatedMessageField(value: self.amount, fieldNumber: 1)
     }
@@ -951,7 +951,7 @@ extension Cosmos_Tx_V1beta1_Fee: SwiftProtobuf.Message, SwiftProtobuf._MessageIm
     try unknownFields.traverse(visitor: &visitor)
   }
 
-  static func ==(lhs: Cosmos_Tx_V1beta1_Fee, rhs: Cosmos_Tx_V1beta1_Fee) -> Bool {
+    public static func ==(lhs: Cosmos_Tx_V1beta1_Fee, rhs: Cosmos_Tx_V1beta1_Fee) -> Bool {
     if lhs.amount != rhs.amount {return false}
     if lhs.gasLimit != rhs.gasLimit {return false}
     if lhs.payer != rhs.payer {return false}

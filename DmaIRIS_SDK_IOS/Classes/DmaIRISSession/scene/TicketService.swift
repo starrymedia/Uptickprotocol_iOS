@@ -52,16 +52,28 @@ open class TicketServiceSession: AbstractService  {
      * @return
      * @throws ServiceException
      */
-    public func mintToken( ticketEntities: [TicketInfo],
-                            sender: String,
-                            recipient: String,
-                            privateKey: String,
-                            isSign: Bool,
-                            protoc: ProtocEnum,
-                            gasLimit: UInt64 = 0,
-                            method: RpcMethods,
-                            successCallback: @escaping (_ res: BroadcastModel) -> (),
-                            errorCallback: @escaping FPErrorCallback) {
+    public func mintToken(tx: TxTx,
+                          method: RpcMethods,
+                          successCallback: @escaping (_ res: BroadcastModel) -> (),
+                          errorCallback: @escaping FPErrorCallback) {
+      
+        RpcService.broadcast(tx: tx, method: method) { res in
+            print(res)
+            successCallback(res)
+        } errorCallBack: { error in
+            errorCallback(error)
+        }
+    }
+    
+    public func mintTokenGas(ticketEntities: [TicketInfo],
+                             sender: String,
+                             recipient: String,
+                             privateKey: String,
+                             isSign: Bool,
+                             gasLimit: UInt64 = 0,
+                             method: RpcMethods,
+                             successCallback: @escaping (_ tx: TxTx) -> (),
+                             errorCallback: @escaping FPErrorCallback) {
         
         var builder = TxBody()
         
@@ -74,7 +86,7 @@ open class TicketServiceSession: AbstractService  {
             }
             
             dataStandard.body = ticketEntity
-            dataStandard.protoc = protoc.rawValue
+            dataStandard.protoc = ProtocEnum.ticket.rawValue
             if (isSign) {
                 dataStandard.sign(signPriKey: privateKey, pubKeyEnum: .base64)
             }
@@ -101,18 +113,13 @@ open class TicketServiceSession: AbstractService  {
         TxService.signTx(txBody: builder,
                          gasLimit: gasLimit,
                          privateKey: privateKey) { tx in
-            
-            RpcService.broadcast(tx: tx, method: method) { res in
-                print(res)
-                successCallback(res)
-            } errorCallBack: { error in
-                errorCallback(error)
-            }
+             successCallback(tx)
         } errorCallBack: { error in
             errorCallback(error)
         }
     }
     
+
     
     /**
      * 获取票详情
