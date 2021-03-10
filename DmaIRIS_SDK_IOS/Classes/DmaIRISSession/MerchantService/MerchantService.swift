@@ -61,7 +61,7 @@ public class Merchant {
     
     //MARK:- 根据denom tokenid 获取已上架NFT信息
     public func getToken(denom: String, tokenId: String,
-                         successCallback: @escaping (_ token: TokenDataModel ) -> (),
+                         successCallback: @escaping (_ token: TokenDataModel) -> (),
                          errorCallback: @escaping FPErrorCallback) {
         let url = nodeUrl + getTokenUrl + "?denom=\(denom)&tokenId=\(tokenId)"
         
@@ -69,6 +69,8 @@ public class Merchant {
             if let responseModel = TokenModel.deserialize(from: jsonString) {
                 if let data = responseModel.data {
                     successCallback(data)
+                } else {
+                    successCallback(TokenDataModel())
                 }
             } else {
                 errorCallback("getToken error")
@@ -333,8 +335,7 @@ public class Merchant {
         param.tokenIds = tokenIds
         param.recipien = WalletManager.exportBech32Address(privateKey: privateKey)
         param.memo = memo
-        param.callback = callback
-        
+        param.callBack = callback
         
         if shares != nil && shares!.count > 0 {
             var shareEntityArrayList = [ShareEntity]()

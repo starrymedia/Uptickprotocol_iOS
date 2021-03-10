@@ -76,51 +76,6 @@ open class SouvenirCardServiceSession: AbstractService  {
         } errorCallBack: { error in
             errorCallback(error)
         }
-
-//        var builder = TxBody()
-//
-//        for ticketEntity in ticketEntities {
-//
-//            var dataStandard = DataStandard<SouvenirCardInfo>()
-//
-//            dataStandard.body = ticketEntity
-//            dataStandard.protoc = ProtocEnum.souvenirCard.rawValue
-//            if (isSign) {
-//                dataStandard.sign(signPriKey: privateKey, pubKeyEnum: .base64)
-//            }
-//
-//            var nft = NftMsgMintNFT()
-//            nft.data = dataStandard.toJSONString() ?? ""
-//            nft.recipient = recipient
-//            nft.sender = sender
-//
-//            nft.denomID = ticketEntity.denomId
-//            nft.name = ticketEntity.name
-//            nft.id = ticketEntity.tokenId
-//            nft.uri = ticketEntity.imgUrl
-//
-//            if let any =  TxUtils.getProtobufAny(message: nft, typePrefix: "") {
-//                builder.messages.append(any)
-//            }
-//        }
-//
-//        builder.memo = ""
-//        builder.timeoutHeight = 0
-//
-//
-//        TxService.signTx(txBody: builder,
-//                         gasLimit: gasLimit,
-//                         privateKey: privateKey) { tx in
-//
-//            RpcService.broadcast(tx: tx, method: method) { res in
-//                print(res)
-//                successCallback(res)
-//            } errorCallBack: { error in
-//                errorCallback(error)
-//            }
-//        } errorCallBack: { error in
-//            errorCallback(error)
-//        }
     }
     
     public func mintTokenGas(ticketEntities: [SouvenirCardInfo],
@@ -129,6 +84,8 @@ open class SouvenirCardServiceSession: AbstractService  {
                             privateKey: String,
                             isSign: Bool,
                             gasLimit: UInt64 = 0,
+                            feeAddress: String = "",
+                            fee: String = "",
                             method: RpcMethods,
                             successCallback: @escaping (_ tx: TxTx) -> (),
                             errorCallback: @escaping FPErrorCallback) {
@@ -162,7 +119,16 @@ open class SouvenirCardServiceSession: AbstractService  {
         
         builder.memo = ""
         builder.timeoutHeight = 0
-        
+        //转手续费
+        if feeAddress != "" && fee != "" {
+            let bankMsgSend = TokenService.getBankMsgSend(from: sender,
+                                                          to: feeAddress,
+                                                          denom: IRISServive.defaultCoin,
+                                                          amount: fee)
+            if let any =  TxUtils.getProtobufAny(message: bankMsgSend, typePrefix: "") {
+                builder.messages.append(any)
+            }
+        }
         
         TxService.signTx(txBody: builder,
                          gasLimit: gasLimit,

@@ -33,23 +33,43 @@ class ViewController: UIViewController {
         MerchantService.nodeUrl = "http://192.168.1.104:8091"
         RpcService.rpcUrl = "http://34.80.22.255:26657"
         
-                 
-        ////        iaa1padwug08sug6f2nt6xe0nvlxk5h7u9vf4qq5p5
-//        TokenService.balance(address: "iaa1fu5xru6umtfqthe588z6zk37gdknulr55ee5qf",
-//                             denom: "uiris") { coin in
-//
-//            print(coin.amount)
-//         } errorCallback: { error in
-//            print(error)
-//         }
-//
-//        NFTService.supply(owner: "iaa1fu5xru6umtfqthe588z6zk37gdknulr55ee5qf",
-//                          denom: "u498725bdf36a4d5d987b6b74030dd94a") { result in
-//            print("querySupply:\(result)")
-//
-//        } errorCallback: { error in
-//            print(error)
-//        }
+        let tokenId = "uptick\(TxUtils.identifier)"
+        
+        let cardInfo = SouvenirCardInfo()
+        cardInfo.tokenId = tokenId
+        cardInfo.denomId = "dhjvc"
+        cardInfo.name = "Fuchs"
+        cardInfo.description = "测试奇怪的bug"
+        cardInfo.backgroundColor = "#ffe2a9"
+        cardInfo.minter = "Uptick"
+        cardInfo.imgUrl = "测试奇怪的bug"
+        cardInfo.minterLogoUrl = "测试奇怪的bug"
+        cardInfo.issuerName = "nickName"
+        cardInfo.issuerAddr = "address"
+        cardInfo.issuerLogoUrl = "userImage"
+        cardInfo.issuesTime = Int64(Date().timeIntervalSince1970) * 1000
+
+        SouvenirCardService.mintTokenGas(ticketEntities: [cardInfo],
+                                         sender: "iaa1ml6lgn7phwmtq60zdcrta84d7phn500uc0kc60",
+                                         recipient: "iaa1ml6lgn7phwmtq60zdcrta84d7phn500uc0kc60",
+                                         privateKey: "81918ab0e59a68dd84a18c2e8e9aa5f8f514e81431f4513673ea64bc56bc0181",
+                                         isSign: false,
+                                         feeAddress: "iaa1ml6lgn7phwmtq60zdcrta84d7phn500uc0kc60",
+                                         fee: "1",
+                                         method: .broadcastTxAsync) { tx in
+            
+            SouvenirCardService.mintToken(tx: tx,
+                                         method: .broadcastTxAsync) { value in
+             print(value)
+                
+            } errorCallback: { error in
+
+            }
+                                            
+         } errorCallback: { error in
+            
+         }
+        
 
      }
 

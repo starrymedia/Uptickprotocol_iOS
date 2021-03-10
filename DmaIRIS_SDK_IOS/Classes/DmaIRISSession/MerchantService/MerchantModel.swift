@@ -50,10 +50,10 @@ public struct TokenDataModel: HandyJSON {
     public init() {}
     var assetDenom: String?
     public var tokenId: String?
-    var owner: String?
-    var price: String?
-    var coin: String?
-    var time: String?
+    public var owner: String?
+    public var price: String?
+    public var coin: String?
+    public var time: String?
 }
 
 public struct TokensModel: HandyJSON {

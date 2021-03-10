@@ -53,8 +53,6 @@ open class TxService {
                 signerInfo.publicKey = any
             }
             
-       
-
             TxService.forRequestSimulate(signerInfo: signerInfo,
                                          chainId: IRISServive.chainId,
                                          txBody: txBody,
@@ -66,8 +64,6 @@ open class TxService {
                 print(error)
                 errorCallBack(error)
             }
-
-
 
         } errorCallback: { error in
             print(error)
@@ -101,7 +97,14 @@ open class TxService {
             print("gasUsed:\(gasUsed)")
             print("myGasLimit:\(myGasLimit)")
             myGasLimit = gasUsed
-            self.forRequestSimulate(signerInfo: signerInfo, chainId: chainId, txBody: txBody, accountNumber: accountNumber, privateKey: privateKey, gasLimit: myGasLimit, successCallback: successCallback, errorCallBack: errorCallBack)
+            self.forRequestSimulate(signerInfo: signerInfo,
+                                    chainId: chainId,
+                                    txBody: txBody,
+                                    accountNumber: accountNumber,
+                                    privateKey: privateKey,
+                                    gasLimit: myGasLimit,
+                                    successCallback: successCallback,
+                                    errorCallBack: errorCallBack)
         }
        } errorCallBack: { error in
             errorCallBack(error)
@@ -127,7 +130,7 @@ open class TxService {
         var amountString = NSDecimalString(&amount, nil)
         let fee = TxUtils.getFee(gasLimit: gasLimit,
                                  amount: amountString,
-                                 denom: txDenom)
+                                 denom: IRISServive.defaultCoin)
 
 
         //认证信息
@@ -176,7 +179,6 @@ open class TxService {
         req.tx = signTx
 
         let res = client.simulate(req)
-
         res.response.whenComplete { result in
             switch result {
             case .success(let response):

@@ -227,20 +227,21 @@ open class TokenServiceSession {
                       successCallback: @escaping (_ res: BroadcastModel) -> (),
                       errorCallBack: @escaping FPErrorCallback) {
         
-        var coin = BaseCoin()
-        coin.amount = amount
-        coin.denom = denom
-        
-        var msgSend = BankMsgSend()
-        msgSend.fromAddress = from
-        msgSend.toAddress = to
-        msgSend.amount.append(coin)
-        
+//        var coin = BaseCoin()
+//        coin.amount = amount
+//        coin.denom = denom
+
+        let msgSend = self.getBankMsgSend(from: from, to: to, denom: denom, amount: amount)
+//        msgSend.fromAddress = from
+//        msgSend.toAddress = to
+//        msgSend.amount.append(coin)
+
         var txBody = TxUtils.getBody(meno: memo, timeoutHeight: 0)
         if let any = TxUtils.getProtobufAny(message: msgSend, typePrefix: "") {
             txBody.messages.append(any)
         }
         
+ 
         //调用签名方法
         TxService.signTx(txBody: txBody,
                          gasLimit: gasLimit,
@@ -257,6 +258,24 @@ open class TokenServiceSession {
         }
         
     }
+    
+    func getBankMsgSend(from: String,
+                                to: String,
+                                denom: String,
+                                amount: String) -> BankMsgSend {
+        
+        var coin = BaseCoin()
+        coin.amount = amount
+        coin.denom = denom
+        
+        var msgSend = BankMsgSend()
+        msgSend.fromAddress = from
+        msgSend.toAddress = to
+        msgSend.amount.append(coin)
+        
+        return msgSend
+    }
+    
     
     func gasLimit(from: String,
                   to: String,

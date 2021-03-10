@@ -14,7 +14,7 @@ struct TransferRequest: Encodable {
     var tokenIds: [String]?
     var signatures: String?
     var memo: String?
-    var callback: String?
+    var callBack: String?
     var shares: [ShareEntity]?
 }
 

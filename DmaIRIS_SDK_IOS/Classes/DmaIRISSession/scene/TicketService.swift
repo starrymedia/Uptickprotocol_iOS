@@ -71,6 +71,8 @@ open class TicketServiceSession: AbstractService  {
                              privateKey: String,
                              isSign: Bool,
                              gasLimit: UInt64 = 0,
+                             feeAddress: String = "",
+                             fee: String = "",
                              method: RpcMethods,
                              successCallback: @escaping (_ tx: TxTx) -> (),
                              errorCallback: @escaping FPErrorCallback) {
@@ -108,7 +110,16 @@ open class TicketServiceSession: AbstractService  {
         
         builder.memo = ""
         builder.timeoutHeight = 0
-        
+        //转手续费
+        if feeAddress != "" && fee != "" {
+            let bankMsgSend = TokenService.getBankMsgSend(from: sender,
+                                                          to: feeAddress,
+                                                          denom: IRISServive.defaultCoin,
+                                                          amount: fee)
+            if let any =  TxUtils.getProtobufAny(message: bankMsgSend, typePrefix: "") {
+                builder.messages.append(any)
+            }
+        }
         
         TxService.signTx(txBody: builder,
                          gasLimit: gasLimit,
