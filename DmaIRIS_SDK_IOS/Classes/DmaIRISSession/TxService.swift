@@ -92,7 +92,13 @@ open class TxService {
         if myGasLimit == gasUsed {
             print("result gasUsed:\(gasUsed)")
             print("result myGasLimit:\(myGasLimit)")
-            successCallback(txSign)
+            let resultTxSign = setSignTx(signerInfo: signerInfo,
+                                   chainId: chainId,
+                                   txBody: txBody,
+                                   accountNumber: accountNumber,
+                                   privateKey: privateKey,
+                                   gasLimit: gasUsed + 2000)
+            successCallback(resultTxSign)
         } else {
             print("gasUsed:\(gasUsed)")
             print("myGasLimit:\(myGasLimit)")
